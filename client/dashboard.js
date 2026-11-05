@@ -21,13 +21,27 @@ document.addEventListener("DOMContentLoaded", async () => {
  * Carga información del negocio
  */
 async function loadBusinessInfo() {
+  let allBusinesses = {};
   try {
     const res = await fetch("../../data/businesses.json");
     if (res.ok) {
-      const all = await res.json();
-      if (all[businessId]) businessData = all[businessId];
+      allBusinesses = await res.json();
+      if (allBusinesses[businessId]) businessData = allBusinesses[businessId];
     }
   } catch (e) {}
+
+  // Actualizar selector desplegable de negocios
+  const sel = document.getElementById("switchBizSelect");
+  if (sel && Object.keys(allBusinesses).length > 0) {
+    sel.innerHTML = "";
+    Object.keys(allBusinesses).forEach(id => {
+      const opt = document.createElement("option");
+      opt.value = id;
+      opt.textContent = allBusinesses[id].nombre_negocio || id;
+      if (id === businessId) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
 
   if (!businessData) {
     try {

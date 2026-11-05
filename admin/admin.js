@@ -596,6 +596,11 @@ window.previewInNewTab = function () {
   window.open(`../p/?id=${data.id}`, "_blank");
 };
 
+window.openClientDashboardInNewTab = function () {
+  const data = getFormData();
+  window.open(`../client/dashboard.html?id=${data.id}`, "_blank");
+};
+
 /**
  * Modal de Progreso del Commit
  */
@@ -645,6 +650,7 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
 
 
 
