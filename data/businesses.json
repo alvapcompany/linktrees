@@ -33,49 +33,7 @@
       }
     ],
     "fecha_creacion": "2026-11-01T10:00:00.000Z",
-    "fecha_actualizacion": "2026-11-04T12:00:00.000Z",
-    "google_reviews": {
-      "rating_promedio": 4.8,
-      "total_reviews": 5,
-      "reviews": [
-        {
-          "autor": "Comensal Verificado",
-          "rating": 5,
-          "tiempo": "Hace pocas horas",
-          "isNew": true,
-          "comentario": "],null,[null,null,[null,[0,-87.8267065,41.616238499999994,null,3054415.4239422637,null,13.1,0,0,0],null,1],[null,["
-        },
-        {
-          "autor": "Comensal Verificado",
-          "rating": 5,
-          "tiempo": "Hace pocas horas",
-          "isNew": true,
-          "comentario": ",null,null,1]]],null,null,[59,63,60,67,68,61,65,66,78,79],["
-        },
-        {
-          "autor": "Comensal Verificado",
-          "rating": 5,
-          "tiempo": "Hace pocas horas",
-          "isNew": true,
-          "comentario": "Find local businesses, view maps and get driving directions in Google Maps."
-        },
-        {
-          "autor": "Comensal Verificado",
-          "rating": 5,
-          "tiempo": "Hace pocas horas",
-          "isNew": true,
-          "comentario": "//www.google.com/js/bg/h44Z3rilDG0EQdpWD_6VhDP_gWWnoGu4_7D-wFzRNUE.js"
-        },
-        {
-          "autor": "Comensal Verificado",
-          "rating": 5,
-          "tiempo": "Hace pocas horas",
-          "isNew": true,
-          "comentario": "h44Z3rilDG0EQdpWD_6VhDP_gWWnoGu4_7D-wFzRNUE"
-        }
-      ],
-      "ultima_actualizacion": "2026-11-05T17:01:44.244Z"
-    }
+    "fecha_actualizacion": "2026-11-04T12:00:00.000Z"
   },
   "tacos-el-pastor": {
     "id": "tacos-el-pastor",
@@ -84,7 +42,7 @@
     "descripcion": "Los mejores tacos al pastor y cortes al carbón de la ciudad. Abierto desde las 6:00 PM.",
     "avatar_url": "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=200&auto=format&fit=crop&q=80",
     "portada_url": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&auto=format&fit=crop&q=80",
-    "tema": "neon-sunset",
+    "tema": "luxury-gold",
     "boton_whatsapp": "https://wa.me/5215598765432?text=Hola,%20quiero%20hacer%20un%20pedido%20a%20domicilio",
     "boton_facebook": "https://facebook.com/tacoselpastorreal",
     "boton_instagram": "https://instagram.com/tacoselpastorreal",
@@ -93,78 +51,35 @@
     "boton_extra_url": "https://menu.tacoselpastor.com",
     "color_primario": "#f43f5e",
     "color_acento": "#fb923c",
-    "link_google_negocio": "https://www.google.com/maps/place/Taquer%C3%ADa+El+Pastor/@25.4217144,-100.9958742,17z/data=!3m1!4b1!4m6!3m5!1s0x86880d6bb6b5ef4f:0xcde20042777174b8!8m2!3d25.4217144!4d-100.9932993!16s%2Fg%2F11b6d19y56",
+    "link_google_negocio": "https://maps.google.com/?q=Taqueria+El+Pastor",
     "botones_adicionales": [
       {
-        "id": "btn_uber",
+        "id": "btn_extra_0",
         "label": "Pedir por Uber Eats",
         "url": "https://ubereats.com",
         "color": "#10b981",
-        "icon": "fas fa-utensils"
+        "icon": "fas fa-external-link-alt"
       }
     ],
-    "fecha_creacion": "2026-11-02T15:30:00.000Z",
-    "fecha_actualizacion": "2026-11-04T18:00:00.000Z",
-    "google_reviews": {
-      "rating_promedio": 4.8,
-      "total_reviews": 5,
-      "reviews": [
-        {
-          "autor": "Comensal Verificado",
-          "rating": 5,
-          "tiempo": "Hace pocas horas",
-          "isNew": true,
-          "comentario": ",[15,7189,13989],4,[802568412,802568448,802568448,802568448,802568412,802568448,802568448,802568448,802568412,802568412,802568412,802568412]],["
-        },
-        {
-          "autor": "Comensal Verificado",
-          "rating": 5,
-          "tiempo": "Hace pocas horas",
-          "isNew": true,
-          "comentario": "],null,[null,null,[null,[2,-100.9958742,25.4217144,null,null,17],null,1],[null,null,["
-        },
-        {
-          "autor": "Comensal Verificado",
-          "rating": 5,
-          "tiempo": "Hace pocas horas",
-          "isNew": true,
-          "comentario": ",null,null,null,null,null,[null,null,25.4217144,-100.9932993],null,null,null,null,null,null,null,"
-        },
-        {
-          "autor": "Comensal Verificado",
-          "rating": 5,
-          "tiempo": "Hace pocas horas",
-          "isNew": true,
-          "comentario": "]]],null,null,[59,63,60,67,68,61,65,66,78,79],["
-        },
-        {
-          "autor": "Comensal Verificado",
-          "rating": 5,
-          "tiempo": "Hace pocas horas",
-          "isNew": true,
-          "comentario": "Find local businesses, view maps and get driving directions in Google Maps."
-        }
-      ],
-      "ultima_actualizacion": "2026-11-05T17:01:58.844Z"
-    }
+    "fecha_actualizacion": "2026-11-05T16:54:45.024Z"
   },
   "vainilla-saltillo": {
     "id": "vainilla-saltillo",
     "nombre_negocio": "Vainilla | Cocina Contemporánea",
     "categoria": "Desayunos, Comidas y Cenas",
     "descripcion": "Cocina contemporánea en Saltillo. Disfruta los mejores desayunos, comidas y cenas en un ambiente exclusivo.",
-    "avatar_url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=200&auto=format&fit=crop&q=80",
-    "portada_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80",
+    "avatar_url": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBhUIBxEVFhMXGRUXFRYXGBIXGBYeIBgXFiAWGBgYHSgjGCYlHhgfLTMtJSorLzMxIx8zOTosQys5MCsBCgoKDg0NFw8OFy0dFyAtLSs3LS0rKzc3KysrKzcrLSstKystKysrKysrLSstKy0tKysrKzctLS0rKysrKysrK//AABEIAOEA4QMBIgACEQEDEQH/xAAcAAEAAgMBAQEAAAAAAAAAAAAABgcDBAUCAQj/xAA9EAEAAQMCAwQFCAkFAQAAAAAAAQIDBAURBjFBEiFRYQcTIlKRFHGBgqHB0fAVI0JykqKxwuEyQ2Ky8VP/xAAXAQEBAQEAAAAAAAAAAAAAAAAAAQMC/8QAGxEBAQEBAQEBAQAAAAAAAAAAAAECEUExUSH/2gAMAwEAAhEDEQA/AI6AzZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHLmAk2LwresaNc1jV96KKaZmi3yqrme6nte7G8x5z5JHwPwjTjUU6nqlO9ydpt0TH+jwqqj3v6fPy3PSXem3w12I/buUU/CKq/7YHcz/O1VQA4AAAAAAAAAAAAAAAAAAAAAAAAEo9H+i06pq3yjIje3a2qmOlVX7NP2TP0R4outv0e4cYvDNFyY77k1Vz8ezH8tMfEdZnakqH+lCiauH6Ko6Xqd/wCC5CYODx1izl8L3op50xTXH1aomf5d1aX4p0BGIAAAAAAAAAAAAAAAAAAAAAAAAu3hiIp4cx4j/wCVv/rEqSXBwHmU5fDFqI50b26vLsz3fyzSO8fUgeblui7bm3cjeJiYmPGJjaYehWii9XwLml6ncwbvOiqYifGOcVfTExLTWX6SNCnKxY1bGj27cbXI8aOfa+rM/CZ8FaIxs5QAQAAAAAAH3bu3fAAAAAAAAAAAAAAAEt9HetRp+qThX52t3toiekV8o+O+38KJAsvH6AEV4G4ljV8X5HmVfr6I5z/uUx+188dfj17pUraXpMRVG1XJUXGnDtWiZ3rceP1Fcz2J9yec25+7y+aVutfUMHH1HDqxMyntUVRtMf0mJ6THQTU6ocdXiPQsjQc/1F7vonebdfSqPumOsfi5SMQAAAAHR0DSL2t6nTh2e6OddXuU9Z/Dz2BIdG0D13AmRmXI9qr26PHa1vPd8/tx8ENXx8ms2dP+S2oiKIo7ER4R2dtvgoan/TA71OPoA4AAAAAAAAAAAAAAZca/excinIxqpprpnemqOcStrhLiazr2P6u7tTfpj26elUe/R5eXT7ZqBlxsi9iZFORjVTTXTO9NUc4kdS8X2I5wjxTZ12z6m/tTfpj2qelce/R98dEjVrL1paxpeLrGDOHmR3TymOdM9KqZ6T/4pzXNIytFz5xMuPOmqOVce9H4dF4OXxHomPrunTjXu6qO+3X1pq++J6x/gc6z1SYzZmLewsurFyo2rpnaqPzzhhRkA2dPwcnUsynEw6e1XVyjpHjMz0iAfNPwcnUcunEw6e1XVyjw85npEeK4eGdBsaDgept+1XVtNyv3p8I8IjpH4vPDPD2NoGJ2LftXKtvWXOs+UeER4OyrXOeOfxDmRp+h3sqf2aKtv3pjs0x/FMKPjujZN/SPr1OVfjScSd6aJ3uzHKaulH1evn8yEI51e0AHAAAAAAAAAAAAAAAADJYvXce9F6xVNNVM701R3TE+MLW4P4qt63a+TZW1ORTHfHKLke9T98fmKle7N65j3ovWKppqpmJpqjumJ8YHUvF+iO8H8S29dxfV3tov0R7dPSqOXbp8vGOk/QkStZeoP6StEi9ixq9iPao2pubdad+6r6sz8J8lbr9yLNvIsVWL0b01RNNUeMTG0wozU8KvTdRuYV3nRVNO/jHSfpjafpRnuesFm1cv3YtWYmaqpiKYjnMz3RELg4T4dtaDg+1tN6qI9ZV/ZT5R9vNHfRpocbTrOTHjTZ3+FVf3R9ZPxcz0RPjjiiNJs/IcGf19Ud8x/txPX96enx8N97i3iK3oOF7G03q9/V0+H/Oryj7Z7vHaob967kXpv36pqqqmZqqnnMz1Vda8Y+ffICMgAAAAAAAAAAAAAAAAAAAGfBzL+Bl05WJV2a6Z3ifunxieq5eHNasa7p0ZVnuqjuuUe5V4ecT0lSbqcOa1e0LUoyrW80z3XKPep/GOn+ZHWdcXYrvj3RLmXxPY+Tc78RRM+E0ztNU/NRMfBPsPKs5uLTk41XaoqiJpn88nq5j2rl6m9XG9VHa7M+G8bT9itLOvmJj2sTFpxseNqaIimmPKI2auuatj6Lp1WZk9O6mnrXV0pj890by3b123YtTdvTEU0xM1TPdERHfMypvivXrmval62N4tU7xap8I96fOfwjoGrxz9T1DI1TOqzMyd6qvhEdKYjpENUEYgAAAAAAAAAAAAAAAAAAAAAAAJh6P+Iv0dl/o3Mq/VXJ9mZ5UVz/SKv67T4rQfn9P9J44izwzVTlTvkW4im3v3+s37qap8ez1+aPEaZ1+vPpH1/t1/obFnujab0x1nnFv6Oc/R4IE9XK67tyblyZmqZmZmeczPfMy8ji3oAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/9k=",
+    "portada_url": "https://lh3.googleusercontent.com/grass-cs/AABkmLerWGyrYFYBsyLGOL1dhAPoAsGW7YF7Qy43BtIdTpf3AjTbeZuOrLirYrvrvyh0HzjfnK0Yar31umHoa9gFCLNVOA9i6uP6HaHQ5WD5Z9uJUTQR1zdb7dX2MxJMmhrMK3vSM5fYGGCIS4Xl=w408-h544-k-no",
     "tema": "glassmorphism",
     "boton_whatsapp": "https://wa.me/5218449060272?text=Hola%20Vainilla,%20me%20gustar%C3%ADa%20hacer%20una%20reservaci%C3%B3n",
     "boton_facebook": "https://facebook.com/search/top?q=Vainilla%20Saltillo",
-    "boton_instagram": "https://www.instagram.com/vainilla.slw/",
+    "boton_instagram": "https://www.instagram.com/vainilla.slw?psln=a2h5bDBiZmx2NG0=",
     "boton_ubicacion": "https://maps.app.goo.gl/uA5ifUdr9zVSaLwQ8",
     "boton_extra_label": "🍽️ Menú & Reservaciones",
     "boton_extra_url": "https://www.restaurantvainilla.com",
     "color_primario": "#d97706",
     "color_acento": "#f59e0b",
-    "link_google_negocio": "https://www.google.com/maps/place/Vainilla+%7C+Desayunos,+Comidas+y+Cenas+en+Saltillo/@25.4620009,-100.9547255,17z/data=!3m1!4b1!4m6!3m5!1s0x868813214f2caa6d:0x7d69d3d8893e2a11!8m2!3d25.4620009!4d-100.9521506!16s%2Fg%2F11yg20l973",
+    "link_google_negocio": "https://maps.app.goo.gl/uA5ifUdr9zVSaLwQ8",
     "botones_adicionales": [
       {
         "id": "btn_extra_0",
@@ -181,69 +96,6 @@
         "icon": "fas fa-external-link-alt"
       }
     ],
-    "fecha_actualizacion": "2026-11-05T17:00:00.000Z",
-    "google_reviews": {
-      "rating_promedio": 4.8,
-      "total_reviews": 10,
-      "reviews": [
-        {
-          "autor": "Julissa Cardona",
-          "rating": 5,
-          "tiempo": "Hace 2 meses",
-          "isNew": false,
-          "comentario": "Fuimos por la noche y Lo ame! Y música en vivo, genial!\n\nPlatos servidos con amor. Su sabor wow..\n\nDespués probamos por la mañana y wooow. Super rico el café capuchino caliente, la concha rellena uff. Los chilaquiles 7 chiles delis con sus frijolitos negros y quesito.. 🤤\n\nTodo una delicia..Tipo de comidaCenaPrecio por persona$400-500Comida: 5Servicio: 5Ambiente: 5ReservasLugares sin reserva previaTiempo de esperaSin espera"
-        },
-        {
-          "autor": "Julissa Cardona",
-          "rating": 5,
-          "tiempo": "Hace 2 meses",
-          "isNew": false,
-          "comentario": "Fuimos por la noche y Lo ame! Y música en vivo, genial!\n\nPlatos servidos con amor. Su sabor wow..\n\nDespués probamos por la mañana y wooow. Super rico el café capuchino caliente, la concha rellena uff. Los chilaquiles 7 chiles delis con sus frijolitos negros y quesito.. 🤤\n\nTodo una delicia..Tipo de comidaCenaPrecio por persona$400-500Comida: 5Servicio: 5Ambiente: 5ReservasLugares sin reserva previaTiempo de esperaSin espera"
-        },
-        {
-          "autor": "Azkur Ibrahim Valencia Velazco",
-          "rating": 4,
-          "tiempo": "Editado Hace 4 meses",
-          "isNew": false,
-          "comentario": "Comida excelente y atención muy buena pero la agilidad del servicio puede mejorar.\nAcudí en dos ocasiones a probar la comida del día y la atención mejoró mucho a comparación de la primera vez, dónde estuve media hora esperando a que me sirvieran, pues había mucha desorganización en los meseros.\nLa comida está muy rica, se siente casera y con bastante sabor, buenos ingredientes y de calidad, además de servir en buenas porciones. La atención y amabilidad son muy buenas, pero el servicio es algo lento y a veces descuidado (olvidan las cosas).Tipo de comidaAlmuerzoPrecio por persona$200-300ReservasNo se requiere hacer una reservaTamaño del grupo3 o 4 personas"
-        },
-        {
-          "autor": "Azkur Ibrahim Valencia Velazco",
-          "rating": 4,
-          "tiempo": "Editado Hace 4 meses",
-          "isNew": false,
-          "comentario": "Comida excelente y atención muy buena pero la agilidad del servicio puede mejorar.\nAcudí en dos ocasiones a probar la comida del día y la atención mejoró mucho a comparación de la primera vez, dónde estuve media hora esperando a que me sirvieran, pues había mucha desorganización en los meseros.\nLa comida está muy rica, se siente casera y con bastante sabor, buenos ingredientes y de calidad, además de servir en buenas porciones. La atención y amabilidad son muy buenas, pero el servicio es algo lento y a veces descuidado (olvidan las cosas).Tipo de comidaAlmuerzoPrecio por persona$200-300ReservasNo se requiere hacer una reservaTamaño del grupo3 o 4 personas"
-        },
-        {
-          "autor": "Virginia Thompson (Viglo)",
-          "rating": 3,
-          "tiempo": "Hace 3 meses",
-          "isNew": false,
-          "comentario": "Hemos venido un par de veces a desayunar y han sido excelentes, la comida deliciosa, buen servicio y el lugar es hermoso. Pero justamente hoy venimos a cenar y fue fatal... llegamos a las 8 pm, tardaron una hora en traer la comida y ni siquiera completa(olvidaron la entrada), mi corte lo pedí termino medio y llego bien cocida y la hamburguesa de mi esposo la carne estaba seca y sin sabor. Para los precios de los platillo fue demasiado caro para la baja calidad que nos dieron.\n\nPara desayunar altamente recomendable, no tenemos queja de ello y si me aceptan una recomendación prueben el desayuno kikapu, pero para cenar... deja mucho que desear.Tipo de comidaCenaPrecio por persona$500-600Comida: 4Servicio: 4Ambiente: 4Nivel de ruidoRuido moderadoTamaño del grupo3 o 4 personas"
-        },
-        {
-          "autor": "Virginia Thompson (Viglo)",
-          "rating": 3,
-          "tiempo": "Hace 3 meses",
-          "isNew": false,
-          "comentario": "Hemos venido un par de veces a desayunar y han sido excelentes, la comida deliciosa, buen servicio y el lugar es hermoso. Pero justamente hoy venimos a cenar y fue fatal... llegamos a las 8 pm, tardaron una hora en traer la comida y ni siquiera completa(olvidaron la entrada), mi corte lo pedí termino medio y llego bien cocida y la hamburguesa de mi esposo la carne estaba seca y sin sabor. Para los precios de los platillo fue demasiado caro para la baja calidad que nos dieron.\n\nPara desayunar altamente recomendable, no tenemos queja de ello y si me aceptan una recomendación prueben el desayuno kikapu, pero para cenar... deja mucho que desear.Tipo de comidaCenaPrecio por persona$500-600Comida: 4Servicio: 4Ambiente: 4Nivel de ruidoRuido moderadoTamaño del grupo3 o 4 personas"
-        },
-        {
-          "autor": "jesus briceño mendez",
-          "rating": 5,
-          "tiempo": "Hace un mes",
-          "isNew": false,
-          "comentario": "Un lugar con una onda super buen gusto mesas bien ejecutadas en distancia y estilo. El atencion de javier muy esmerada y atenta. La carta super extensa, la comida muy rica bien elaborada y presentada.Tipo de comidaDesayunoPrecio por persona$600-700Comida: 5Servicio: 5Ambiente: 5Nivel de ruidoSilencioso, agradable para conversarTamaño del grupo3 o 4 personasEspacios para estacionarHay suficiente espacioOpciones de estacionamientoEstacionamiento gratuito"
-        },
-        {
-          "autor": "jesus briceño mendez",
-          "rating": 5,
-          "tiempo": "Hace un mes",
-          "isNew": false,
-          "comentario": "Un lugar con una onda super buen gusto mesas bien ejecutadas en distancia y estilo. El atencion de javier muy esmerada y atenta. La carta super extensa, la comida muy rica bien elaborada y presentada.Tipo de comidaDesayunoPrecio por persona$600-700Comida: 5Servicio: 5Ambiente: 5Nivel de ruidoSilencioso, agradable para conversarTamaño del grupo3 o 4 personasEspacios para estacionarHay suficiente espacioOpciones de estacionamientoEstacionamiento gratuito"
-        }
-      ],
-      "ultima_actualizacion": "2026-11-05T17:02:15.198Z"
-    }
+    "fecha_actualizacion": "2026-11-05T17:03:05.917Z"
   }
 }
