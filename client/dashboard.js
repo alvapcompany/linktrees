@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadBusinessInfo();
   await loadMetrics();
   await loadReviews();
-  setupQrCode();
 });
 
 /**
@@ -356,24 +355,4 @@ window.triggerReviewScraper = async function () {
     btn.innerHTML = origHtml;
     btn.disabled = false;
   }
-};
-
-/**
- * Configurar QR Code y utilidades de NFC
- */
-function setupQrCode() {
-  const publicUrl = `${window.location.origin}${window.location.pathname.replace(/\/client\/.*|\/dashboard\.html.*/, "")}/p/?id=${businessId}`;
-  const qrImg = document.getElementById("nfcQrImg");
-  if (qrImg) {
-    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(publicUrl)}`;
-  }
-}
-
-window.copyNfcUrl = function () {
-  const publicUrl = `${window.location.origin}${window.location.pathname.replace(/\/client\/.*|\/dashboard\.html.*/, "")}/p/?id=${businessId}`;
-  navigator.clipboard.writeText(publicUrl).then(() => {
-    alert("¡Enlace para programar tarjeta NFC copiado al portapapeles!\n\n" + publicUrl);
-  }).catch(() => {
-    prompt("Copia este enlace para grabar tu tarjeta NFC:", publicUrl);
-  });
 };
