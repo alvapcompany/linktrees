@@ -21,7 +21,8 @@ document.addEventListener("DOMContentLoaded", async () => {
  */
 async function loadBusinessInfo() {
   try {
-    const res = await fetch("../../data/businesses.json");
+    const jsonPath = window.location.pathname.includes("/negocios/") ? "../../data/businesses.json" : "../data/businesses.json";
+    const res = await fetch(`${jsonPath}?_t=${Date.now()}`, { cache: "no-store" });
     if (res.ok) {
       const allBusinesses = await res.json();
       if (allBusinesses[businessId]) businessData = allBusinesses[businessId];
