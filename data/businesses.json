@@ -33,7 +33,49 @@
       }
     ],
     "fecha_creacion": "2026-11-01T10:00:00.000Z",
-    "fecha_actualizacion": "2026-11-04T12:00:00.000Z"
+    "fecha_actualizacion": "2026-11-04T12:00:00.000Z",
+    "google_reviews": {
+      "rating_promedio": 4.8,
+      "total_reviews": 5,
+      "reviews": [
+        {
+          "autor": "Comensal Verificado",
+          "rating": 5,
+          "tiempo": "Hace pocas horas",
+          "isNew": true,
+          "comentario": "],null,[null,null,[null,[0,-87.8267065,41.616238499999994,null,3054415.4239422637,null,13.1,0,0,0],null,1],[null,["
+        },
+        {
+          "autor": "Comensal Verificado",
+          "rating": 5,
+          "tiempo": "Hace pocas horas",
+          "isNew": true,
+          "comentario": ",null,null,1]]],null,null,[59,63,60,67,68,61,65,66,78,79],["
+        },
+        {
+          "autor": "Comensal Verificado",
+          "rating": 5,
+          "tiempo": "Hace pocas horas",
+          "isNew": true,
+          "comentario": "Find local businesses, view maps and get driving directions in Google Maps."
+        },
+        {
+          "autor": "Comensal Verificado",
+          "rating": 5,
+          "tiempo": "Hace pocas horas",
+          "isNew": true,
+          "comentario": "//www.google.com/js/bg/h44Z3rilDG0EQdpWD_6VhDP_gWWnoGu4_7D-wFzRNUE.js"
+        },
+        {
+          "autor": "Comensal Verificado",
+          "rating": 5,
+          "tiempo": "Hace pocas horas",
+          "isNew": true,
+          "comentario": "h44Z3rilDG0EQdpWD_6VhDP_gWWnoGu4_7D-wFzRNUE"
+        }
+      ],
+      "ultima_actualizacion": "2026-11-05T17:01:44.244Z"
+    }
   },
   "tacos-el-pastor": {
     "id": "tacos-el-pastor",
@@ -62,7 +104,49 @@
       }
     ],
     "fecha_creacion": "2026-11-02T15:30:00.000Z",
-    "fecha_actualizacion": "2026-11-04T18:00:00.000Z"
+    "fecha_actualizacion": "2026-11-04T18:00:00.000Z",
+    "google_reviews": {
+      "rating_promedio": 4.8,
+      "total_reviews": 5,
+      "reviews": [
+        {
+          "autor": "Comensal Verificado",
+          "rating": 5,
+          "tiempo": "Hace pocas horas",
+          "isNew": true,
+          "comentario": ",[15,7189,13989],4,[802568412,802568448,802568448,802568448,802568412,802568448,802568448,802568448,802568412,802568412,802568412,802568412]],["
+        },
+        {
+          "autor": "Comensal Verificado",
+          "rating": 5,
+          "tiempo": "Hace pocas horas",
+          "isNew": true,
+          "comentario": "],null,[null,null,[null,[2,-100.9958742,25.4217144,null,null,17],null,1],[null,null,["
+        },
+        {
+          "autor": "Comensal Verificado",
+          "rating": 5,
+          "tiempo": "Hace pocas horas",
+          "isNew": true,
+          "comentario": ",null,null,null,null,null,[null,null,25.4217144,-100.9932993],null,null,null,null,null,null,null,"
+        },
+        {
+          "autor": "Comensal Verificado",
+          "rating": 5,
+          "tiempo": "Hace pocas horas",
+          "isNew": true,
+          "comentario": "]]],null,null,[59,63,60,67,68,61,65,66,78,79],["
+        },
+        {
+          "autor": "Comensal Verificado",
+          "rating": 5,
+          "tiempo": "Hace pocas horas",
+          "isNew": true,
+          "comentario": "Find local businesses, view maps and get driving directions in Google Maps."
+        }
+      ],
+      "ultima_actualizacion": "2026-11-05T17:01:58.844Z"
+    }
   },
   "vainilla-saltillo": {
     "id": "vainilla-saltillo",
@@ -97,6 +181,69 @@
         "icon": "fas fa-external-link-alt"
       }
     ],
-    "fecha_actualizacion": "2026-11-05T17:00:00.000Z"
+    "fecha_actualizacion": "2026-11-05T17:00:00.000Z",
+    "google_reviews": {
+      "rating_promedio": 4.8,
+      "total_reviews": 10,
+      "reviews": [
+        {
+          "autor": "Julissa Cardona",
+          "rating": 5,
+          "tiempo": "Hace 2 meses",
+          "isNew": false,
+          "comentario": "Fuimos por la noche y Lo ame! Y música en vivo, genial!\n\nPlatos servidos con amor. Su sabor wow..\n\nDespués probamos por la mañana y wooow. Super rico el café capuchino caliente, la concha rellena uff. Los chilaquiles 7 chiles delis con sus frijolitos negros y quesito.. 🤤\n\nTodo una delicia..Tipo de comidaCenaPrecio por persona$400-500Comida: 5Servicio: 5Ambiente: 5ReservasLugares sin reserva previaTiempo de esperaSin espera"
+        },
+        {
+          "autor": "Julissa Cardona",
+          "rating": 5,
+          "tiempo": "Hace 2 meses",
+          "isNew": false,
+          "comentario": "Fuimos por la noche y Lo ame! Y música en vivo, genial!\n\nPlatos servidos con amor. Su sabor wow..\n\nDespués probamos por la mañana y wooow. Super rico el café capuchino caliente, la concha rellena uff. Los chilaquiles 7 chiles delis con sus frijolitos negros y quesito.. 🤤\n\nTodo una delicia..Tipo de comidaCenaPrecio por persona$400-500Comida: 5Servicio: 5Ambiente: 5ReservasLugares sin reserva previaTiempo de esperaSin espera"
+        },
+        {
+          "autor": "Azkur Ibrahim Valencia Velazco",
+          "rating": 4,
+          "tiempo": "Editado Hace 4 meses",
+          "isNew": false,
+          "comentario": "Comida excelente y atención muy buena pero la agilidad del servicio puede mejorar.\nAcudí en dos ocasiones a probar la comida del día y la atención mejoró mucho a comparación de la primera vez, dónde estuve media hora esperando a que me sirvieran, pues había mucha desorganización en los meseros.\nLa comida está muy rica, se siente casera y con bastante sabor, buenos ingredientes y de calidad, además de servir en buenas porciones. La atención y amabilidad son muy buenas, pero el servicio es algo lento y a veces descuidado (olvidan las cosas).Tipo de comidaAlmuerzoPrecio por persona$200-300ReservasNo se requiere hacer una reservaTamaño del grupo3 o 4 personas"
+        },
+        {
+          "autor": "Azkur Ibrahim Valencia Velazco",
+          "rating": 4,
+          "tiempo": "Editado Hace 4 meses",
+          "isNew": false,
+          "comentario": "Comida excelente y atención muy buena pero la agilidad del servicio puede mejorar.\nAcudí en dos ocasiones a probar la comida del día y la atención mejoró mucho a comparación de la primera vez, dónde estuve media hora esperando a que me sirvieran, pues había mucha desorganización en los meseros.\nLa comida está muy rica, se siente casera y con bastante sabor, buenos ingredientes y de calidad, además de servir en buenas porciones. La atención y amabilidad son muy buenas, pero el servicio es algo lento y a veces descuidado (olvidan las cosas).Tipo de comidaAlmuerzoPrecio por persona$200-300ReservasNo se requiere hacer una reservaTamaño del grupo3 o 4 personas"
+        },
+        {
+          "autor": "Virginia Thompson (Viglo)",
+          "rating": 3,
+          "tiempo": "Hace 3 meses",
+          "isNew": false,
+          "comentario": "Hemos venido un par de veces a desayunar y han sido excelentes, la comida deliciosa, buen servicio y el lugar es hermoso. Pero justamente hoy venimos a cenar y fue fatal... llegamos a las 8 pm, tardaron una hora en traer la comida y ni siquiera completa(olvidaron la entrada), mi corte lo pedí termino medio y llego bien cocida y la hamburguesa de mi esposo la carne estaba seca y sin sabor. Para los precios de los platillo fue demasiado caro para la baja calidad que nos dieron.\n\nPara desayunar altamente recomendable, no tenemos queja de ello y si me aceptan una recomendación prueben el desayuno kikapu, pero para cenar... deja mucho que desear.Tipo de comidaCenaPrecio por persona$500-600Comida: 4Servicio: 4Ambiente: 4Nivel de ruidoRuido moderadoTamaño del grupo3 o 4 personas"
+        },
+        {
+          "autor": "Virginia Thompson (Viglo)",
+          "rating": 3,
+          "tiempo": "Hace 3 meses",
+          "isNew": false,
+          "comentario": "Hemos venido un par de veces a desayunar y han sido excelentes, la comida deliciosa, buen servicio y el lugar es hermoso. Pero justamente hoy venimos a cenar y fue fatal... llegamos a las 8 pm, tardaron una hora en traer la comida y ni siquiera completa(olvidaron la entrada), mi corte lo pedí termino medio y llego bien cocida y la hamburguesa de mi esposo la carne estaba seca y sin sabor. Para los precios de los platillo fue demasiado caro para la baja calidad que nos dieron.\n\nPara desayunar altamente recomendable, no tenemos queja de ello y si me aceptan una recomendación prueben el desayuno kikapu, pero para cenar... deja mucho que desear.Tipo de comidaCenaPrecio por persona$500-600Comida: 4Servicio: 4Ambiente: 4Nivel de ruidoRuido moderadoTamaño del grupo3 o 4 personas"
+        },
+        {
+          "autor": "jesus briceño mendez",
+          "rating": 5,
+          "tiempo": "Hace un mes",
+          "isNew": false,
+          "comentario": "Un lugar con una onda super buen gusto mesas bien ejecutadas en distancia y estilo. El atencion de javier muy esmerada y atenta. La carta super extensa, la comida muy rica bien elaborada y presentada.Tipo de comidaDesayunoPrecio por persona$600-700Comida: 5Servicio: 5Ambiente: 5Nivel de ruidoSilencioso, agradable para conversarTamaño del grupo3 o 4 personasEspacios para estacionarHay suficiente espacioOpciones de estacionamientoEstacionamiento gratuito"
+        },
+        {
+          "autor": "jesus briceño mendez",
+          "rating": 5,
+          "tiempo": "Hace un mes",
+          "isNew": false,
+          "comentario": "Un lugar con una onda super buen gusto mesas bien ejecutadas en distancia y estilo. El atencion de javier muy esmerada y atenta. La carta super extensa, la comida muy rica bien elaborada y presentada.Tipo de comidaDesayunoPrecio por persona$600-700Comida: 5Servicio: 5Ambiente: 5Nivel de ruidoSilencioso, agradable para conversarTamaño del grupo3 o 4 personasEspacios para estacionarHay suficiente espacioOpciones de estacionamientoEstacionamiento gratuito"
+        }
+      ],
+      "ultima_actualizacion": "2026-11-05T17:02:15.198Z"
+    }
   }
 }
