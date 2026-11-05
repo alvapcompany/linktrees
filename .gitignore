@@ -4,3 +4,6 @@ Thumbs.db
 node_modules/
 .env
 *.log
+credentials.json
+config.local.json
+config.local.js
