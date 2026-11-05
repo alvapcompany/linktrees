@@ -22,32 +22,35 @@
   async function loadBusinessProfile(id) {
     let data = window.INITIAL_BUSINESS || null;
 
-    // Si no vino preinyectado, buscar en caché local o data/businesses.json
-    if (!data) {
-      try {
-        const localCache = localStorage.getItem("alvap_biz_" + id);
-        if (localCache) {
-          data = JSON.parse(localCache);
+    // 1. Siempre intentar buscar la versión más fresca en data/businesses.json evitando caché
+    try {
+      const jsonPath = window.location.pathname.includes("/negocios/") ? "../../data/businesses.json" : "../data/businesses.json";
+      const res = await fetch(`${jsonPath}?_t=${Date.now()}`, { cache: "no-store" });
+      if (res.ok) {
+        const dict = await res.json();
+        if (dict && dict[id]) {
+          data = dict[id];
         }
-      } catch (e) {}
-    }
-
-    if (!data) {
-      try {
-        const res = await fetch("../../data/businesses.json");
-        if (res.ok) {
-          const dict = await res.json();
-          if (dict[id]) data = dict[id];
-        }
-      } catch (e) {
-        console.warn("No se pudo cargar data/businesses.json directamente:", e);
       }
+    } catch (e) {
+      console.warn("Buscando en fuentes secundarias:", e);
     }
 
-    // Si aún no hay datos y hay una URL de Google Apps Script configurada, consultar la hoja
-    if (!data && typeof CONFIG !== "undefined" && CONFIG.googleAppsScriptUrl) {
+    // 2. Si no se encontró o hay cambios locales recientes en el navegador del admin
+    try {
+      const localCache = localStorage.getItem("alvap_biz_" + id);
+      if (localCache) {
+        const parsed = JSON.parse(localCache);
+        if (!data || (parsed.fecha_actualizacion && (!data.fecha_actualizacion || new Date(parsed.fecha_actualizacion) > new Date(data.fecha_actualizacion)))) {
+          data = parsed;
+        }
+      }
+    } catch (e) {}
+
+    // 3. Consultar Google Apps Script si está disponible
+    if ((!data || !data.nombre_negocio) && typeof CONFIG !== "undefined" && CONFIG.googleAppsScriptUrl) {
       try {
-        const gasRes = await fetch(`${CONFIG.googleAppsScriptUrl}?action=get_business&id=${encodeURIComponent(id)}`);
+        const gasRes = await fetch(`${CONFIG.googleAppsScriptUrl}?action=get_business&id=${encodeURIComponent(id)}&_t=${Date.now()}`);
         const json = await gasRes.json();
         if (json.success && json.data) {
           data = json.data;

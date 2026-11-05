@@ -6,7 +6,51 @@
 let businesses = {};
 let currentId = "alvap-studio";
 
+// Firma criptográfica SHA-256 de autorización (imposible de revertir desde el repositorio)
+const SECURE_AUTH_HASH = "e318981c6fc3f0613db54042d31b4dc3afeadfd2904b0b92cef04229b28ac56f";
+
+async function sha256(message) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+function checkAdminAuth() {
+  const isAuth = sessionStorage.getItem("alvap_admin_authenticated");
+  const lock = document.getElementById("authLockScreen");
+  if (isAuth === "true") {
+    if (lock) lock.style.display = "none";
+  } else {
+    if (lock) lock.style.display = "flex";
+  }
+}
+
+window.handleAdminLogin = async function (e) {
+  if (e) e.preventDefault();
+  const input = document.getElementById("adminSecretInput");
+  const errorMsg = document.getElementById("authErrorMsg");
+  if (!input) return;
+
+  const enteredHash = await sha256(input.value.trim());
+  if (enteredHash === SECURE_AUTH_HASH) {
+    sessionStorage.setItem("alvap_admin_authenticated", "true");
+    const lock = document.getElementById("authLockScreen");
+    if (lock) lock.style.display = "none";
+  } else {
+    if (errorMsg) errorMsg.style.display = "block";
+    input.value = "";
+    input.focus();
+  }
+};
+
+window.logoutAdmin = function () {
+  sessionStorage.removeItem("alvap_admin_authenticated");
+  window.location.reload();
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
+  checkAdminAuth();
   loadStoredSettings();
   await loadBusinessesData();
   initIdSelector();
@@ -421,7 +465,7 @@ async function saveToGoogleSheets() {
 
   // Guardar siempre en local
   businesses[data.id] = data;
-  localStorage.setItem("alvap_all_businesses", JSON.stringify(businesses));
+  localStorage.setItem("alvap_biz_" + data.id, JSON.stringify(data)); localStorage.setItem("alvap_all_businesses", JSON.stringify(businesses));
   initIdSelector();
 }
 
@@ -479,7 +523,7 @@ async function autoCommitToGitHub() {
   }
 
   // Guardar en local
-  localStorage.setItem("alvap_all_businesses", JSON.stringify(businesses));
+  localStorage.setItem("alvap_biz_" + data.id, JSON.stringify(data)); localStorage.setItem("alvap_all_businesses", JSON.stringify(businesses));
   initIdSelector();
 }
 
@@ -650,6 +694,8 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+
 
 
 

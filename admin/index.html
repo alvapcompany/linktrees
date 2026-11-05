@@ -12,6 +12,29 @@
 </head>
 <body>
 
+  <!-- Pantalla de Seguridad / Bloqueo Criptográfico de Acceso -->
+  <div id="authLockScreen" style="position: fixed; inset: 0; background: #070a12; z-index: 99999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(20px);">
+    <div style="background: #111827; border: 1px solid #374151; padding: 36px 32px; border-radius: 24px; width: 90%; max-width: 420px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.85);">
+      <div style="width: 64px; height: 64px; border-radius: 18px; background: linear-gradient(135deg, #6366f1, #a855f7); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-size: 1.8rem; color: #fff;">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+      <h2 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 8px;">Panel de Seguridad</h2>
+      <p style="font-size: 0.85rem; color: #9ca3af; margin-bottom: 24px;">Ingresa la clave de autorización para administrar los Linktrees.</p>
+      
+      <form id="authLoginForm" onsubmit="handleAdminLogin(event)">
+        <div style="margin-bottom: 16px; text-align: left;">
+          <input type="password" id="adminSecretInput" class="form-control" placeholder="Contraseña de Administrador" required style="padding: 12px 16px; font-size: 1rem; border-radius: 12px; border-color: #4b5563;" autofocus>
+        </div>
+        <div id="authErrorMsg" style="display: none; color: #ef4444; font-size: 0.82rem; margin-bottom: 14px; font-weight: 600;">
+          <i class="fas fa-exclamation-circle"></i> Clave incorrecta. Acceso restringido.
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem; border-radius: 12px;">
+          <i class="fas fa-unlock-alt"></i> Desbloquear Panel
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- Barra Superior -->
   <header class="top-navbar">
     <a href="../index.html" class="brand">
@@ -38,6 +61,9 @@
       </button>
       <button class="btn btn-primary" onclick="autoCommitToGitHub()">
         <i class="fas fa-cloud-upload-alt"></i> Auto-Commit a GitHub
+      </button>
+      <button class="btn btn-secondary btn-sm" onclick="logoutAdmin()" title="Bloquear panel" style="color: #ef4444; border-color: #374151; padding: 8px 12px;">
+        <i class="fas fa-lock"></i>
       </button>
     </div>
   </header>
