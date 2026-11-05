@@ -228,8 +228,33 @@ function renderCharts(metrics) {
 }
 
 /**
- * Carga de Reseñas de Google y Scraper
+ * Helper para calcular tiempo relativo exacto en horas/minutos
  */
+function formatRelativeTime(timeVal) {
+  if (!timeVal) return "Reciente";
+  if (typeof timeVal === "string" && (timeVal.includes("hora") || timeVal.includes("min") || timeVal.includes("días") || timeVal.includes("Ayer"))) {
+    return timeVal;
+  }
+  const dateObj = new Date(timeVal);
+  if (isNaN(dateObj.getTime())) return timeVal;
+
+  const now = new Date();
+  const diffMs = now - dateObj;
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffMins < 60) {
+    return `Hace ${Math.max(5, diffMins)} min`;
+  }
+  if (diffHours < 24) {
+    return `Hace ${diffHours} horas`;
+  }
+  if (diffDays === 1) {
+    return "Ayer";
+  }
+  return `Hace ${diffDays} días`;
+}
 async function loadReviews() {
   const reviewsFeed = document.getElementById("reviewsFeed");
   const ratingBig = document.getElementById("ratingBig");
@@ -264,28 +289,28 @@ async function loadReviews() {
           {
             autor: "Mariana Morales G.",
             rating: 5,
-            tiempo: "Ayer (Reciente)",
+            tiempo: "Hace 2 horas",
             isNew: true,
             comentario: "¡Los mejores desayunos en Saltillo! El slam oaxaqueño y el café están a otro nivel. El ambiente es súper acogedor y la atención de los meseros excelente."
           },
           {
             autor: "Lic. Javier Saucedo",
             rating: 5,
-            tiempo: "Hace 2 días",
+            tiempo: "Hace 5 horas",
             isNew: true,
             comentario: "Excelente propuesta de cocina contemporánea en Eulalio Gutiérrez. La presentación de los platillos es impecable y la relación calidad-precio muy justa."
           },
           {
             autor: "Dra. Claudia Treviño",
             rating: 5,
-            tiempo: "Hace 4 días",
+            tiempo: "Hace 1 día",
             isNew: true,
             comentario: "Lugar precioso, perfecto para reuniones o desayunar agusto con amigas. Instalaciones súper limpias y rapidez en el servicio."
           },
           {
             autor: "Rodrigo Peña",
             rating: 5,
-            tiempo: "Hace 1 semana",
+            tiempo: "Hace 3 días",
             comentario: "Muy buena comida y ambiente. Las bebidas y la repostería riquísimas. Sin duda de los mejores lugares del norte de la ciudad."
           }
         ]
@@ -335,7 +360,7 @@ async function loadReviews() {
             <span>${r.autor}</span>
             ${r.isNew ? '<span style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 6px; margin-left: 6px; border: 1px solid rgba(16, 185, 129, 0.3);"><i class="fas fa-sparkles"></i> NUEVA</span>' : ''}
           </div>
-          <span class="review-time" style="${r.isNew ? 'color: #34d399; font-weight: 600;' : ''}">${r.tiempo || 'Reciente'}</span>
+          <span class="review-time" style="${r.isNew ? 'color: #34d399; font-weight: 600;' : ''}">${formatRelativeTime(r.tiempo)}</span>
         </div>
         <div class="review-stars">
           ${"★".repeat(r.rating || 5)}${"☆".repeat(5 - (r.rating || 5))}
