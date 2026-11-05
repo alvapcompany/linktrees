@@ -71,7 +71,7 @@
     "descripcion": "Cocina contemporánea en Saltillo. Disfruta los mejores desayunos, comidas y cenas en un ambiente exclusivo.",
     "avatar_url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=200&auto=format&fit=crop&q=80",
     "portada_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80",
-    "tema": "luxury-gold",
+    "tema": "glassmorphism",
     "boton_whatsapp": "https://wa.me/5218449060272?text=Hola%20Vainilla,%20me%20gustar%C3%ADa%20hacer%20una%20reservaci%C3%B3n",
     "boton_facebook": "https://facebook.com/search/top?q=Vainilla%20Saltillo",
     "boton_instagram": "https://www.instagram.com/vainilla.slw/",
@@ -83,21 +83,20 @@
     "link_google_negocio": "https://maps.app.goo.gl/uA5ifUdr9zVSaLwQ8",
     "botones_adicionales": [
       {
-        "id": "btn_uber",
+        "id": "btn_extra_0",
         "label": "Pedir a Domicilio (Uber Eats)",
         "url": "https://www.ubereats.com",
         "color": "#10b981",
-        "icon": "fas fa-utensils"
+        "icon": "fas fa-external-link-alt"
       },
       {
-        "id": "btn_google_review",
+        "id": "btn_extra_1",
         "label": "⭐ Dejar Reseña en Google Maps",
         "url": "https://maps.app.goo.gl/uA5ifUdr9zVSaLwQ8",
         "color": "#eab308",
-        "icon": "fas fa-star"
+        "icon": "fas fa-external-link-alt"
       }
     ],
-    "fecha_creacion": "2026-11-04T22:26:00.000Z",
-    "fecha_actualizacion": "2026-11-04T22:26:00.000Z"
+    "fecha_actualizacion": "2026-11-05T16:41:37.929Z"
   }
 }
