@@ -1,0 +1,12 @@
+{
+  "name": "alvap-linktrees-scraper",
+  "version": "1.0.0",
+  "description": "Scraper autónomo de Google Maps y Reseñas para Linktrees NFC Alvap Company",
+  "main": "scripts/scrape-reviews.js",
+  "scripts": {
+    "scrape": "node scripts/scrape-reviews.js"
+  },
+  "dependencies": {
+    "puppeteer": "^22.6.0"
+  }
+}

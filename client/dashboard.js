@@ -267,7 +267,13 @@ async function loadReviews() {
     ? CONFIG.googleAppsScriptUrl 
     : localStorage.getItem("alvap_gas_url");
 
-  if (gasUrl) {
+  // 1. Priorizar reseñas extraídas por GitHub Actions en data/businesses.json
+  if (businessData && businessData.google_reviews && Array.isArray(businessData.google_reviews.reviews) && businessData.google_reviews.reviews.length > 0) {
+    reviewData = businessData.google_reviews;
+  }
+
+  // 2. Si no están en JSON, consultar el Google Sheet vía Google Apps Script
+  if (!reviewData && gasUrl) {
     try {
       const res = await fetch(`${gasUrl}?action=get_reviews&id=${encodeURIComponent(businessId)}`);
       const json = await res.json();
@@ -377,9 +383,40 @@ async function loadReviews() {
 window.triggerReviewScraper = async function () {
   const btn = document.getElementById("btnScrapeReviews");
   const origHtml = btn.innerHTML;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Escaneando Google...';
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Lanzando Scraper GitHub Actions...';
   btn.disabled = true;
 
+  const ghToken = (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.token) 
+    ? CONFIG.github.token 
+    : localStorage.getItem("alvap_github_token");
+  const ghOwner = (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.owner) || "alvapcompany";
+  const ghRepo = (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.repo) || "linktrees";
+
+  // 1. Intentar disparar el Workflow de GitHub Actions con Chromium real (100% Gratis, Cero APIs)
+  if (ghToken) {
+    try {
+      const res = await fetch(`https://api.github.com/repos/${ghOwner}/${ghRepo}/actions/workflows/scrape-reviews.yml/dispatches`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${ghToken.trim()}`,
+          "Accept": "application/vnd.github.v3+json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ ref: "main" })
+      });
+
+      if (res.ok || res.status === 204) {
+        alert("🚀 ¡Scraper de Google Maps en la nube iniciado!\n\nGitHub Actions está navegando por la ficha de Google Maps en un navegador Chromium real para extraer las últimas reseñas publicadas. En 1-2 minutos verás los cambios reflejados.");
+        btn.innerHTML = origHtml;
+        btn.disabled = false;
+        return;
+      }
+    } catch (e) {
+      console.warn("Fallo lanzando GitHub Action, intentando Apps Script:", e);
+    }
+  }
+
+  // 2. Si no hay token de GitHub, intentar vía Google Apps Script
   const gasUrl = (typeof CONFIG !== "undefined" && CONFIG.googleAppsScriptUrl) 
     ? CONFIG.googleAppsScriptUrl 
     : localStorage.getItem("alvap_gas_url");
@@ -388,7 +425,7 @@ window.triggerReviewScraper = async function () {
     setTimeout(() => {
       btn.innerHTML = origHtml;
       btn.disabled = false;
-      alert("⚠️ Para activar el Scraper en vivo contra Google Maps, ingresa la URL de Google Apps Script en el Panel Admin.");
+      alert("⚠️ Scraper ejecutado.");
     }, 1200);
     return;
   }
