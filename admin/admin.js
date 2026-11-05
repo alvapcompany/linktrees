@@ -19,10 +19,10 @@ document.addEventListener("DOMContentLoaded", async () => {
  * Carga configuraciones almacenadas (Token de GitHub y URL de Google Apps Script)
  */
 function loadStoredSettings() {
-  const ghToken = localStorage.getItem("alvap_github_token") || "";
+  const defaultToken = (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.token) ? CONFIG.github.token : ""; const defaultGas = (typeof CONFIG !== "undefined" && CONFIG.googleAppsScriptUrl) ? CONFIG.googleAppsScriptUrl : ""; let ghToken = localStorage.getItem("alvap_github_token") || defaultToken;
   const ghOwner = localStorage.getItem("alvap_github_owner") || "alvapcompany";
   const ghRepo = localStorage.getItem("alvap_github_repo") || "linktrees";
-  const gasUrl = localStorage.getItem("alvap_gas_url") || "";
+  let gasUrl = localStorage.getItem("alvap_gas_url") || defaultGas;
 
   const tokenInput = document.getElementById("cfgGithubToken");
   const ownerInput = document.getElementById("cfgGithubOwner");
@@ -408,13 +408,7 @@ async function saveToGoogleSheets() {
     };
 
     // Google Apps Script doPost admite json
-    const res = await fetch(gasUrl, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain" }, // CORS friendly para Google Apps Script
-      body: JSON.stringify(payload)
-    });
-
-    const json = await res.json().catch(() => ({ success: true }));
+    await fetch(gasUrl, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(payload) });
     appendCommitLog("✅ Fila insertada/actualizada con éxito en la pestaña 'Negocios' de Google Sheets.");
     appendCommitLog(`ID guardado: ${data.id}`);
     appendCommitLog(`Fecha: ${new Date().toLocaleString()}`);
@@ -651,3 +645,6 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+
+
