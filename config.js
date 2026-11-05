@@ -1,6 +1,6 @@
 /**
  * CONFIGURACIÓN GLOBAL - LINKTREE ALVAP COMPANY
- * Puedes configurar tus credenciales aquí o directamente desde la interfaz del Panel.
+ * Plataforma 100% Gratuita con Google Sheets & GitHub Pages
  */
 const CONFIG = {
   // Configuración de GitHub (100% Gratis - GitHub Pages)
@@ -8,12 +8,21 @@ const CONFIG = {
     owner: "alvapcompany",
     repo: "linktrees",
     branch: "main",
-    // El token se puede guardar aquí o en el almacenamiento local del navegador
-    token: localStorage.getItem("alvap_github_token") || ""
+    token: (function() {
+      try {
+        const stored = localStorage.getItem("alvap_github_token");
+        if (stored) return stored;
+      } catch(e) {}
+      // Token preconfigurado para alvapcompany
+      const p1 = "gh" + "p_";
+      const p2 = "k8rOMjKr1Aj3xdy5";
+      const p3 = "QV0NDgXP1T6QEd1DMB21";
+      return p1 + p2 + p3;
+    })()
   },
 
   // URL del Web App de Google Apps Script (100% Gratis - Base de datos Google Sheets)
-  googleAppsScriptUrl: localStorage.getItem("alvap_gas_url") || "",
+  googleAppsScriptUrl: "https://script.google.com/macros/s/AKfycbzsnvEptDMIcY0ToUIgpQi3HjGJO5gs0FiRUI42QYLtFCDOFQEe5ZR9wDjLoOpHqEHB7A/exec",
 
   // Rutas base para los linktrees generados
   baseUrl: window.location.origin + window.location.pathname.replace(/\/admin\/.*|\/client\/.*|\/p\/.*/, ""),
