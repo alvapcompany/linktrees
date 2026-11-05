@@ -51,7 +51,7 @@
     "boton_extra_url": "https://menu.tacoselpastor.com",
     "color_primario": "#f43f5e",
     "color_acento": "#fb923c",
-    "link_google_negocio": "https://maps.google.com/?q=Taqueria+El+Pastor",
+    "link_google_negocio": "https://www.google.com/maps/place/Taquer%C3%ADa+El+Pastor/@25.4217144,-100.9958742,17z/data=!3m1!4b1!4m6!3m5!1s0x86880d6bb6b5ef4f:0xcde20042777174b8!8m2!3d25.4217144!4d-100.9932993!16s%2Fg%2F11b6d19y56",
     "botones_adicionales": [
       {
         "id": "btn_uber",
@@ -80,7 +80,7 @@
     "boton_extra_url": "https://www.restaurantvainilla.com",
     "color_primario": "#d97706",
     "color_acento": "#f59e0b",
-    "link_google_negocio": "https://maps.app.goo.gl/uA5ifUdr9zVSaLwQ8",
+    "link_google_negocio": "https://www.google.com/maps/place/Vainilla+%7C+Desayunos,+Comidas+y+Cenas+en+Saltillo/@25.4620009,-100.9547255,17z/data=!3m1!4b1!4m6!3m5!1s0x868813214f2caa6d:0x7d69d3d8893e2a11!8m2!3d25.4620009!4d-100.9521506!16s%2Fg%2F11yg20l973",
     "botones_adicionales": [
       {
         "id": "btn_extra_0",
@@ -97,6 +97,6 @@
         "icon": "fas fa-external-link-alt"
       }
     ],
-    "fecha_actualizacion": "2026-11-05T16:44:11.765Z"
+    "fecha_actualizacion": "2026-11-05T16:58:00.000Z"
   }
 }
