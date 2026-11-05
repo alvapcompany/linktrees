@@ -1,0 +1,67 @@
+{
+  "alvap-studio": {
+    "id": "alvap-studio",
+    "nombre_negocio": "Alvap Digital Studio",
+    "categoria": "Agencia Digital & NFC",
+    "descripcion": "Soluciones digitales de alto impacto, tarjetas inteligentes NFC y diseño web.",
+    "avatar_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80",
+    "portada_url": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&auto=format&fit=crop&q=80",
+    "tema": "modern-dark",
+    "boton_whatsapp": "https://wa.me/5215512345678?text=Hola%20Alvap%20Company,%20me%20interesa%20m%C3%A1s%20informaci%C3%B3n",
+    "boton_facebook": "https://facebook.com/alvapcompany",
+    "boton_instagram": "https://instagram.com/alvapcompany",
+    "boton_ubicacion": "https://maps.google.com/?q=Alvap+Company",
+    "boton_extra_label": "Catálogo de Tarjetas NFC",
+    "boton_extra_url": "https://alvapcompany.com/catalogo",
+    "color_primario": "#6366f1",
+    "color_acento": "#a855f7",
+    "link_google_negocio": "https://maps.google.com/?q=Alvap+Company+Digital",
+    "botones_adicionales": [
+      {
+        "id": "btn_tiktok",
+        "label": "TikTok Oficial",
+        "url": "https://tiktok.com/@alvapcompany",
+        "color": "#000000",
+        "icon": "fab fa-tiktok"
+      },
+      {
+        "id": "btn_review",
+        "label": "⭐ Dejar Reseña en Google (Gana 10% desc)",
+        "url": "https://search.google.com/local/writereview?placeid=ChIJN1t_tDeuEmsRUsoyG83frY4",
+        "color": "#eab308",
+        "icon": "fas fa-star"
+      }
+    ],
+    "fecha_creacion": "2026-11-01T10:00:00.000Z",
+    "fecha_actualizacion": "2026-11-04T12:00:00.000Z"
+  },
+  "tacos-el-pastor": {
+    "id": "tacos-el-pastor",
+    "nombre_negocio": "Taquería El Pastor Real",
+    "categoria": "Restaurante & Comida",
+    "descripcion": "Los mejores tacos al pastor y cortes al carbón de la ciudad. Abierto desde las 6:00 PM.",
+    "avatar_url": "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=200&auto=format&fit=crop&q=80",
+    "portada_url": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&auto=format&fit=crop&q=80",
+    "tema": "neon-sunset",
+    "boton_whatsapp": "https://wa.me/5215598765432?text=Hola,%20quiero%20hacer%20un%20pedido%20a%20domicilio",
+    "boton_facebook": "https://facebook.com/tacoselpastorreal",
+    "boton_instagram": "https://instagram.com/tacoselpastorreal",
+    "boton_ubicacion": "https://maps.google.com/?q=Taqueria+El+Pastor",
+    "boton_extra_label": "Ver Menú Digital QR",
+    "boton_extra_url": "https://menu.tacoselpastor.com",
+    "color_primario": "#f43f5e",
+    "color_acento": "#fb923c",
+    "link_google_negocio": "https://maps.google.com/?q=Taqueria+El+Pastor",
+    "botones_adicionales": [
+      {
+        "id": "btn_uber",
+        "label": "Pedir por Uber Eats",
+        "url": "https://ubereats.com",
+        "color": "#10b981",
+        "icon": "fas fa-utensils"
+      }
+    ],
+    "fecha_creacion": "2026-11-02T15:30:00.000Z",
+    "fecha_actualizacion": "2026-11-04T18:00:00.000Z"
+  }
+}

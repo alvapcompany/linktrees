@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel del Cliente | Métricas & Reseñas Alvap</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="dashboard-container">
+    
+    <!-- Header del Negocio -->
+    <header class="dash-header">
+      <div class="biz-profile">
+        <img id="bizAvatar" class="biz-avatar" src="https://via.placeholder.com/150" alt="Logo">
+        <div class="biz-info">
+          <h1 id="bizTitle">Cargando Negocio...</h1>
+          <p id="bizCategory">Portal de Rendimiento y Reputación Online</p>
+        </div>
+      </div>
+
+      <div class="dash-actions">
+        <a id="btnViewProfile" href="#" target="_blank" class="btn btn-secondary">
+          <i class="fas fa-external-link-alt"></i> Ver Mi Linktree
+        </a>
+        <button class="btn btn-primary" onclick="copyNfcUrl()">
+          <i class="fas fa-id-card"></i> Copiar Link NFC
+        </button>
+      </div>
+    </header>
+
+    <!-- KPI Grid de Métricas Clave -->
+    <section class="kpi-grid">
+      <!-- Vistas -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span>Visitas Totales</span>
+          <div class="kpi-icon" style="background: rgba(99, 102, 241, 0.15); color: #818cf8;">
+            <i class="fas fa-eye"></i>
+          </div>
+        </div>
+        <div id="kpiTotalViews" class="kpi-value">0</div>
+        <div class="kpi-trend">
+          <i class="fas fa-arrow-up"></i> +14.2% vs semana anterior
+        </div>
+      </div>
+
+      <!-- Visitantes Únicos -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span>Visitantes Únicos</span>
+          <div class="kpi-icon" style="background: rgba(168, 85, 247, 0.15); color: #c084fc;">
+            <i class="fas fa-users"></i>
+          </div>
+        </div>
+        <div id="kpiUniqueVisitors" class="kpi-value">0</div>
+        <div class="kpi-trend">
+          <i class="fas fa-mobile-alt"></i> Personas distintas interesadas
+        </div>
+      </div>
+
+      <!-- Clics Totales -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span>Clics en Botones</span>
+          <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+            <i class="fas fa-mouse-pointer"></i>
+          </div>
+        </div>
+        <div id="kpiTotalClicks" class="kpi-value">0</div>
+        <div class="kpi-trend" style="color: #34d399;">
+          <i class="fas fa-check"></i> Clientes derivados a tus redes
+        </div>
+      </div>
+
+      <!-- Tasa de Conversión (CTR) -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span>Tasa de Interacción (CTR)</span>
+          <div class="kpi-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+            <i class="fas fa-bolt"></i>
+          </div>
+        </div>
+        <div id="kpiCtr" class="kpi-value">0%</div>
+        <div class="kpi-trend" style="color: #fbbf24;">
+          <i class="fas fa-fire"></i> Alto interés por cliente
+        </div>
+      </div>
+    </section>
+
+    <!-- Gráficos de Analíticas -->
+    <section class="charts-grid">
+      <!-- Gráfico de Líneas: Evolución -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title"><i class="fas fa-chart-area" style="color: #6366f1;"></i> Visitas vs Clics en el Tiempo</div>
+          <span style="font-size: 0.78rem; color: #9ca3af;">Últimos 7 días</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="timelineChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Gráfico de Dona: Distribución de Botones -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title"><i class="fas fa-pie-chart" style="color: #10b981;"></i> Clics por Canal</div>
+          <span style="font-size: 0.78rem; color: #9ca3af;">WhatsApp, Redes, GPS</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="buttonsChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección de Reseñas de Google y Scraper -->
+    <section class="reviews-section">
+      <div class="reviews-header">
+        <div>
+          <h2 style="font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+            <i class="fab fa-google" style="color: #4285F4;"></i> Reseñas & Reputación en Google Maps
+          </h2>
+          <p style="font-size: 0.85rem; color: #9ca3af; margin-top: 4px;">Monitorea en tiempo real lo que tus clientes opinan de tu negocio.</p>
+        </div>
+        <button id="btnScrapeReviews" class="btn btn-secondary" onclick="triggerReviewScraper()">
+          <i class="fas fa-sync-alt"></i> Sincronizar Reseñas en Vivo
+        </button>
+      </div>
+
+      <!-- Barra de Resumen de Calificación -->
+      <div class="reviews-summary-bar">
+        <div id="ratingBig" class="rating-big">4.9</div>
+        <div>
+          <div id="starsHeader" style="color: #fbbf24; font-size: 1.2rem; letter-spacing: 2px;">★★★★★</div>
+          <div id="totalReviewsText" style="font-size: 0.85rem; color: #9ca3af; margin-top: 2px;">Basado en 34 reseñas verificadas</div>
+        </div>
+      </div>
+
+      <!-- Tarjetas de Reseñas Recientes -->
+      <div id="reviewsFeed" class="reviews-feed"></div>
+    </section>
+
+    <!-- Tarjeta NFC y Generador de Código QR para imprimir -->
+    <section class="nfc-card">
+      <div class="nfc-text">
+        <h3><i class="fas fa-wifi"></i> Listo para tu Tarjeta Inteligente NFC</h3>
+        <p>Este es el enlace y código QR oficial de tu negocio. Puedes grabarlo en tus tarjetas plásticas o llaveros NFC, colocarlo en tu mostrador o imprimirlo en manteles y volantes.</p>
+        <div style="margin-top: 14px; display: flex; gap: 10px;">
+          <button class="btn btn-secondary" onclick="copyNfcUrl()">
+            <i class="fas fa-copy"></i> Copiar URL NFC
+          </button>
+        </div>
+      </div>
+      <div class="nfc-qr-box">
+        <img id="nfcQrImg" src="" alt="QR Negocio" width="140" height="140">
+      </div>
+    </section>
+
+  </div>
+
+  <script src="../config.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

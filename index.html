@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alvap Company | Plataforma de Linktrees Inteligentes NFC</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(255, 255, 255, 0.04);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --primary: #6366f1;
+      --accent: #a855f7;
+      --text: #f8fafc;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+    }
+    .hero {
+      text-align: center;
+      max-width: 650px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 30px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #ffffff 40%, #c4b5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p {
+      font-size: 1.05rem;
+      opacity: 0.8;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+    .portal-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 30px;
+    }
+    .portal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(12px);
+      border-radius: 18px;
+      padding: 24px;
+      text-decoration: none;
+      color: inherit;
+      text-align: left;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .portal-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(99, 102, 241, 0.5);
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+    }
+    .icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+    }
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    .card-desc {
+      font-size: 0.86rem;
+      opacity: 0.7;
+    }
+    .card-link {
+      margin-top: 6px;
+      color: #818cf8;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    footer {
+      font-size: 0.8rem;
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="badge">
+      <i class="fas fa-bolt"></i> Sistema Linktrees NFC 100% Gratis
+    </div>
+    <h1>Plataforma de Perfiles & Analíticas Alvap Company</h1>
+    <p>Crea, personaliza y despliega landing pages con auto-commit a GitHub Pages, sincronización con Google Sheets y analíticas de clics y reseñas en tiempo real.</p>
+
+    <div class="portal-cards">
+      <a href="admin/" class="portal-card">
+        <div class="icon-box">
+          <i class="fas fa-sliders-h"></i>
+        </div>
+        <div class="card-title">Panel Administrativo</div>
+        <div class="card-desc">Crea y edita Linktrees por ID, personaliza botones, colores y haz auto-commit a GitHub.</div>
+        <div class="card-link">Entrar al Admin <i class="fas fa-arrow-right"></i></div>
+      </a>
+
+      <a href="client/dashboard.html?id=alvap-studio" class="portal-card">
+        <div class="icon-box" style="background: linear-gradient(135deg, #10b981, #065f46);">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="card-title">Panel del Cliente</div>
+        <div class="card-desc">Métricas de visitas, clics a WhatsApp/Instagram y reseñas de Google en vivo.</div>
+        <div class="card-link">Ver Demo Cliente <i class="fas fa-arrow-right"></i></div>
+      </a>
+    </div>
+
+    <footer>
+      © 2026 Alvap Company • Soluciones Inteligentes para Tarjetas NFC
+    </footer>
+  </div>
+
+  <script>
+    // Si la URL contiene un ID directamente (?id=ejemplo), redirigir al visor
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("id")) {
+      window.location.href = "p/?id=" + encodeURIComponent(params.get("id"));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Administrativo de Linktrees | Alvap Company</title>
+  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Barra Superior -->
+  <header class="top-navbar">
+    <a href="../index.html" class="brand">
+      <i class="fas fa-layer-group" style="color: var(--primary);"></i>
+      <span>Alvap Linktrees</span>
+      <span class="brand-badge">ADMIN</span>
+    </a>
+
+    <div class="nav-actions">
+      <span id="githubStatusBadge" class="brand-badge" style="background: #374151;">
+        <i class="fas fa-spinner fa-spin"></i> GitHub
+      </span>
+      <span id="gasStatusBadge" class="brand-badge" style="background: #374151;">
+        <i class="fas fa-spinner fa-spin"></i> Sheets
+      </span>
+      <button class="btn btn-secondary" onclick="previewInNewTab()">
+        <i class="fas fa-external-link-alt"></i> Ver Perfil
+      </button>
+      <button class="btn btn-secondary" onclick="saveToGoogleSheets()" style="border-color: #0284c7; color: #38bdf8;">
+        <i class="fas fa-table"></i> Guardar en Sheet
+      </button>
+      <button class="btn btn-primary" onclick="autoCommitToGitHub()">
+        <i class="fas fa-cloud-upload-alt"></i> Auto-Commit a GitHub
+      </button>
+    </div>
+  </header>
+
+  <!-- Espacio de Trabajo Principal (Editor Izquierda + Preview Derecha) -->
+  <main class="admin-workspace">
+    
+    <!-- Columna Izquierda: Editor de Negocio -->
+    <section class="editor-panel">
+      
+      <!-- Selector de ID y Crear Nuevo -->
+      <div class="editor-header">
+        <div class="id-selector-box">
+          <label style="font-size: 0.85rem; font-weight: 700; color: #9ca3af;">ID Negocio:</label>
+          <select id="businessSelect"></select>
+          <button class="btn btn-secondary btn-sm" onclick="createNewBusinessId()" title="Crear un nuevo Linktree con ID único">
+            <i class="fas fa-plus"></i> Nuevo ID
+          </button>
+        </div>
+      </div>
+
+      <!-- Barra de Pestañas -->
+      <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="tabInfo" onclick="switchTab('tabInfo')">
+          <i class="fas fa-store"></i> Información & Marca
+        </button>
+        <button class="tab-btn" data-tab="tabButtons" onclick="switchTab('tabButtons')">
+          <i class="fas fa-link"></i> Botones & Redes
+        </button>
+        <button class="tab-btn" data-tab="tabThemes" onclick="switchTab('tabThemes')">
+          <i class="fas fa-palette"></i> Plantillas & Colores
+        </button>
+        <button class="tab-btn" data-tab="tabConnections" onclick="switchTab('tabConnections')">
+          <i class="fas fa-plug"></i> Conexiones (GitHub / Sheets)
+        </button>
+      </div>
+
+      <!-- Pestaña 1: Información y Marca -->
+      <div id="tabInfo" class="tab-pane active">
+        <div class="form-section">
+          <div class="section-title"><i class="fas fa-id-card"></i> Identificación del Negocio</div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>ID Único (Ruta web / NFC)</label>
+              <input type="text" id="businessId" class="form-control" readonly style="background: #1e293b; color: #94a3b8; cursor: not-allowed;">
+            </div>
+            <div class="form-group">
+              <label>Nombre del Negocio</label>
+              <input type="text" id="nombreNegocio" class="form-control" placeholder="Ej: Taquería El Pastor">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Categoría / Rubro</label>
+            <input type="text" id="categoria" class="form-control" placeholder="Ej: Restaurante, Agencia, Barbería, Spa">
+          </div>
+
+          <div class="form-group">
+            <label>Descripción / Bio Corta</label>
+            <textarea id="descripcion" class="form-control" rows="2" placeholder="Breve mensaje de bienvenida para clientes..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>URL Foto de Perfil / Logo (Cuadrado)</label>
+              <input type="url" id="avatarUrl" class="form-control" placeholder="https://ejemplo.com/logo.jpg">
+            </div>
+            <div class="form-group">
+              <label>URL Portada / Banner (Opcional)</label>
+              <input type="url" id="portadaUrl" class="form-control" placeholder="https://ejemplo.com/portada.jpg">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label><i class="fab fa-google" style="color: #4285F4;"></i> Enlace de Google Maps / Reseñas</label>
+            <input type="url" id="linkGoogle" class="form-control" placeholder="https://maps.google.com/?q=Mi+Negocio (Para mostrar reseñas en vivo)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Pestaña 2: Botones y Redes -->
+      <div id="tabButtons" class="tab-pane">
+        <div class="form-section">
+          <div class="section-title"><i class="fas fa-share-alt"></i> Botones Principales</div>
+
+          <!-- WhatsApp -->
+          <div class="form-group">
+            <label><i class="fab fa-whatsapp" style="color: #25D366;"></i> Enlace WhatsApp (Con mensaje predeterminado)</label>
+            <input type="url" id="btnWhatsapp" class="form-control" placeholder="https://wa.me/5215512345678?text=Hola,%20solicito%20información">
+          </div>
+
+          <!-- Instagram -->
+          <div class="form-group">
+            <label><i class="fab fa-instagram" style="color: #E1306C;"></i> Enlace de Instagram</label>
+            <input type="url" id="btnInstagram" class="form-control" placeholder="https://instagram.com/minegocio">
+          </div>
+
+          <!-- Facebook -->
+          <div class="form-group">
+            <label><i class="fab fa-facebook" style="color: #1877F2;"></i> Enlace de Facebook</label>
+            <input type="url" id="btnFacebook" class="form-control" placeholder="https://facebook.com/minegocio">
+          </div>
+
+          <!-- Ubicación / Maps -->
+          <div class="form-group">
+            <label><i class="fas fa-map-marked-alt" style="color: #EA4335;"></i> Enlace de Ubicación / Cómo Llegar</label>
+            <input type="url" id="btnUbicacion" class="form-control" placeholder="https://maps.google.com/?q=Direccion">
+          </div>
+
+          <!-- Botón Extra Principal -->
+          <div class="form-row">
+            <div class="form-group">
+              <label><i class="fas fa-star" style="color: #eab308;"></i> Texto Botón Destacado Extra</label>
+              <input type="text" id="btnExtraLabel" class="form-control" placeholder="Ej: Ver Menú Digital, Agendar Cita">
+            </div>
+            <div class="form-group">
+              <label>Enlace del Botón Destacado Extra</label>
+              <input type="url" id="btnExtraUrl" class="form-control" placeholder="https://...">
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones Dinámicos Ilimitados -->
+        <div class="form-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <div class="section-title" style="margin-bottom: 0;"><i class="fas fa-plus-circle"></i> Botones Personalizados Adicionales</div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="addDynamicButton()">
+              <i class="fas fa-plus"></i> Agregar Botón
+            </button>
+          </div>
+          <p style="font-size: 0.82rem; color: #9ca3af; margin-bottom: 14px;">Agrega botones con etiquetas, enlaces y colores personalizados según las necesidades del cliente.</p>
+          <div id="extraButtonsContainer"></div>
+        </div>
+      </div>
+
+      <!-- Pestaña 3: Plantillas y Colores -->
+      <div id="tabThemes" class="tab-pane">
+        <div class="form-section">
+          <div class="section-title"><i class="fas fa-paint-roller"></i> Elige la Plantilla del Cliente</div>
+          <div class="theme-grid">
+            <div class="theme-card active" data-theme="modern-dark">
+              <div class="theme-preview-bubble" style="background: linear-gradient(135deg, #0f172a, #1e1b4b);"></div>
+              <span>Cyber Dark</span>
+            </div>
+            <div class="theme-card" data-theme="glassmorphism">
+              <div class="theme-preview-bubble" style="background: linear-gradient(135deg, #064e3b, #022c22);"></div>
+              <span>Glass Esmeralda</span>
+            </div>
+            <div class="theme-card" data-theme="luxury-gold">
+              <div class="theme-preview-bubble" style="background: linear-gradient(135deg, #000000, #422006); border: 1px solid #eab308;"></div>
+              <span>Luxury Gold</span>
+            </div>
+            <div class="theme-card" data-theme="neon-sunset">
+              <div class="theme-preview-bubble" style="background: linear-gradient(135deg, #3b0764, #831843);"></div>
+              <span>Sunset Neon</span>
+            </div>
+            <div class="theme-card" data-theme="clean-light">
+              <div class="theme-preview-bubble" style="background: linear-gradient(135deg, #f8fafc, #cbd5e1);"></div>
+              <span style="color: #94a3b8;">Clean Light</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="section-title"><i class="fas fa-sliders-h"></i> Ajustes de Color Fino</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Color Primario / Resaltado</label>
+              <div class="color-input-wrapper">
+                <input type="color" id="colorPrimary" class="color-picker" value="#6366f1" onchange="updateLivePreview()">
+                <span style="font-size: 0.85rem; color: #9ca3af;">Color para íconos y detalles</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Color Acento / Gradiente</label>
+              <div class="color-input-wrapper">
+                <input type="color" id="colorAccent" class="color-picker" value="#a855f7" onchange="updateLivePreview()">
+                <span style="font-size: 0.85rem; color: #9ca3af;">Color complementario</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pestaña 4: Conexiones Gratuitas -->
+      <div id="tabConnections" class="tab-pane">
+        <div class="form-section">
+          <div class="section-title"><i class="fab fa-github"></i> Conexión GitHub (Auto-Commit 100% Gratis)</div>
+          <p style="font-size: 0.82rem; color: #9ca3af; margin-bottom: 12px;">
+            Permite que al hacer clic en "Auto-Commit", el sistema suba automáticamente los archivos a tu cuenta de GitHub y se publiquen en GitHub Pages.
+          </p>
+          <div class="form-group">
+            <label>Token de Acceso Personal (GitHub PAT)</label>
+            <input type="password" id="cfgGithubToken" class="form-control" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+            <small style="font-size: 0.75rem; color: #6b7280; margin-top: 4px; display: block;">
+              Genera un token clásico con permiso <code>repo</code> en <a href="https://github.com/settings/tokens" target="_blank" style="color: #818cf8;">GitHub Tokens</a>.
+            </small>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Cuenta / Organización</label>
+              <input type="text" id="cfgGithubOwner" class="form-control" value="alvapcompany">
+            </div>
+            <div class="form-group">
+              <label>Nombre del Repositorio</label>
+              <input type="text" id="cfgGithubRepo" class="form-control" value="linktrees">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="section-title"><i class="fab fa-google-drive" style="color: #10b981;"></i> Base de Datos Google Sheets (100% Gratis)</div>
+          <p style="font-size: 0.82rem; color: #9ca3af; margin-bottom: 12px;">
+            URL del Web App de Google Apps Script para guardar filas y registrar vistas/clics en tiempo real sin pagar bases de datos.
+          </p>
+          <div class="form-group">
+            <label>URL de Implementación Web App de Google Apps Script</label>
+            <input type="url" id="cfgGasUrl" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
+            <small style="font-size: 0.75rem; color: #6b7280; margin-top: 4px; display: block;">
+              Consulta la guía en <code>google-apps-script/INSTRUCCIONES_GOOGLE_SHEETS.md</code> para obtenerla en 2 minutos.
+            </small>
+          </div>
+        </div>
+
+        <button type="button" id="btnSaveSettings" class="btn btn-primary" style="width: 100%;">
+          <i class="fas fa-save"></i> Guardar Credenciales y Conexiones
+        </button>
+      </div>
+
+    </section>
+
+    <!-- Columna Derecha: Previsualizador en Vivo (Smartphone Mockup) -->
+    <section class="preview-panel">
+      <div class="preview-toolbar">
+        <span class="preview-label">
+          <span class="live-pulse"></span> Vista Previa en Vivo
+        </span>
+      </div>
+
+      <!-- Marco del Smartphone -->
+      <div class="phone-mockup">
+        <div class="phone-notch"></div>
+        <iframe id="phonePreviewFrame" class="phone-screen" title="Live Preview"></iframe>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal de Commit y Despliegue -->
+  <div id="commitModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalCommitTitle" class="modal-title">Auto-Commit a GitHub</h3>
+        <button class="modal-close" onclick="closeCommitModal()">&times;</button>
+      </div>
+      <p id="modalStatusText" style="font-size: 0.9rem; color: #9ca3af; margin-bottom: 10px;">Procesando cambios...</p>
+      
+      <div id="commitLogs" class="commit-log-box"></div>
+
+      <div id="modalLiveUrlBox" style="display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 14px; border-radius: 12px; margin-top: 15px;">
+        <div style="font-weight: 700; color: #10b981; font-size: 0.9rem; margin-bottom: 4px;">
+          <i class="fas fa-check-circle"></i> ¡Página en línea!
+        </div>
+        <a id="modalLiveLink" href="#" target="_blank" style="color: #6ee7b7; font-size: 0.85rem; word-break: break-all;"></a>
+      </div>
+
+      <div style="text-align: right; margin-top: 20px;">
+        <button id="modalCloseBtn" class="btn btn-secondary" onclick="closeCommitModal()" style="display: none;">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../config.js"></script>
+  <script src="../assets/github-sync.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
