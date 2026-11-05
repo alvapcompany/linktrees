@@ -8,6 +8,8 @@ const fs = require('fs');
 const path = require('path');
 const puppeteer = require('puppeteer');
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
 const DATA_FILE = path.join(__dirname, '..', 'data', 'businesses.json');
 const CONFIG_FILE = path.join(__dirname, '..', 'config.js');
 
@@ -72,7 +74,7 @@ async function main() {
         const acceptBtn = await page.$('button[aria-label*="Aceptar"], form[action*="consent"] button');
         if (acceptBtn) {
           await acceptBtn.click();
-          await page.waitForTimeout(1500);
+          await sleep(1500);
         }
       } catch (e) {}
 
@@ -103,7 +105,7 @@ async function main() {
         const reviewsTab = await page.$('button[role="tab"][aria-label*="Reseñas"], button[aria-label*="Reseñas"]');
         if (reviewsTab) {
           await reviewsTab.click();
-          await page.waitForTimeout(2000);
+          await sleep(2000);
         }
       } catch (e) {}
 
@@ -112,11 +114,11 @@ async function main() {
         const sortBtn = await page.$('button[aria-label*="Ordenar"], button[data-value*="Ordenar"]');
         if (sortBtn) {
           await sortBtn.click();
-          await page.waitForTimeout(1000);
+          await sleep(1000);
           const newestOption = await page.$('div[role="menuitemradio"][data-index="1"], div[role="menuitem"][data-index="1"]');
           if (newestOption) {
             await newestOption.click();
-            await page.waitForTimeout(2500);
+            await sleep(2500);
           }
         }
       } catch (e) {}
@@ -126,7 +128,7 @@ async function main() {
         const scrollable = document.querySelector('div.m6QErb.DxyBCb.kA9KIf.dS8AEf') || document.body;
         if (scrollable) scrollable.scrollTop = 800;
       });
-      await page.waitForTimeout(1500);
+      await sleep(1500);
 
       // Extraer las reseñas individuales
       const extractedReviews = await page.evaluate(() => {
@@ -220,3 +222,4 @@ main().catch(err => {
   console.error('Fatal error:', err);
   process.exit(1);
 });
+
