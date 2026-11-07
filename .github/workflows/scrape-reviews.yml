@@ -27,7 +27,7 @@ jobs:
 
       - name: 📦 Instalar dependencias (Puppeteer & Chromium)
         run: |
-          npm install puppeteer
+          npm install puppeteer --no-save --no-package-lock
 
       - name: 🚀 Ejecutar Scraper de Google Maps
         run: |
@@ -37,6 +37,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action Bot"
+          git checkout -- package*.json 2>/dev/null || true
           git add data/businesses.json
           if ! git diff --cached --quiet; then
             git commit -m "chore(reviews): auto-update google maps reviews [skip ci]"
