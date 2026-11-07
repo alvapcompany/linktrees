@@ -94,6 +94,7 @@
 
     // Construcción de botones configurados
     const buttons = [];
+    const estilo = b.estilo_botones || "icon_only";
 
     if (b.boton_whatsapp) {
       buttons.push({
@@ -102,7 +103,8 @@
         subtitle: "Respuesta inmediata y cotizaciones",
         url: b.boton_whatsapp,
         icon: "fab fa-whatsapp",
-        customClass: "icon-whatsapp"
+        customClass: "icon-whatsapp",
+        customColor: b.color_btn_whatsapp || "#25D366"
       });
     }
 
@@ -113,7 +115,8 @@
         subtitle: "Fotos, promociones e historias",
         url: b.boton_instagram,
         icon: "fab fa-instagram",
-        customClass: "icon-instagram"
+        customClass: "icon-instagram",
+        customColor: b.color_btn_instagram || "#E1306C"
       });
     }
 
@@ -124,7 +127,8 @@
         subtitle: "Comunidad y publicaciones",
         url: b.boton_facebook,
         icon: "fab fa-facebook-f",
-        customClass: "icon-facebook"
+        customClass: "icon-facebook",
+        customColor: b.color_btn_facebook || "#1877F2"
       });
     }
 
@@ -135,7 +139,8 @@
         subtitle: "Ver dirección y navegar en GPS",
         url: b.boton_ubicacion,
         icon: "fas fa-map-marker-alt",
-        customClass: "icon-ubicacion"
+        customClass: "icon-ubicacion",
+        customColor: b.color_btn_ubicacion || "#EA4335"
       });
     }
 
@@ -146,7 +151,8 @@
         subtitle: "Enlace destacado del negocio",
         url: b.boton_extra_url,
         icon: "fas fa-external-link-alt",
-        customClass: "icon-extra"
+        customClass: "icon-extra",
+        customColor: b.color_btn_extra || b.color_primario || "#eab308"
       });
     }
 
@@ -188,23 +194,34 @@
       </div>
 
       <div class="links-list">
-        ${buttons.map(btn => `
-          <a href="${btn.url}" 
-             target="_blank" 
-             rel="noopener noreferrer" 
-             class="link-btn" 
-             data-btn-id="${btn.id}"
-             onclick="return handleButtonClick(event, '${b.id}', '${btn.id}', '${btn.url}')">
-            <div class="link-icon-box ${btn.customClass || ''}" style="${btn.customColor ? `background: ${btn.customColor};` : ''}">
-              <i class="${btn.icon}"></i>
-            </div>
-            <div class="link-content">
-              <span class="link-title">${btn.title}</span>
-              <span class="link-subtitle">${btn.subtitle}</span>
-            </div>
-            <i class="fas fa-chevron-right link-arrow"></i>
-          </a>
-        `).join("")}
+        ${buttons.map(btn => {
+          let cardStyle = "";
+          let iconStyle = btn.customColor ? `background: ${btn.customColor};` : "";
+          if (estilo === "full_card") {
+            cardStyle = `background: ${btn.customColor}; color: #ffffff; border: 1px solid rgba(255,255,255,0.25); box-shadow: 0 4px 15px rgba(0,0,0,0.25);`;
+            iconStyle = `background: rgba(0, 0, 0, 0.25); color: #ffffff;`;
+          } else if (estilo === "border_glow") {
+            cardStyle = `border: 1.5px solid ${btn.customColor}; box-shadow: 0 0 15px ${btn.customColor}40;`;
+          }
+          return `
+            <a href="${btn.url}" 
+               target="_blank" 
+               rel="noopener noreferrer" 
+               class="link-btn ${estilo === 'full_card' ? 'link-btn-full' : ''}" 
+               style="${cardStyle}"
+               data-btn-id="${btn.id}"
+               onclick="return handleButtonClick(event, '${b.id}', '${btn.id}', '${btn.url}')">
+              <div class="link-icon-box ${btn.customClass || ''}" style="${iconStyle}">
+                <i class="${btn.icon}"></i>
+              </div>
+              <div class="link-content">
+                <span class="link-title">${btn.title}</span>
+                <span class="link-subtitle" ${estilo === 'full_card' ? 'style="opacity: 0.9;"' : ''}>${btn.subtitle}</span>
+              </div>
+              <i class="fas fa-chevron-right link-arrow"></i>
+            </a>
+          `;
+        }).join("")}
       </div>
 
       <div class="linktree-footer">

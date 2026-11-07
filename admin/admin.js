@@ -6,7 +6,7 @@
 let businesses = {};
 let currentId = "alvap-studio";
 
-// Firma criptogr�fica SHA-256 de autorizaci�n (imposible de revertir desde el repositorio)
+// Firma criptogr�fica SHA-256 de autorizaci�n (imposible de revertir desde el repositorio)
 const SECURE_AUTH_HASH = "e318981c6fc3f0613db54042d31b4dc3afeadfd2904b0b92cef04229b28ac56f";
 
 async function sha256(message) {
@@ -203,6 +203,14 @@ function selectBusiness(id) {
   document.getElementById("btnExtraLabel").value = b.boton_extra_label || "";
   document.getElementById("btnExtraUrl").value = b.boton_extra_url || "";
 
+  // Colores individuales de botones
+  if (document.getElementById("btnWhatsappColor")) document.getElementById("btnWhatsappColor").value = b.color_btn_whatsapp || "#25D366";
+  if (document.getElementById("btnInstagramColor")) document.getElementById("btnInstagramColor").value = b.color_btn_instagram || "#E1306C";
+  if (document.getElementById("btnFacebookColor")) document.getElementById("btnFacebookColor").value = b.color_btn_facebook || "#1877F2";
+  if (document.getElementById("btnUbicacionColor")) document.getElementById("btnUbicacionColor").value = b.color_btn_ubicacion || "#EA4335";
+  if (document.getElementById("btnExtraColor")) document.getElementById("btnExtraColor").value = b.color_btn_extra || "#eab308";
+  if (document.getElementById("estiloBotones")) document.getElementById("estiloBotones").value = b.estilo_botones || "icon_only";
+
   // Colores y Tema
   document.getElementById("colorPrimary").value = b.color_primario || "#6366f1";
   document.getElementById("colorAccent").value = b.color_acento || "#a855f7";
@@ -215,6 +223,44 @@ function selectBusiness(id) {
 /**
  * Selecciona visualmente la tarjeta de tema
  */
+
+/**
+ * Renderiza la grilla de 30 temas de CONFIG
+ */
+function renderThemeGrid() {
+  const grid = document.getElementById("themeGrid");
+  if (!grid || typeof CONFIG === "undefined" || !CONFIG.themes) return;
+
+  grid.innerHTML = CONFIG.themes.map(t => `
+    <div class="theme-card" data-theme="${t.id}" data-category="${t.category || 'all'}">
+      <div class="theme-preview-bubble" style="background: ${t.bg}; ${t.cardBorder ? 'border: 1px solid ' + t.cardBorder : ''}"></div>
+      <span style="color: ${t.textColor || '#fff'};">${t.name}</span>
+    </div>
+  `).join("");
+
+  grid.querySelectorAll(".theme-card").forEach(c => {
+    c.addEventListener("click", () => {
+      grid.querySelectorAll(".theme-card").forEach(x => x.classList.remove("active"));
+      c.classList.add("active");
+      updateLivePreview();
+    });
+  });
+}
+
+window.filterThemes = function (category) {
+  document.querySelectorAll(".theme-filters .filter-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.getAttribute("data-filter") === category);
+  });
+  document.querySelectorAll("#themeGrid .theme-card").forEach(card => {
+    if (category === "all") {
+      card.style.display = "block";
+    } else {
+      const cat = card.getAttribute("data-category");
+      card.style.display = (cat === category) ? "block" : "none";
+    }
+  });
+};
+
 function selectThemeCard(themeId) {
   document.querySelectorAll(".theme-card").forEach(c => {
     c.classList.toggle("active", c.getAttribute("data-theme") === themeId);
@@ -320,6 +366,12 @@ function getFormData() {
     boton_extra_url: document.getElementById("btnExtraUrl").value || "",
     color_primario: document.getElementById("colorPrimary").value || "#6366f1",
     color_acento: document.getElementById("colorAccent").value || "#a855f7",
+    color_btn_whatsapp: document.getElementById("btnWhatsappColor") ? document.getElementById("btnWhatsappColor").value : "#25D366",
+    color_btn_instagram: document.getElementById("btnInstagramColor") ? document.getElementById("btnInstagramColor").value : "#E1306C",
+    color_btn_facebook: document.getElementById("btnFacebookColor") ? document.getElementById("btnFacebookColor").value : "#1877F2",
+    color_btn_ubicacion: document.getElementById("btnUbicacionColor") ? document.getElementById("btnUbicacionColor").value : "#EA4335",
+    color_btn_extra: document.getElementById("btnExtraColor") ? document.getElementById("btnExtraColor").value : "#eab308",
+    estilo_botones: document.getElementById("estiloBotones") ? document.getElementById("estiloBotones").value : "icon_only",
     link_google_negocio: document.getElementById("linkGoogle").value || "",
     botones_adicionales: extraBtns,
     fecha_actualizacion: new Date().toISOString()
@@ -348,20 +400,22 @@ function updateLivePreview() {
   const cardBorder = theme.cardBorder || "rgba(255, 255, 255, 0.16)";
 
   const buttons = [];
+  const estilo = data.estilo_botones || "icon_only";
+
   if (data.boton_whatsapp) {
-    buttons.push({ label: "WhatsApp", sub: "Respuesta rápida", icon: "fab fa-whatsapp", color: "linear-gradient(135deg, #25D366, #128C7E)" });
+    buttons.push({ label: "WhatsApp", sub: "Respuesta rápida", icon: "fab fa-whatsapp", color: data.color_btn_whatsapp || "#25D366" });
   }
   if (data.boton_instagram) {
-    buttons.push({ label: "Instagram", sub: "Galería de fotos", icon: "fab fa-instagram", color: "linear-gradient(135deg, #833AB4, #FD1D1D)" });
+    buttons.push({ label: "Instagram", sub: "Galería de fotos", icon: "fab fa-instagram", color: data.color_btn_instagram || "#E1306C" });
   }
   if (data.boton_facebook) {
-    buttons.push({ label: "Facebook", sub: "Comunidad oficial", icon: "fab fa-facebook-f", color: "linear-gradient(135deg, #1877F2, #0d5dbb)" });
+    buttons.push({ label: "Facebook", sub: "Comunidad oficial", icon: "fab fa-facebook-f", color: data.color_btn_facebook || "#1877F2" });
   }
   if (data.boton_ubicacion) {
-    buttons.push({ label: "Google Maps", sub: "Ver ubicación en GPS", icon: "fas fa-map-marker-alt", color: "linear-gradient(135deg, #EA4335, #c5221f)" });
+    buttons.push({ label: "Google Maps", sub: "Ver ubicación en GPS", icon: "fas fa-map-marker-alt", color: data.color_btn_ubicacion || "#EA4335" });
   }
   if (data.boton_extra_label && data.boton_extra_url) {
-    buttons.push({ label: data.boton_extra_label, sub: "Enlace destacado", icon: "fas fa-external-link-alt", color: data.color_primario });
+    buttons.push({ label: data.boton_extra_label, sub: "Enlace destacado", icon: "fas fa-external-link-alt", color: data.color_btn_extra || data.color_primario || "#eab308" });
   }
   (data.botones_adicionales || []).forEach(b => {
     buttons.push({ label: b.label, sub: "Directo", icon: "fas fa-link", color: b.color || data.color_primario });
@@ -413,16 +467,27 @@ function updateLivePreview() {
       </div>
 
       <div class="buttons-list">
-        ${buttons.map(b => `
-          <div class="btn-card">
-            <div class="icon-box" style="background: ${b.color};"><i class="${b.icon}"></i></div>
-            <div>
-              <div class="title">${escapeHtml(b.label)}</div>
-              <div class="sub">${escapeHtml(b.sub)}</div>
+        ${buttons.map(b => {
+          let cardStyle = `background: ${cardBg}; border: 1px solid ${cardBorder};`;
+          let iconStyle = `background: ${b.color};`;
+          if (estilo === "full_card") {
+            cardStyle = `background: ${b.color}; color: #ffffff; border: 1px solid rgba(255,255,255,0.25); box-shadow: 0 4px 14px rgba(0,0,0,0.25);`;
+            iconStyle = `background: rgba(0,0,0,0.25); color: #fff;`;
+          } else if (estilo === "border_glow") {
+            cardStyle = `background: ${cardBg}; border: 1.5px solid ${b.color}; box-shadow: 0 0 12px ${b.color}40;`;
+            iconStyle = `background: ${b.color};`;
+          }
+          return `
+            <div class="btn-card" style="${cardStyle}">
+              <div class="icon-box" style="${iconStyle}"><i class="${b.icon}"></i></div>
+              <div>
+                <div class="title">${escapeHtml(b.label)}</div>
+                <div class="sub" style="${estilo === 'full_card' ? 'opacity: 0.9;' : ''}">${escapeHtml(b.sub)}</div>
+              </div>
+              <i class="fas fa-chevron-right arrow"></i>
             </div>
-            <i class="fas fa-chevron-right arrow"></i>
-          </div>
-        `).join("")}
+          `;
+        }).join("")}
       </div>
     </body>
     </html>

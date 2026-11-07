@@ -148,42 +148,83 @@
       <!-- Pestaña 2: Botones y Redes -->
       <div id="tabButtons" class="tab-pane">
         <div class="form-section">
-          <div class="section-title"><i class="fas fa-share-alt"></i> Botones Principales</div>
+          <div class="section-title"><i class="fas fa-share-alt"></i> Botones Principales & Colores Individuales</div>
+          <p style="font-size: 0.82rem; color: #9ca3af; margin-bottom: 16px;">Configura el enlace y personaliza el color de cada botón para que combine con la marca del cliente.</p>
 
           <!-- WhatsApp -->
           <div class="form-group">
-            <label><i class="fab fa-whatsapp" style="color: #25D366;"></i> Enlace WhatsApp (Con mensaje predeterminado)</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label style="margin: 0;"><i class="fab fa-whatsapp" style="color: #25D366;"></i> Enlace WhatsApp</label>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 0.75rem; color: #9ca3af;">Color:</span>
+                <input type="color" id="btnWhatsappColor" class="color-picker" value="#25D366" title="Color de WhatsApp" onchange="updateLivePreview()">
+              </div>
+            </div>
             <input type="url" id="btnWhatsapp" class="form-control" placeholder="https://wa.me/5215512345678?text=Hola,%20solicito%20información">
           </div>
 
           <!-- Instagram -->
           <div class="form-group">
-            <label><i class="fab fa-instagram" style="color: #E1306C;"></i> Enlace de Instagram</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label style="margin: 0;"><i class="fab fa-instagram" style="color: #E1306C;"></i> Enlace de Instagram</label>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 0.75rem; color: #9ca3af;">Color:</span>
+                <input type="color" id="btnInstagramColor" class="color-picker" value="#E1306C" title="Color de Instagram" onchange="updateLivePreview()">
+              </div>
+            </div>
             <input type="url" id="btnInstagram" class="form-control" placeholder="https://instagram.com/minegocio">
           </div>
 
           <!-- Facebook -->
           <div class="form-group">
-            <label><i class="fab fa-facebook" style="color: #1877F2;"></i> Enlace de Facebook</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label style="margin: 0;"><i class="fab fa-facebook" style="color: #1877F2;"></i> Enlace de Facebook</label>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 0.75rem; color: #9ca3af;">Color:</span>
+                <input type="color" id="btnFacebookColor" class="color-picker" value="#1877F2" title="Color de Facebook" onchange="updateLivePreview()">
+              </div>
+            </div>
             <input type="url" id="btnFacebook" class="form-control" placeholder="https://facebook.com/minegocio">
           </div>
 
           <!-- Ubicación / Maps -->
           <div class="form-group">
-            <label><i class="fas fa-map-marked-alt" style="color: #EA4335;"></i> Enlace de Ubicación / Cómo Llegar</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label style="margin: 0;"><i class="fas fa-map-marked-alt" style="color: #EA4335;"></i> Enlace de Ubicación / Cómo Llegar</label>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 0.75rem; color: #9ca3af;">Color:</span>
+                <input type="color" id="btnUbicacionColor" class="color-picker" value="#EA4335" title="Color de Ubicación" onchange="updateLivePreview()">
+              </div>
+            </div>
             <input type="url" id="btnUbicacion" class="form-control" placeholder="https://maps.google.com/?q=Direccion">
           </div>
 
           <!-- Botón Extra Principal -->
           <div class="form-row">
             <div class="form-group">
-              <label><i class="fas fa-star" style="color: #eab308;"></i> Texto Botón Destacado Extra</label>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label style="margin: 0;"><i class="fas fa-star" style="color: #eab308;"></i> Texto Botón Destacado Extra</label>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="font-size: 0.75rem; color: #9ca3af;">Color:</span>
+                  <input type="color" id="btnExtraColor" class="color-picker" value="#eab308" title="Color del Botón Extra" onchange="updateLivePreview()">
+                </div>
+              </div>
               <input type="text" id="btnExtraLabel" class="form-control" placeholder="Ej: Ver Menú Digital, Agendar Cita">
             </div>
             <div class="form-group">
-              <label>Enlace del Botón Destacado Extra</label>
+              <label style="margin-bottom: 6px; display: block;">Enlace del Botón Destacado Extra</label>
               <input type="url" id="btnExtraUrl" class="form-control" placeholder="https://...">
             </div>
+          </div>
+
+          <!-- Estilo Visual de los Botones -->
+          <div class="form-group" style="margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08);">
+            <label><i class="fas fa-paint-brush" style="color: #38bdf8;"></i> Estilo de Color de los Botones</label>
+            <select id="estiloBotones" class="form-control" onchange="updateLivePreview()">
+              <option value="icon_only">🎨 Solo Ícono Coloreado (Elegante y limpio)</option>
+              <option value="full_card">🔥 Botón Completo Coloreado (Alto impacto visual)</option>
+              <option value="border_glow">✨ Borde & Brillo Neón del Color</option>
+            </select>
           </div>
         </div>
 
@@ -203,29 +244,21 @@
       <!-- Pestaña 3: Plantillas y Colores -->
       <div id="tabThemes" class="tab-pane">
         <div class="form-section">
-          <div class="section-title"><i class="fas fa-paint-roller"></i> Elige la Plantilla del Cliente</div>
-          <div class="theme-grid">
-            <div class="theme-card active" data-theme="modern-dark">
-              <div class="theme-preview-bubble" style="background: linear-gradient(135deg, #0f172a, #1e1b4b);"></div>
-              <span>Cyber Dark</span>
-            </div>
-            <div class="theme-card" data-theme="glassmorphism">
-              <div class="theme-preview-bubble" style="background: linear-gradient(135deg, #064e3b, #022c22);"></div>
-              <span>Glass Esmeralda</span>
-            </div>
-            <div class="theme-card" data-theme="luxury-gold">
-              <div class="theme-preview-bubble" style="background: linear-gradient(135deg, #000000, #422006); border: 1px solid #eab308;"></div>
-              <span>Luxury Gold</span>
-            </div>
-            <div class="theme-card" data-theme="neon-sunset">
-              <div class="theme-preview-bubble" style="background: linear-gradient(135deg, #3b0764, #831843);"></div>
-              <span>Sunset Neon</span>
-            </div>
-            <div class="theme-card" data-theme="clean-light">
-              <div class="theme-preview-bubble" style="background: linear-gradient(135deg, #f8fafc, #cbd5e1);"></div>
-              <span style="color: #94a3b8;">Clean Light</span>
-            </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div class="section-title" style="margin-bottom: 0;"><i class="fas fa-paint-roller"></i> Elige la Plantilla del Cliente (30 Diseños)</div>
           </div>
+          
+          <!-- Filtros de categoría para las 30 plantillas -->
+          <div class="theme-filters" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px;">
+            <button type="button" class="btn btn-sm btn-secondary filter-btn active" data-filter="all" onclick="filterThemes('all')">Todos (30)</button>
+            <button type="button" class="btn btn-sm btn-secondary filter-btn" data-filter="dark" onclick="filterThemes('dark')">🌙 Oscuros & Cyber</button>
+            <button type="button" class="btn btn-sm btn-secondary filter-btn" data-filter="light" onclick="filterThemes('light')">☀️ Claros & Salud</button>
+            <button type="button" class="btn btn-sm btn-secondary filter-btn" data-filter="luxury" onclick="filterThemes('luxury')">👑 Lujo & Joyas</button>
+            <button type="button" class="btn btn-sm btn-secondary filter-btn" data-filter="gastro" onclick="filterThemes('gastro')">🍽️ Gastro & Cafés</button>
+            <button type="button" class="btn btn-sm btn-secondary filter-btn" data-filter="creative" onclick="filterThemes('creative')">🎨 Creativos & Neón</button>
+          </div>
+
+          <div id="themeGrid" class="theme-grid" style="max-height: 420px; overflow-y: auto; padding-right: 6px;"></div>
         </div>
 
         <div class="form-section">

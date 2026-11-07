@@ -265,6 +265,28 @@ body {
 }
 
 /* Temas Selectores */
+.theme-filters .filter-btn {
+  font-size: 0.76rem;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: #1f2937;
+  color: #9ca3af;
+  border: 1px solid #374151;
+  transition: all 0.2s ease;
+}
+
+.theme-filters .filter-btn:hover {
+  color: #fff;
+  border-color: #4b5563;
+}
+
+.theme-filters .filter-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+}
+
 .theme-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
