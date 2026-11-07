@@ -81,7 +81,49 @@
     "color_acento": "#f59e0b",
     "link_google_negocio": "https://maps.app.goo.gl/uA5ifUdr9zVSaLwQ8",
     "botones_adicionales": [],
-    "fecha_actualizacion": "2026-11-07T15:43:06.607Z"
+    "fecha_actualizacion": "2026-11-07T15:43:06.607Z",
+    "google_reviews": {
+      "rating_promedio": 4.8,
+      "total_reviews": 5,
+      "reviews": [
+        {
+          "autor": "William Webb",
+          "rating": 5,
+          "tiempo": "3 months ago",
+          "isNew": false,
+          "comentario": "Great place for brunch.\nQuality good and great service.\nVery pleasing ambiance.\nVery loud music, but when we asked staff to modulate the volume they accommodated.\nA quality venue as this should have background music only, not blasting it making conversations hard\nAdvice to management: control the music level, it really doesn't need to be loud to make this place stand out. The food already does so.Meal typeBrunchPrice per person$200–300Noise levelVery loud, hard to hearGroup size3-4 peopleVegetarian optionsA few in the menu.Parking spaceSomewhat difficult to find parkingParking optionsFree parking lot"
+        },
+        {
+          "autor": "Tania Vela",
+          "rating": 3,
+          "tiempo": "2 months ago",
+          "isNew": false,
+          "comentario": "I ate huevos motuleños and it was very good, but vanilla Kids was 3☆☆☆.Meal typeBreakfastPrice per person$100–200Food: 3Service: 5Atmosphere: 5Group sizeSuitable for all group sizesWait timeNo waitParking spacePlenty of parkingParking optionsFree parking lotKid-friendlinessnormal"
+        },
+        {
+          "autor": "David Medina",
+          "rating": 3,
+          "tiempo": "2 weeks ago",
+          "isNew": false,
+          "comentario": "I think that here is normal to wait more than 30 minutes to be served, the drinks came so much after the food, the portions aren't too much. I must say that we were like 3 or 4 tables at the moment we order so it isn't like we were a lot of people, they should improve that.Meal typeDinnerPrice per person$200–300Food: 3Service: 3Atmosphere: 5ReservationNot sureWait timeUp to 10 minParking spacePlenty of parkingParking optionsFree parking lot"
+        },
+        {
+          "autor": "Lisa W",
+          "rating": 1,
+          "tiempo": "3 months ago",
+          "isNew": false,
+          "comentario": "Terrible horrible service. We will never be coming back. Once seated, we waited around 10-15 minutes for anyone to come to our table. We tried to order some juices, but several were not available. The juices that were available,  orange and green, were watered down and not good. My son tried ordering pancakes that were on the menu, and those were not available either. So he ordered french toast, and they brought him a waffle. I ordered eggs Benedict without ham, and mine was brought to the table with ham. The waiter wanted me to keep the plate, but I asked him to bring me what I ordered. Instead of making me a new plate, the cook obviously just removed the ham and brought me back the original plate. It was cold. Overall, terrible experience.Food: 3Service: 1"
+        },
+        {
+          "autor": "Ricardo Correa",
+          "rating": 5,
+          "tiempo": "3 months ago",
+          "isNew": false,
+          "comentario": "Great atmosphere. Delicious food. Friendly staff. Value. Wonderful for breakfast and brunch.Order typeDine inMeal typeBreakfastPrice per person$300–400Food: 5Service: 5Atmosphere: 5Group size5-8 peopleParking spacePlenty of parkingParking optionsFree parking lotWheelchair accessibilityWheelchair friendly"
+        }
+      ],
+      "ultima_actualizacion": "2026-11-07T15:45:30.878Z"
+    }
   },
   "barbacoasofi": {
     "id": "barbacoasofi",
