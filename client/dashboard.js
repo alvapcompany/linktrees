@@ -672,8 +672,15 @@ async function loadReviews() {
   }
 
   if (reviewsFeed) {
-    // Ordenar automáticamente por recencia (minutos -> horas -> días -> semanas -> meses)
-    window.allLoadedReviews = (reviewData.reviews || []).slice().sort((a, b) => {
+    // Regla estricta: solo mostrar reseñas recientes de minutos, horas o máximo 1 semana (<= 7 días)
+    const recentOnlyReviews = (reviewData.reviews || []).filter(r => {
+      if (r.isNew) return true;
+      const weight = getRecencyWeight(r.tiempo);
+      return weight <= 10080; // Máximo 1 semana (10080 min)
+    });
+
+    // Ordenar automáticamente por recencia (minutos -> horas -> días -> semana)
+    window.allLoadedReviews = recentOnlyReviews.slice().sort((a, b) => {
       return getRecencyWeight(a.tiempo) - getRecencyWeight(b.tiempo);
     });
 
