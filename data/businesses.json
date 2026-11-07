@@ -96,9 +96,23 @@
     "botones_adicionales": [],
     "fecha_actualizacion": "2026-11-07T20:51:15.406Z",
     "google_reviews": {
-      "rating_promedio": 4.4,
+      "rating_promedio": 4.8,
       "total_reviews": 683,
       "reviews": [
+        {
+          "autor": "Azkur Ibrahim Valencia Velazco",
+          "rating": 4,
+          "tiempo": "Editado Hace 4 meses",
+          "isNew": true,
+          "comentario": "Comida excelente y atención muy buena pero la agilidad del servicio puede mejorar.\nAcudí en dos ocasiones a probar la comida del día y la atención mejoró mucho a comparación de la primera vez, dónde estuve media hora esperando a que me sirvieran, pues había mucha desorganización en los meseros.\nLa comida está muy rica, se siente casera y con bastante sabor, buenos ingredientes y de calidad, además de servir en buenas porciones. La atención y amabilidad son muy buenas, pero el servicio es algo lento y a veces descuidado (olvidan las cosas)."
+        },
+        {
+          "autor": "María José Corpus Salas",
+          "rating": 3,
+          "tiempo": "Hace un mes",
+          "isNew": true,
+          "comentario": "Asistí con mi familia un 16 de septiembre a las 10:00 A. M. Y, por supuesto, estaba lleno. Sin embargo, conseguimos un buen lugar. Había mucho bullicio y la música alta, así que no era muy cómodo platicar; la mesera era amable e intentó ser atenta, pero por alguna razón no pudo ser eficiente: olvidó traerme cubiertos, nunca me trajo el perchero que solicité desde que llegamos y tardó mucho en tomar mi orden.\nQuiero pensar que eso fue porque había más gente de lo habitual.\nLa comida por su parte es excelente: platillos bastos, ingredientes buenos y excelente sabor y presentación."
+        },
         {
           "autor": "David Medina",
           "rating": 3,
@@ -107,10 +121,17 @@
           "comentario": "Creo que aquí es normal esperar más de 30 minutos a que te sirvan, las bebidas llegaron mucho después de la comida, las porciones no son tan abundantes. Éramos 3 o 4 mesas al momento de ordenar, así que no es que estuviera lleno, deberían mejorar eso."
         },
         {
+          "autor": "Julissa Cardona",
+          "rating": 5,
+          "tiempo": "Hace 2 meses",
+          "isNew": true,
+          "comentario": "Fuimos por la noche y Lo ame! Y música en vivo, genial! Platos servidos con amor. Su sabor wow.. Después probamos por la mañana y wooow. Super rico el café capuchino caliente, la concha rellena uff. Los chilaquiles 7 chiles delis con sus frijolitos negros y quesito.. 🤤 Todo una delicia.."
+        },
+        {
           "autor": "jesus briceño mendez",
           "rating": 5,
           "tiempo": "Hace un mes",
-          "isNew": false,
+          "isNew": true,
           "comentario": "Un lugar con una onda super buen gusto mesas bien ejecutadas en distancia y estilo. El atencion de javier muy esmerada y atenta. La carta super extensa, la comida muy rica bien elaborada y presentada."
         },
         {
@@ -170,7 +191,7 @@
           "comentario": "Comida excelente y atención muy buena pero la agilidad del servicio puede mejorar. Acudí en dos ocasiones a probar la comida del día y la atención mejoró mucho a comparación de la primera vez, dónde estuve media hora esperando a que me sirvieran, pues había mucha desorganización en los meseros. La comida está muy rica, se siente casera y con bastante sabor, buenos ingredientes y de calidad, además de servir en buenas porciones. La atención y amabilidad son muy buenas, pero el servicio es algo lento y a veces descuidado (olvidan las cosas)."
         }
       ],
-      "ultima_actualizacion": "2026-11-07T22:00:58.470Z"
+      "ultima_actualizacion": "2026-11-07T22:02:38.032Z"
     }
   },
   "barbacoasofi": {
