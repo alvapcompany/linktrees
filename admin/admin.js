@@ -52,6 +52,7 @@ window.logoutAdmin = function () {
 document.addEventListener("DOMContentLoaded", async () => {
   checkAdminAuth();
   loadStoredSettings();
+  renderThemeGrid();
   await loadBusinessesData();
   initIdSelector();
   selectBusiness(currentId);
@@ -650,9 +651,10 @@ function setupEventListeners() {
     });
   }
 
-  // Cambio en cualquier input de texto
-  document.querySelectorAll(".editor-panel input, .editor-panel textarea").forEach(el => {
+  // Cambio en cualquier input, color picker o selector para actualizar la vista previa en vivo
+  document.querySelectorAll(".editor-panel input, .editor-panel textarea, .editor-panel select").forEach(el => {
     el.addEventListener("input", updateLivePreview);
+    el.addEventListener("change", updateLivePreview);
   });
 
   // Selector de tema
