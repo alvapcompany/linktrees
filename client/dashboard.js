@@ -509,7 +509,10 @@ function renderReviewCards(list) {
   const feed = document.getElementById("reviewsFeed");
   if (!feed) return;
 
-  feed.innerHTML = list.map(r => {
+    const mapsUrl = (businessData && (businessData.link_google_negocio || businessData.boton_ubicacion)) || "https://maps.google.com";
+  const totalCount = (businessData && businessData.google_reviews && businessData.google_reviews.total_reviews) || 683;
+
+  const cardsHtml = list.map(r => {
     const isFresh = r.isNew || getRecencyWeight(r.tiempo) <= 1440;
     const formattedTime = formatRelativeTime(r.tiempo);
     return `
@@ -638,6 +641,12 @@ async function loadReviews() {
       };
     }
   }
+
+  const btnViewAll = document.getElementById("btnViewAllGoogleMaps");
+  const btnViewAllText = document.getElementById("btnViewAllText");
+  const placeUrl = (businessData && (businessData.link_google_negocio || businessData.boton_ubicacion)) || "https://maps.google.com";
+  if (btnViewAll) btnViewAll.href = placeUrl;
+  if (btnViewAllText) btnViewAllText.textContent = `Ver las ${reviewData.total_reviews || 683} en Google Maps`;
 
   if (ratingBig) ratingBig.textContent = (reviewData.rating_promedio || 4.8).toFixed(1);
   if (totalReviewsText) totalReviewsText.textContent = `Basado en ${reviewData.total_reviews || 86} reseñas verificadas de Google Maps (Actualizadas)`;

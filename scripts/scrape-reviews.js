@@ -196,12 +196,18 @@ async function main() {
       let prevCount = 0;
       let noChangeCount = 0;
 
-      for (let cycle = 1; cycle <= 25; cycle++) {
+      for (let cycle = 1; cycle <= 35; cycle++) {
+        try {
+          await page.mouse.move(360, 500);
+          await page.mouse.wheel({ deltaY: 3500 });
+          await page.keyboard.press('PageDown');
+        } catch (e) {}
+
         await page.evaluate(() => {
           const scrollers = document.querySelectorAll('div.m6QErb.DxyBCb, div.m6QErb[aria-label*="opiniones"], div.m6QErb[aria-label*="reseñas"], div[role="main"], div.dS8AEf');
           scrollers.forEach(s => {
             if (s.scrollHeight > s.clientHeight) {
-              s.scrollTop = s.scrollHeight;
+              s.scrollTop += 3000;
               s.dispatchEvent(new Event('scroll', { bubbles: true }));
             }
           });
@@ -212,16 +218,7 @@ async function main() {
           }
         });
 
-        await sleep(1800);
-
-        const currentCount = await page.evaluate(() => document.querySelectorAll('div.jftiEf').length);
-        if (currentCount === prevCount) {
-          noChangeCount++;
-          if (noChangeCount >= 3) break;
-        } else {
-          noChangeCount = 0;
-          prevCount = currentCount;
-        }
+        await sleep(1400);
       }
 
       // Expandir textos truncados ("Ver más")
