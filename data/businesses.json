@@ -79,51 +79,15 @@
     "boton_extra_url": "https://www.restaurantvainilla.com",
     "color_primario": "#d97706",
     "color_acento": "#f59e0b",
+    "color_btn_whatsapp": "#25d366",
+    "color_btn_instagram": "#e1306c",
+    "color_btn_facebook": "#1877f2",
+    "color_btn_ubicacion": "#ea4335",
+    "color_btn_extra": "#eab308",
+    "estilo_botones": "border_glow",
     "link_google_negocio": "https://search.google.com/local/writereview?placeid=ChIJbaosTyETiIYRESo-idjTaX0",
     "botones_adicionales": [],
-    "fecha_actualizacion": "2026-11-07T19:51:48.942Z",
-    "google_reviews": {
-      "rating_promedio": 4.8,
-      "total_reviews": 86,
-      "reviews": [
-        {
-          "autor": "William Webb",
-          "rating": 5,
-          "tiempo": "Hace 3 meses",
-          "isNew": false,
-          "comentario": "Gran lugar para brunch. Muy buena calidad y excelente servicio. El ambiente es sumamente agradable y la comida deliciosa."
-        },
-        {
-          "autor": "Tania Vela",
-          "rating": 4,
-          "tiempo": "Hace 2 meses",
-          "isNew": false,
-          "comentario": "Comí huevos motuleños y estaban deliciosos, excelente sazón en los desayunos y muy buena presentación."
-        },
-        {
-          "autor": "David Medina",
-          "rating": 4,
-          "tiempo": "Hace 2 semanas",
-          "isNew": false,
-          "comentario": "Excelente sabor y ambiente muy agradable. Los platillos tienen porciones bien servidas y los postres están riquísimos."
-        },
-        {
-          "autor": "Ricardo Correa",
-          "rating": 5,
-          "tiempo": "Hace 3 meses",
-          "isNew": false,
-          "comentario": "Excelente ambiente, comida deliciosa y personal muy atento. Maravilloso lugar para desayunar en familia."
-        },
-        {
-          "autor": "Julissa Cardona",
-          "rating": 5,
-          "tiempo": "Hace 2 meses",
-          "isNew": false,
-          "comentario": "Fuimos por la noche y lo amé, música en vivo genial. Super rico el café capuchino, la concha rellena y los chilaquiles deliciosos. 100% recomendado."
-        }
-      ],
-      "ultima_actualizacion": "2026-11-07T20:13:16.415Z"
-    }
+    "fecha_actualizacion": "2026-11-07T20:18:20.532Z"
   },
   "barbacoasofi": {
     "id": "barbacoasofi",
