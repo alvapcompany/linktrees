@@ -40,7 +40,8 @@ jobs:
           git add data/businesses.json
           if ! git diff --cached --quiet; then
             git commit -m "chore(reviews): auto-update google maps reviews [skip ci]"
-            git push
+            git pull --rebase origin main
+            git push origin main
             echo "✅ Nuevas reseñas commiteadas y subidas a main."
           else
             echo "ℹ️ No hay cambios en las reseñas."
