@@ -207,7 +207,8 @@ body {
 
 .chart-container {
   position: relative;
-  height: 250px;
+  height: 290px;
+  min-height: 290px;
   width: 100%;
 }
 
