@@ -351,6 +351,94 @@ function cleanAndFormatComment(text) {
 
   return str.trim() || "Excelente atención y servicio.";
 }
+
+window.allLoadedReviews = [];
+
+function updateFilterCounts(reviews) {
+  const total = reviews.length;
+  const fresh = reviews.filter(r => r.isNew || getRecencyWeight(r.tiempo) <= 1440).length;
+  const fiveStars = reviews.filter(r => (r.rating || 5) === 5).length;
+  const fourStars = reviews.filter(r => (r.rating || 5) === 4).length;
+  const critical = reviews.filter(r => (r.rating || 5) <= 3).length;
+  const comments = reviews.filter(r => cleanAndFormatComment(r.comentario).length > 10).length;
+
+  const elAll = document.getElementById("countAll");
+  const elFresh = document.getElementById("countFresh");
+  const el5 = document.getElementById("count5Stars");
+  const el4 = document.getElementById("count4Stars");
+  const elCrit = document.getElementById("countCritical");
+  const elComm = document.getElementById("countComments");
+
+  if (elAll) elAll.textContent = total;
+  if (elFresh) elFresh.textContent = fresh;
+  if (el5) el5.textContent = fiveStars;
+  if (el4) el4.textContent = fourStars;
+  if (elCrit) elCrit.textContent = critical;
+  if (elComm) elComm.textContent = comments;
+}
+
+window.filterReviews = function(type) {
+  document.querySelectorAll(".review-filter-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.getAttribute("data-filter") === type);
+  });
+
+  const feed = document.getElementById("reviewsFeed");
+  if (!feed || !Array.isArray(window.allLoadedReviews)) return;
+
+  let filtered = window.allLoadedReviews;
+
+  if (type === "fresh") {
+    filtered = window.allLoadedReviews.filter(r => r.isNew || getRecencyWeight(r.tiempo) <= 1440);
+  } else if (type === "5stars") {
+    filtered = window.allLoadedReviews.filter(r => (r.rating || 5) === 5);
+  } else if (type === "4stars") {
+    filtered = window.allLoadedReviews.filter(r => (r.rating || 5) === 4);
+  } else if (type === "critical") {
+    filtered = window.allLoadedReviews.filter(r => (r.rating || 5) <= 3);
+  } else if (type === "comments") {
+    filtered = window.allLoadedReviews.filter(r => cleanAndFormatComment(r.comentario).length > 10);
+  }
+
+  if (filtered.length === 0) {
+    feed.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 36px 20px; background: #1f293d; border-radius: 12px; border: 1px dashed #374151;">
+        <i class="fas fa-filter" style="font-size: 2rem; color: #6b7280; margin-bottom: 12px; display: block;"></i>
+        <p style="font-weight: 600; color: #e5e7eb; margin-bottom: 4px;">No hay reseñas en este filtro</p>
+        <p style="font-size: 0.85rem; color: #9ca3af;">Selecciona "Todas" para ver la lista completa.</p>
+      </div>
+    `;
+    return;
+  }
+
+  renderReviewCards(filtered);
+};
+
+function renderReviewCards(list) {
+  const feed = document.getElementById("reviewsFeed");
+  if (!feed) return;
+
+  feed.innerHTML = list.map(r => {
+    const isFresh = r.isNew || getRecencyWeight(r.tiempo) <= 1440;
+    const formattedTime = formatRelativeTime(r.tiempo);
+    return `
+      <div class="review-item" style="${isFresh ? 'border-color: #10b981; background: rgba(16, 185, 129, 0.06); box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);' : ''}">
+        <div class="review-author-row">
+          <div class="author-name">
+            <i class="fab fa-google" style="color: #4285F4; font-size: 0.9rem;"></i>
+            <span>${r.autor}</span>
+            ${isFresh ? '<span style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin-left: 6px; border: 1px solid rgba(16, 185, 129, 0.4);"><i class="fas fa-bolt"></i> EN VIVO</span>' : ''}
+          </div>
+          <span class="review-time" style="${isFresh ? 'color: #34d399; font-weight: 700;' : ''}">${formattedTime}</span>
+        </div>
+        <div class="review-stars">
+          ${"★".repeat(r.rating || 5)}${"☆".repeat(5 - (r.rating || 5))}
+        </div>
+        <p class="review-text">${cleanAndFormatComment(r.comentario)}</p>
+      </div>
+    `;
+  }).join("");
+}
+
 async function loadReviews() {
   const reviewsFeed = document.getElementById("reviewsFeed");
   const ratingBig = document.getElementById("ratingBig");
@@ -455,30 +543,12 @@ async function loadReviews() {
 
   if (reviewsFeed) {
     // Ordenar automáticamente por recencia (minutos -> horas -> días -> semanas -> meses)
-    const sortedReviews = (reviewData.reviews || []).slice().sort((a, b) => {
+    window.allLoadedReviews = (reviewData.reviews || []).slice().sort((a, b) => {
       return getRecencyWeight(a.tiempo) - getRecencyWeight(b.tiempo);
     });
 
-    reviewsFeed.innerHTML = sortedReviews.map(r => {
-      const isFresh = r.isNew || getRecencyWeight(r.tiempo) <= 1440;
-      const formattedTime = formatRelativeTime(r.tiempo);
-      return `
-      <div class="review-item" style="${isFresh ? 'border-color: #10b981; background: rgba(16, 185, 129, 0.06); box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);' : ''}">
-        <div class="review-author-row">
-          <div class="author-name">
-            <i class="fab fa-google" style="color: #4285F4; font-size: 0.9rem;"></i>
-            <span>${r.autor}</span>
-            ${isFresh ? '<span style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin-left: 6px; border: 1px solid rgba(16, 185, 129, 0.4);"><i class="fas fa-bolt"></i> EN VIVO</span>' : ''}
-          </div>
-          <span class="review-time" style="${isFresh ? 'color: #34d399; font-weight: 700;' : ''}">${formattedTime}</span>
-        </div>
-        <div class="review-stars">
-          ${"★".repeat(r.rating || 5)}${"☆".repeat(5 - (r.rating || 5))}
-        </div>
-        <p class="review-text">${cleanAndFormatComment(r.comentario)}</p>
-      </div>
-    `;
-    }).join("");
+    updateFilterCounts(window.allLoadedReviews);
+    renderReviewCards(window.allLoadedReviews);
   }
 }
 
