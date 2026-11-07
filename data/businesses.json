@@ -100,18 +100,18 @@
       "total_reviews": 683,
       "reviews": [
         {
-          "autor": "Azkur Ibrahim Valencia Velazco",
-          "rating": 4,
-          "tiempo": "Editado Hace 4 meses",
+          "autor": "vladimir kaiceros",
+          "rating": 5,
+          "tiempo": "Hace 3 horas",
           "isNew": true,
-          "comentario": "Comida excelente y atención muy buena pero la agilidad del servicio puede mejorar.\nAcudí en dos ocasiones a probar la comida del día y la atención mejoró mucho a comparación de la primera vez, dónde estuve media hora esperando a que me sirvieran, pues había mucha desorganización en los meseros.\nLa comida está muy rica, se siente casera y con bastante sabor, buenos ingredientes y de calidad, además de servir en buenas porciones. La atención y amabilidad son muy buenas, pero el servicio es algo lento y a veces descuidado (olvidan las cosas)."
+          "comentario": "Comida: 5, Servicio: 5. Excelente sabor y atención de primera."
         },
         {
-          "autor": "María José Corpus Salas",
-          "rating": 3,
-          "tiempo": "Hace un mes",
+          "autor": "Fernando Medina Roman",
+          "rating": 2,
+          "tiempo": "Hace 5 horas",
           "isNew": true,
-          "comentario": "Asistí con mi familia un 16 de septiembre a las 10:00 A. M. Y, por supuesto, estaba lleno. Sin embargo, conseguimos un buen lugar. Había mucho bullicio y la música alta, así que no era muy cómodo platicar; la mesera era amable e intentó ser atenta, pero por alguna razón no pudo ser eficiente: olvidó traerme cubiertos, nunca me trajo el perchero que solicité desde que llegamos y tardó mucho en tomar mi orden.\nQuiero pensar que eso fue porque había más gente de lo habitual.\nLa comida por su parte es excelente: platillos bastos, ingredientes buenos y excelente sabor y presentación."
+          "comentario": "El desayuno de Vainilla deja mucho que desear.. pedi un jugo de betabel y era 80% agua , 20% jugo.. el desayuno tardo 35 mins y el lugar no estaba lleno.."
         },
         {
           "autor": "David Medina",
@@ -140,58 +140,9 @@
           "tiempo": "Hace un mes",
           "isNew": false,
           "comentario": "Asistí con mi familia un 16 de septiembre a las 10:00 A. M. Y, por supuesto, estaba lleno. Sin embargo, conseguimos un buen lugar. Había mucho bullicio y la música alta, así que no era muy cómodo platicar; la mesera era amable e intentó ser atenta, pero por alguna razón no pudo ser eficiente: olvidó traerme cubiertos, nunca me trajo el perchero que solicité desde que llegamos y tardó mucho en tomar mi orden. Quiero pensar que eso fue porque había más gente de lo habitual. La comida por su parte es excelente: platillos bastos, ingredientes buenos y excelente sabor y presentación."
-        },
-        {
-          "autor": "Julissa Cardona",
-          "rating": 5,
-          "tiempo": "Hace 2 meses",
-          "isNew": false,
-          "comentario": "Fuimos por la noche y Lo ame! Y música en vivo, genial! Platos servidos con amor. Su sabor wow.. Después probamos por la mañana y wooow. Super rico el café capuchino caliente, la concha rellena uff. Los chilaquiles 7 chiles delis con sus frijolitos negros y quesito.. 🤤 Todo una delicia.."
-        },
-        {
-          "autor": "Tania Vela",
-          "rating": 4,
-          "tiempo": "Hace 2 meses",
-          "isNew": false,
-          "comentario": "Comí huevos motuleños y estaban muy buenos, pero el menú Kids fue de 3 estrellas. Buena atención y presentación."
-        },
-        {
-          "autor": "William Webb",
-          "rating": 5,
-          "tiempo": "Hace 3 meses",
-          "isNew": false,
-          "comentario": "Gran lugar para brunch. Calidad buena y gran servicio. Ambiente muy agradable. La música un poco fuerte, pero cuando pedimos al personal modular el volumen fueron muy amables y lo ajustaron. El lugar es excelente y la comida deliciosa."
-        },
-        {
-          "autor": "Ricardo Correa",
-          "rating": 5,
-          "tiempo": "Hace 3 meses",
-          "isNew": false,
-          "comentario": "Excelente ambiente, comida deliciosa y personal muy atento. Maravilloso lugar para desayunar en familia."
-        },
-        {
-          "autor": "Virginia Thompson (Viglo)",
-          "rating": 3,
-          "tiempo": "Hace 3 meses",
-          "isNew": false,
-          "comentario": "Hemos venido un par de veces a desayunar y han sido excelentes, la comida deliciosa, buen servicio y el lugar es hermoso. Pero justamente hoy venimos a cenar y fue fatal... llegamos a las 8 pm, tardaron una hora en traer la comida y ni siquiera completa(olvidaron la entrada), mi corte lo pedí termino medio y llego bien cocida y la hamburguesa de mi esposo la carne estaba seca y sin sabor. Para los precios de los platillo fue demasiado caro para la baja calidad que nos dieron. Para desayunar altamente recomendable, no tenemos queja de ello y si me aceptan una recomendación prueben el desayuno kikapu, pero para cenar... deja mucho que desear."
-        },
-        {
-          "autor": "Lisa W",
-          "rating": 1,
-          "tiempo": "Hace 3 meses",
-          "isNew": false,
-          "comentario": "Servicio terrible y pésimo. Jamás volveremos. Una vez sentados, esperamos entre 10 y 15 minutos a que alguien se acercara a la mesa. Quisimos pedir jugos pero varios no estaban disponibles. Los jugos que sí había (verde y naranja) estaban aguados y de mal sabor. Mi hijo pidió hot cakes del menú y tampoco tenían. Pidió pan francés y le llevaron un waffle. Yo pedí huevos benedictinos sin jamón y me los llevaron con jamón."
-        },
-        {
-          "autor": "Azkur Ibrahim Valencia Velazco",
-          "rating": 4,
-          "tiempo": "Hace 4 meses",
-          "isNew": false,
-          "comentario": "Comida excelente y atención muy buena pero la agilidad del servicio puede mejorar. Acudí en dos ocasiones a probar la comida del día y la atención mejoró mucho a comparación de la primera vez, dónde estuve media hora esperando a que me sirvieran, pues había mucha desorganización en los meseros. La comida está muy rica, se siente casera y con bastante sabor, buenos ingredientes y de calidad, además de servir en buenas porciones. La atención y amabilidad son muy buenas, pero el servicio es algo lento y a veces descuidado (olvidan las cosas)."
         }
       ],
-      "ultima_actualizacion": "2026-11-07T22:02:38.032Z"
+      "ultima_actualizacion": "2026-11-07T22:10:23.688Z"
     }
   },
   "barbacoasofi": {

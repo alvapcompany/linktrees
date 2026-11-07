@@ -672,8 +672,15 @@ async function loadReviews() {
   }
 
   if (reviewsFeed) {
-    // Ordenar automáticamente por recencia real de Google Maps (las más recientes primero)
-    window.allLoadedReviews = (reviewData.reviews || []).slice().sort((a, b) => {
+    // Regla solicitada: solo mostrar las más recientes reales (máximo 1 mes)
+    const maxOneMonthReviews = (reviewData.reviews || []).filter(r => {
+      if (r.isNew) return true;
+      const weight = getRecencyWeight(r.tiempo);
+      return weight <= 43200; // Máximo 1 mes (43200 min / 30 días)
+    });
+
+    // Ordenar automáticamente por recencia real (horas -> días -> semanas -> 1 mes)
+    window.allLoadedReviews = maxOneMonthReviews.slice().sort((a, b) => {
       return getRecencyWeight(a.tiempo) - getRecencyWeight(b.tiempo);
     });
 
