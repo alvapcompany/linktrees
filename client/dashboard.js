@@ -267,6 +267,41 @@ function formatRelativeTime(timeVal) {
   return `Hace ${Math.floor(diffDays / 30)} meses`;
 }
 
+
+function getRecencyWeight(timeStr) {
+  if (!timeStr) return 999999;
+  const s = String(timeStr).toLowerCase();
+  
+  if (s.includes('un momento') || s.includes('just now')) return 0;
+
+  // Minutos
+  const minMatch = s.match(/(\d+)\s*min/);
+  if (minMatch) return parseInt(minMatch[1], 10);
+
+  // Horas
+  const hourMatch = s.match(/(\d+)\s*hora/);
+  if (hourMatch) return parseInt(hourMatch[1], 10) * 60;
+
+  // Días
+  if (s.includes('ayer')) return 1440;
+  const dayMatch = s.match(/(\d+)\s*d[ií]a/);
+  if (dayMatch) return parseInt(dayMatch[1], 10) * 1440;
+
+  // Semanas
+  const weekMatch = s.match(/(\d+)\s*semana/);
+  if (weekMatch) return parseInt(weekMatch[1], 10) * 10080;
+
+  // Meses
+  const monthMatch = s.match(/(\d+)\s*mes/);
+  if (monthMatch) return parseInt(monthMatch[1], 10) * 43200;
+
+  // Años
+  const yearMatch = s.match(/(\d+)\s*a[nñ]o/);
+  if (yearMatch) return parseInt(yearMatch[1], 10) * 525600;
+
+  return 999999;
+}
+
 function cleanAndFormatComment(text) {
   if (!text) return "Excelente atención y servicio.";
   let str = String(text);
@@ -419,22 +454,31 @@ async function loadReviews() {
   }
 
   if (reviewsFeed) {
-    reviewsFeed.innerHTML = (reviewData.reviews || []).map(r => `
-      <div class="review-item" style="${r.isNew ? 'border-color: #6366f1; background: rgba(99, 102, 241, 0.05);' : ''}">
+    // Ordenar automáticamente por recencia (minutos -> horas -> días -> semanas -> meses)
+    const sortedReviews = (reviewData.reviews || []).slice().sort((a, b) => {
+      return getRecencyWeight(a.tiempo) - getRecencyWeight(b.tiempo);
+    });
+
+    reviewsFeed.innerHTML = sortedReviews.map(r => {
+      const isFresh = r.isNew || getRecencyWeight(r.tiempo) <= 1440;
+      const formattedTime = formatRelativeTime(r.tiempo);
+      return `
+      <div class="review-item" style="${isFresh ? 'border-color: #10b981; background: rgba(16, 185, 129, 0.06); box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);' : ''}">
         <div class="review-author-row">
           <div class="author-name">
             <i class="fab fa-google" style="color: #4285F4; font-size: 0.9rem;"></i>
             <span>${r.autor}</span>
-            ${r.isNew ? '<span style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 6px; margin-left: 6px; border: 1px solid rgba(16, 185, 129, 0.3);"><i class="fas fa-sparkles"></i> NUEVA</span>' : ''}
+            ${isFresh ? '<span style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin-left: 6px; border: 1px solid rgba(16, 185, 129, 0.4);"><i class="fas fa-bolt"></i> EN VIVO</span>' : ''}
           </div>
-          <span class="review-time" style="${r.isNew ? 'color: #34d399; font-weight: 600;' : ''}">${formatRelativeTime(r.tiempo)}</span>
+          <span class="review-time" style="${isFresh ? 'color: #34d399; font-weight: 700;' : ''}">${formattedTime}</span>
         </div>
         <div class="review-stars">
           ${"★".repeat(r.rating || 5)}${"☆".repeat(5 - (r.rating || 5))}
         </div>
         <p class="review-text">${cleanAndFormatComment(r.comentario)}</p>
       </div>
-    `).join("");
+    `;
+    }).join("");
   }
 }
 

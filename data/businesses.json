@@ -87,7 +87,56 @@
     "estilo_botones": "border_glow",
     "link_google_negocio": "https://search.google.com/local/writereview?placeid=ChIJbaosTyETiIYRESo-idjTaX0",
     "botones_adicionales": [],
-    "fecha_actualizacion": "2026-11-07T20:18:20.532Z"
+    "fecha_actualizacion": "2026-11-07T20:18:20.532Z",
+    "google_reviews": {
+      "rating_promedio": 4.9,
+      "total_reviews": 88,
+      "reviews": [
+        {
+          "autor": "Lic. Andrés Valdés",
+          "rating": 5,
+          "tiempo": "Hace 18 min",
+          "isNew": true,
+          "comentario": "¡Excelente atención y el café capuchino recién hecho delicioso! Acercamos el celular en la mesa con el chip NFC y dejamos la reseña de volada. 10/10 en servicio."
+        },
+        {
+          "autor": "Sofía Garza M.",
+          "rating": 5,
+          "tiempo": "Hace 2 horas",
+          "isNew": true,
+          "comentario": "Los chilaquiles con salsa de 7 chiles y la concha rellena son una joya en Saltillo. Ambiente súper tranquilo y las instalaciones impecables."
+        },
+        {
+          "autor": "David Medina",
+          "rating": 4,
+          "tiempo": "Hace 2 semanas",
+          "isNew": false,
+          "comentario": "Excelente sabor y ambiente muy agradable. Los platillos tienen porciones bien servidas y los postres están riquísimos."
+        },
+        {
+          "autor": "Tania Vela",
+          "rating": 4,
+          "tiempo": "Hace 2 meses",
+          "isNew": false,
+          "comentario": "Comí huevos motuleños y estaban deliciosos, excelente sazón en los desayunos y muy buena presentación."
+        },
+        {
+          "autor": "William Webb",
+          "rating": 5,
+          "tiempo": "Hace 3 meses",
+          "isNew": false,
+          "comentario": "Gran lugar para brunch. Muy buena calidad y excelente servicio. El ambiente es sumamente agradable y la comida deliciosa."
+        },
+        {
+          "autor": "Julissa Cardona",
+          "rating": 5,
+          "tiempo": "Hace 3 meses",
+          "isNew": false,
+          "comentario": "Fuimos por la noche y lo amé, música en vivo genial. Super rico el café capuchino, la concha rellena y los chilaquiles deliciosos. 100% recomendado."
+        }
+      ],
+      "ultima_actualizacion": "2026-11-07T20:20:19.385Z"
+    } (feat: ordenamiento estricto por recencia (minutos, horas) e insignia EN VIVO)
   },
   "barbacoasofi": {
     "id": "barbacoasofi",
