@@ -195,6 +195,9 @@ function selectBusiness(id) {
   document.getElementById("avatarUrl").value = b.avatar_url || "";
   document.getElementById("portadaUrl").value = b.portada_url || "";
   document.getElementById("linkGoogle").value = b.link_google_negocio || "";
+  if (document.getElementById("businessPassword")) {
+    document.getElementById("businessPassword").value = b.password || "";
+  }
 
   // Botones principales
   document.getElementById("btnWhatsapp").value = b.boton_whatsapp || "";
@@ -374,6 +377,7 @@ function getFormData() {
     color_btn_extra: document.getElementById("btnExtraColor") ? document.getElementById("btnExtraColor").value : "#eab308",
     estilo_botones: document.getElementById("estiloBotones") ? document.getElementById("estiloBotones").value : "icon_only",
     link_google_negocio: document.getElementById("linkGoogle").value || "",
+    password: document.getElementById("businessPassword") ? document.getElementById("businessPassword").value.trim() : "",
     botones_adicionales: extraBtns,
     google_reviews: (businesses[id] && businesses[id].google_reviews) ? businesses[id].google_reviews : undefined,
     fecha_actualizacion: new Date().toISOString()

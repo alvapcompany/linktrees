@@ -223,7 +223,7 @@ async function main() {
           }
 
           const timeEl = card.querySelector('span.rsqaWe, span.dehysf');
-          const timeText = timeEl ? timeEl.textContent.trim() : 'Reciente';
+          let timeText = timeEl ? timeEl.textContent.trim() : 'Reciente';
 
           const textEl = card.querySelector('span.wiI7pd, div.MyEned');
           let comment = textEl ? textEl.textContent.trim() : '';
@@ -285,12 +285,12 @@ async function main() {
 
       if (cleanReviews.length > 0) {
         b.google_reviews = {
-          rating_promedio: stats.rating || 4.8,
+          rating_promedio: stats.rating || 4.4,
           total_reviews: stats.total || cleanReviews.length,
-          reviews: cleanReviews.slice(0, 8),
+          reviews: cleanReviews,
           ultima_actualizacion: new Date().toISOString()
         };
-        console.log(`✅ [${id}] Perfil de Google Maps actualizado exitosamente.`);
+        console.log(`✅ [${id}] Perfil de Google Maps actualizado exitosamente con ${cleanReviews.length} reseñas.`);
       } else {
         console.log(`ℹ️ [${id}] No se encontraron tarjetas de reseñas en el DOM (se mantiene la versión actual).`);
       }
@@ -298,7 +298,8 @@ async function main() {
       // Sincronizar con Google Sheets si está disponible
       if (gasUrl && b.google_reviews) {
         try {
-          console.log(`☁️ Transmitiendo a Google Sheets...`);
+          console.log(`☁️ Transmitiendo reseñas y datos a Google Sheets...`);
+          // 1. Guardar en Reseñas_Cache
           await fetch(gasUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain' },
@@ -310,7 +311,16 @@ async function main() {
               data: b.google_reviews
             })
           });
-          console.log(`✅ Sincronizado en Google Sheets.`);
+          // 2. Guardar actualización en Negocios
+          await fetch(gasUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({
+              action: 'save_business',
+              data: b
+            })
+          });
+          console.log(`✅ Sincronizado en Google Sheets (Reseñas_Cache y Negocios).`);
         } catch (e) {
           console.warn(`⚠️ Google Sheets sync falló para [${id}]:`, e.message);
         }

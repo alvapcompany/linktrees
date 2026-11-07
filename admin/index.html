@@ -138,9 +138,18 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label><i class="fab fa-google" style="color: #4285F4;"></i> Enlace de Google Maps / Reseñas</label>
-            <input type="url" id="linkGoogle" class="form-control" placeholder="https://maps.google.com/?q=Mi+Negocio (Para mostrar reseñas en vivo)">
+          <div class="form-row">
+            <div class="form-group">
+              <label><i class="fab fa-google" style="color: #4285F4;"></i> Enlace de Google Maps / Reseñas</label>
+              <input type="url" id="linkGoogle" class="form-control" placeholder="https://maps.google.com/?q=Mi+Negocio (Para mostrar reseñas en vivo)">
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-key" style="color: #6366f1;"></i> Contraseña del Panel de Cliente (Privado)</label>
+              <input type="text" id="businessPassword" class="form-control" placeholder="Ej: vainilla2026 (Dejar vacío para acceso público)">
+              <small style="color: #94a3b8; font-size: 0.75rem; margin-top: 4px; display: block;">
+                🔒 Si defines una clave, el cliente deberá ingresarla para ver su panel. Se guarda en Google Sheets.
+              </small>
+            </div>
           </div>
         </div>
       </div>

@@ -62,6 +62,29 @@
 </head>
 <body>
 
+  <!-- Pantalla de Bloqueo por Contraseña para el Cliente -->
+  <div id="clientLockScreen" style="display: none; position: fixed; inset: 0; background: rgba(7, 10, 18, 0.94); z-index: 99999; backdrop-filter: blur(14px); align-items: center; justify-content: center;">
+    <div style="background: #111827; border: 1px solid #374151; padding: 36px 28px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.8);">
+      <div style="width: 60px; height: 60px; border-radius: 16px; background: linear-gradient(135deg, #4f46e5, #6366f1); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 1.6rem; color: #fff;">
+        <i class="fas fa-lock"></i>
+      </div>
+      <h2 id="lockBizName" style="font-size: 1.3rem; font-weight: 700; color: #fff; margin-bottom: 6px;">Panel Privado</h2>
+      <p style="font-size: 0.85rem; color: #9ca3af; margin-bottom: 22px;">Ingresa la contraseña asignada a tu negocio para consultar métricas y reseñas de Google Maps.</p>
+      
+      <form id="clientLoginForm" onsubmit="handleClientLogin(event)">
+        <div style="margin-bottom: 14px;">
+          <input type="password" id="clientSecretInput" placeholder="Contraseña de acceso" required style="width: 100%; box-sizing: border-box; padding: 12px 16px; font-size: 1rem; border-radius: 12px; background: #1f293d; color: #fff; border: 1px solid #4b5563; outline: none;" autofocus>
+        </div>
+        <div id="clientErrorMsg" style="display: none; color: #ef4444; font-size: 0.82rem; margin-bottom: 14px; font-weight: 600;">
+          <i class="fas fa-exclamation-circle"></i> Contraseña incorrecta.
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem; border-radius: 12px; background: #6366f1; color: #fff; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-unlock"></i> Acceder a mis Métricas
+        </button>
+      </form>
+    </div>
+  </div>
+
   <div class="dashboard-container">
     
     <!-- Header del Negocio -->
@@ -78,6 +101,9 @@
         <a id="btnViewProfile" href="#" target="_blank" class="btn btn-secondary">
           <i class="fas fa-external-link-alt"></i> Ver Mi Linktree
         </a>
+        <button id="btnLockDashboard" onclick="lockClientDashboard()" class="btn btn-secondary" style="display: none; color: #ef4444; border-color: #374151; padding: 10px 14px;" title="Cerrar sesión del panel">
+          <i class="fas fa-lock"></i> Salir
+        </button>
       </div>
     </header>
 

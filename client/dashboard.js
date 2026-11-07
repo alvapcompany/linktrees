@@ -12,9 +12,65 @@ let buttonsChart = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
   await loadBusinessInfo();
+  checkClientAuth();
   await loadMetrics();
   await loadReviews();
 });
+
+function checkClientAuth() {
+  const lock = document.getElementById("clientLockScreen");
+  const lockBiz = document.getElementById("lockBizName");
+  const lockBtn = document.getElementById("btnLockDashboard");
+
+  if (!businessData || !businessData.password) {
+    if (lock) lock.style.display = "none";
+    if (lockBtn) lockBtn.style.display = "none";
+    return true;
+  }
+
+  if (lockBiz) {
+    lockBiz.textContent = `Panel Privado de ${businessData.nombre_negocio || "Negocio"}`;
+  }
+
+  const isAuth = sessionStorage.getItem("alvap_client_auth_" + businessId);
+  if (isAuth === "true") {
+    if (lock) lock.style.display = "none";
+    if (lockBtn) lockBtn.style.display = "inline-flex";
+    return true;
+  } else {
+    if (lock) lock.style.display = "flex";
+    if (lockBtn) lockBtn.style.display = "none";
+    return false;
+  }
+}
+
+window.handleClientLogin = function(e) {
+  if (e) e.preventDefault();
+  const input = document.getElementById("clientSecretInput");
+  const errorMsg = document.getElementById("clientErrorMsg");
+  if (!input) return;
+
+  const entered = input.value.trim();
+  const actualPass = (businessData && businessData.password) ? String(businessData.password).trim() : "";
+
+  if (entered === actualPass) {
+    sessionStorage.setItem("alvap_client_auth_" + businessId, "true");
+    const lock = document.getElementById("clientLockScreen");
+    if (lock) lock.style.display = "none";
+    const lockBtn = document.getElementById("btnLockDashboard");
+    if (lockBtn) lockBtn.style.display = "inline-flex";
+    if (errorMsg) errorMsg.style.display = "none";
+  } else {
+    if (errorMsg) errorMsg.style.display = "block";
+    input.value = "";
+    input.focus();
+  }
+};
+
+window.lockClientDashboard = function() {
+  sessionStorage.removeItem("alvap_client_auth_" + businessId);
+  window.location.reload();
+};
 
 /**
  * Carga información del negocio
@@ -451,17 +507,12 @@ async function loadReviews() {
     ? CONFIG.googleAppsScriptUrl 
     : localStorage.getItem("alvap_gas_url");
 
-  // 1. Priorizar reseñas extraídas por GitHub Actions en data/businesses.json
-  if (businessData && businessData.google_reviews && Array.isArray(businessData.google_reviews.reviews) && businessData.google_reviews.reviews.length > 0) {
-    reviewData = businessData.google_reviews;
-  }
-
-  // 2. Si no están en JSON, consultar el Google Sheet vía Google Apps Script
-  if (!reviewData && gasUrl) {
+  // 1. Intentar consultar Google Sheets vía Google Apps Script (para tener reseñas en vivo sincronizadas)
+  if (gasUrl) {
     try {
       const res = await fetch(`${gasUrl}?action=get_reviews&id=${encodeURIComponent(businessId)}`);
       const json = await res.json();
-      if (json.success && json.data) {
+      if (json.success && json.data && Array.isArray(json.data.reviews) && json.data.reviews.length > 0) {
         reviewData = json.data;
       }
     } catch (e) {
@@ -469,39 +520,52 @@ async function loadReviews() {
     }
   }
 
-  // Respaldo de reseñas para mostrar al cliente
+  // 2. Si no están en Google Sheets, tomar de data/businesses.json
+  if (!reviewData && businessData && businessData.google_reviews && Array.isArray(businessData.google_reviews.reviews) && businessData.google_reviews.reviews.length > 0) {
+    reviewData = businessData.google_reviews;
+  }
+
+  // 3. Respaldo de reseñas reales para Vainilla Saltillo
   if (!reviewData) {
     if (businessId === "vainilla-saltillo") {
       reviewData = {
-        rating_promedio: 4.8,
-        total_reviews: 86,
+        rating_promedio: 4.4,
+        total_reviews: 683,
         reviews: [
           {
-            autor: "Mariana Morales G.",
-            rating: 5,
-            tiempo: "Hace 2 horas",
-            isNew: true,
-            comentario: "¡Los mejores desayunos en Saltillo! El slam oaxaqueño y el café están a otro nivel. El ambiente es súper acogedor y la atención de los meseros excelente."
+            autor: "David Medina",
+            rating: 3,
+            tiempo: "Hace 2 semanas",
+            isNew: false,
+            comentario: "I think that here is normal to wait more than 30 minutes to be served, the drinks came so much after the food, the portions aren't too much. I must say that we were like 3 or 4 tables at the moment we order so it isn't like we were a lot of people, they should improve that."
           },
           {
-            autor: "Lic. Javier Saucedo",
+            autor: "jesus briceño mendez",
             rating: 5,
-            tiempo: "Hace 5 horas",
-            isNew: true,
-            comentario: "Excelente propuesta de cocina contemporánea en Eulalio Gutiérrez. La presentación de los platillos es impecable y la relación calidad-precio muy justa."
+            tiempo: "Hace un mes",
+            isNew: false,
+            comentario: "Un lugar con una onda super buen gusto mesas bien ejecutadas en distancia y estilo. El atencion de javier muy esmerada y atenta. La carta super extensa, la comida muy rica bien elaborada y presentada."
           },
           {
-            autor: "Dra. Claudia Treviño",
-            rating: 5,
-            tiempo: "Hace 1 día",
-            isNew: true,
-            comentario: "Lugar precioso, perfecto para reuniones o desayunar agusto con amigas. Instalaciones súper limpias y rapidez en el servicio."
+            autor: "María José Corpus Salas",
+            rating: 3,
+            tiempo: "Hace un mes",
+            isNew: false,
+            comentario: "Asistí con mi familia un 16 de septiembre a las 10:00 A. M. Y, por supuesto, estaba lleno. Sin embargo, conseguimos un buen lugar. Había mucho bullicio y la música alta, así que no era muy cómodo platicar; la mesera era amable e intentó ser atenta, pero por alguna razón no pudo ser eficiente: olvidó traerme cubiertos, nunca me trajo el perchero que solicité desde que llegamos y tardó mucho en tomar mi orden. Quiero pensar que eso fue porque había más gente de lo habitual. La comida por su parte es excelente: platillos bastos, ingredientes buenos y excelente sabor y presentación."
           },
           {
-            autor: "Rodrigo Peña",
+            autor: "Julissa Cardona",
             rating: 5,
-            tiempo: "Hace 3 días",
-            comentario: "Muy buena comida y ambiente. Las bebidas y la repostería riquísimas. Sin duda de los mejores lugares del norte de la ciudad."
+            tiempo: "Hace 2 meses",
+            isNew: false,
+            comentario: "Fuimos por la noche y Lo ame! Y música en vivo, genial! Platos servidos con amor. Su sabor wow.. Después probamos por la mañana y wooow. Super rico el café capuchino caliente, la concha rellena uff. Los chilaquiles 7 chiles delis con sus frijolitos negros y quesito.. 🤤 Todo una delicia.."
+          },
+          {
+            autor: "Lisa W",
+            rating: 1,
+            tiempo: "Hace 3 meses",
+            isNew: false,
+            comentario: "Terrible horrible service. We will never be coming back. Once seated, we waited around 10–15 minutes for anyone to come to our table. We tried to order some juices, but several were not available. The juices that were available, orange and green, were watered down and not good. My son tried ordering pancakes that were on the menu, and those were not available either. So he ordered french toast, and they brought him a waffle. I ordered eggs Benedict without ham, and mine was brought to the table with ham."
           }
         ]
       };

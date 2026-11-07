@@ -38,9 +38,10 @@ function initSheets() {
       "link_google_negocio",
       "botones_json",
       "fecha_creacion",
-      "fecha_actualizacion"
+      "fecha_actualizacion",
+      "password"
     ]);
-    sheetBiz.getRange(1, 1, 1, 19).setFontWeight("bold").setBackground("#e0f2fe");
+    sheetBiz.getRange(1, 1, 1, 20).setFontWeight("bold").setBackground("#e0f2fe");
   }
 
   // Hoja de Métricas (Vistas y Clics)
@@ -157,8 +158,13 @@ function doPost(e) {
       return jsonResponse({ success: true });
     }
 
-    if (action === "sync_reviews") {
-      const result = scrapeAndCacheReviews(payload.business_id, payload.google_place_url, payload.business_name);
+    if (action === "sync_reviews" || action === "save_reviews") {
+      let result;
+      if (payload.data && (payload.data.reviews || payload.data.rating_promedio)) {
+        result = saveReviewsToCache(payload.business_id, payload.data.rating_promedio, payload.data.total_reviews, payload.data.reviews);
+      } else {
+        result = scrapeAndCacheReviews(payload.business_id, payload.google_place_url, payload.business_name);
+      }
       return jsonResponse({ success: true, data: result });
     }
 
@@ -199,7 +205,8 @@ function saveOrUpdateBusiness(biz) {
     biz.link_google_negocio || "",
     JSON.stringify(biz.botones_adicionales || biz.botones_json || []),
     biz.fecha_creacion || now,
-    now
+    now,
+    biz.password || ""
   ];
 
   let foundIndex = -1;
@@ -216,6 +223,13 @@ function saveOrUpdateBusiness(biz) {
     sheet.getRange(foundIndex, 1, 1, rowData.length).setValues([rowData]);
   } else {
     sheet.appendRow(rowData);
+  }
+
+  // Si incluye reseñas de Google, guardarlas en la hoja Reseñas_Cache
+  if (biz.google_reviews && Array.isArray(biz.google_reviews.reviews)) {
+    try {
+      saveReviewsToCache(id, biz.google_reviews.rating_promedio, biz.google_reviews.total_reviews, biz.google_reviews.reviews);
+    } catch (e) {}
   }
 
   return { id: id, status: foundIndex > 0 ? "updated" : "created" };
@@ -281,7 +295,8 @@ function parseBusinessRow(row) {
     link_google_negocio: row[15],
     botones_adicionales: botonesExtras,
     fecha_creacion: row[17],
-    fecha_actualizacion: row[18]
+    fecha_actualizacion: row[18],
+    password: row[19] || ""
   };
 }
 
@@ -492,6 +507,46 @@ function scrapeAndCacheReviews(businessId, googleUrl, businessName) {
     rating,
     totalReviews,
     JSON.stringify(reviews),
+    now
+  ];
+
+  if (foundIndex > 0) {
+    sheet.getRange(foundIndex, 1, 1, 5).setValues([cacheRow]);
+  } else {
+    sheet.appendRow(cacheRow);
+  }
+
+  return {
+    business_id: businessId,
+    rating_promedio: rating,
+    total_reviews: totalReviews,
+    reviews: reviews,
+    ultima_actualizacion: now
+  };
+}
+
+/**
+ * Guarda o actualiza directamente las reseñas en la hoja Reseñas_Cache
+ */
+function saveReviewsToCache(businessId, rating, totalReviews, reviews) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_REVIEWS);
+  const now = new Date().toISOString();
+
+  const rows = sheet.getDataRange().getValues();
+  let foundIndex = -1;
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]).toLowerCase() === String(businessId).toLowerCase()) {
+      foundIndex = i + 1;
+      break;
+    }
+  }
+
+  const cacheRow = [
+    businessId,
+    rating || 4.8,
+    totalReviews || (reviews ? reviews.length : 0),
+    JSON.stringify(reviews || []),
     now
   ];
 
