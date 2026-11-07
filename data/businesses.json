@@ -39,42 +39,42 @@
       "total_reviews": 5,
       "reviews": [
         {
-          "autor": "Dave North",
+          "autor": "David Fernández Garrido",
+          "rating": 5,
+          "tiempo": "Hace 5 años",
+          "isNew": false,
+          "comentario": "Fantástico tanto el servicio como la atención. Tanto en taller cómo en alquiler de vehículos, si está en su mano siempre buscan una solución."
+        },
+        {
+          "autor": "santiago luis parente bustabad",
+          "rating": 1,
+          "tiempo": "Hace 5 años",
+          "isNew": false,
+          "comentario": "Carísimo,poca atención y mucho dinero quieren ganar con cuatro furgonetas a costa de alquilarselas a otro.Si ya tenemos impuestos en combustible con ellos se elevará más si cabe.ladrones.gracias por vuestra mala y deficiente oferta."
+        },
+        {
+          "autor": "CRUNCHYDISCOVERY",
+          "rating": 5,
+          "tiempo": "Hace un año",
+          "isNew": false,
+          "comentario": "Gran equipo de profesionales....recomendable."
+        },
+        {
+          "autor": "Alvaro Rey",
           "rating": 5,
           "tiempo": "Hace 6 años",
           "isNew": false,
-          "comentario": "Dan, de Alpha Digital Pro, ha mejorado notablemente la imagen de mi empresa de techos. Su habilidad con la videografía con drones y su edición entre bastidores ofrecen una perspectiva visual de nuestro trabajo que solo se consigue con su servicio. Le ha dado a nuestra página web el factor sorpresa que necesitábamos para diferenciarnos de la competencia.\n\nDave North\nPresidente, Dave North Roofing Corp., Milwaukee, WI"
+          "comentario": "Trato exquisito y gran profesionalidad a un precio muy razonable.Aspectos positivosPuntualidad, Calidad, Profesionalidad y ValorServiciosReparación de motores, Cambio de aceite y Transmisión"
         },
         {
-          "autor": "Ryan Mleziva",
-          "rating": 5,
-          "tiempo": "Hace 6 años",
+          "autor": "Nuevo Huawei",
+          "rating": 1,
+          "tiempo": "Hace 5 años",
           "isNew": false,
-          "comentario": "Llevo dos años trabajando con Dan y Alpha Digital Pro, y han realizado diversos vídeos promocionales, fotos, contenido para redes sociales y marketing digital con excelentes resultados. Además, es un placer trabajar con ellos; transforman tus ideas en creaciones que jamás hubieras imaginado. Recomiendo encarecidamente a cualquiera que busque servicios de vídeo, fotografía o publicidad que contacte con Alpha Digital."
-        },
-        {
-          "autor": "Jon Trapp (BigJonnay67)",
-          "rating": 5,
-          "tiempo": "Hace 6 años",
-          "isNew": false,
-          "comentario": "Estoy muy feliz de haber encontrado a Alpha Digital Pro para mi video profesional de bienes raíces. La edición final sin duda atrajo a compradores potenciales gracias al trabajo y la visión de futuro que Dan y Brandon aportaron al video. No creo que haya otra forma de vender bienes raíces sin ellos. ¡Muchísimas gracias por el valor que aportan a nuestra comunidad! Los recomiendo 10/10."
-        },
-        {
-          "autor": "Gary Les",
-          "rating": 5,
-          "tiempo": "Hace 3 años",
-          "isNew": false,
-          "comentario": "Estoy muy impresionado con la forma en que Dan Wein ha creado Alpha Digital Pro. Es un empresario muy talentoso e ingenioso que busca maneras creativas de impulsar el crecimiento de los ingresos de sus clientes. Dan y su equipo Alpha impulsan los resultados. Pídale que presente algunos ejemplos y casos prácticos. Estoy seguro de que quedará impresionado."
-        },
-        {
-          "autor": "Ryan Hull",
-          "rating": 5,
-          "tiempo": "Hace 6 años",
-          "isNew": false,
-          "comentario": "¡Tuve una experiencia excelente trabajando con los profesionales de Alpha Digital! La calidad de sus imágenes y la atención al detalle en sus videos le dan un valor añadido al producto final. Los recomiendo ampliamente a amigos, familiares y socios comerciales."
+          "comentario": "Manolo un impresentable que solo sabe gritar y mirar con mala cara.. cuidado con élAspectos negativosCalidad y ProfesionalidadServiciosEl servicio no está en la lista"
         }
       ],
-      "ultima_actualizacion": "2026-11-06T18:35:20.319Z"
+      "ultima_actualizacion": "2026-11-07T00:25:52.404Z"
     }
   },
   "tacos-el-pastor": {
@@ -206,7 +206,7 @@
           "comentario": "Great atmosphere. Delicious food. Friendly staff. Value. Wonderful for breakfast and brunch.Order typeDine inMeal typeBreakfastPrice per person$300–400Food: 5Service: 5Atmosphere: 5Group size5-8 peopleParking spacePlenty of parkingParking optionsFree parking lotWheelchair accessibilityWheelchair friendly"
         }
       ],
-      "ultima_actualizacion": "2026-11-06T18:35:53.101Z"
+      "ultima_actualizacion": "2026-11-07T00:26:24.841Z"
     }
   },
   "barbacoasofi": {
