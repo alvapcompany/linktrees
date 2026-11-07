@@ -191,22 +191,46 @@ async function main() {
         console.warn('Advertencia ordenando:', e.message);
       }
 
-      // Hacer scroll para cargar más reseñas
-      await page.evaluate(() => {
-        const scrollable = document.querySelector('div.m6QErb.DxyBCb.kA9KIf.dS8AEf') || document.querySelector('div.m6QErb[aria-label*="opiniones"]') || document.querySelector('div[role="main"]') || document.body;
-        if (scrollable) {
-          scrollable.scrollTop = 1500;
+      // Realizar scroll continuo profundo para cargar lotes sucesivos de reseñas
+      console.log('🔄 Ejecutando scroll continuo para cargar la mayor cantidad de opiniones reales...');
+      let prevCount = 0;
+      let noChangeCount = 0;
+
+      for (let cycle = 1; cycle <= 25; cycle++) {
+        await page.evaluate(() => {
+          const scrollers = document.querySelectorAll('div.m6QErb.DxyBCb, div.m6QErb[aria-label*="opiniones"], div.m6QErb[aria-label*="reseñas"], div[role="main"], div.dS8AEf');
+          scrollers.forEach(s => {
+            if (s.scrollHeight > s.clientHeight) {
+              s.scrollTop = s.scrollHeight;
+              s.dispatchEvent(new Event('scroll', { bubbles: true }));
+            }
+          });
+
+          const cards = document.querySelectorAll('div.jftiEf');
+          if (cards.length > 0) {
+            cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
+        });
+
+        await sleep(1800);
+
+        const currentCount = await page.evaluate(() => document.querySelectorAll('div.jftiEf').length);
+        if (currentCount === prevCount) {
+          noChangeCount++;
+          if (noChangeCount >= 3) break;
+        } else {
+          noChangeCount = 0;
+          prevCount = currentCount;
         }
-      });
-      await sleep(2500);
+      }
 
       // Expandir textos truncados ("Ver más")
       await page.evaluate(() => {
         document.querySelectorAll('button.w8nwRe, button[aria-label*="Ver más"], button[aria-label*="More"]').forEach(b => b.click());
       });
-      await sleep(1200);
+      await sleep(1500);
 
-      // Extraer las reseñas individuales limpias
+      // Extraer todas las reseñas visibles limpias
       let extractedReviews = await page.evaluate(() => {
         const items = [];
         const reviewCards = document.querySelectorAll('div.jftiEf');
@@ -236,7 +260,7 @@ async function main() {
           }
           comment = comment.replace(/^\(Traducido por Google\)\s*/i, '').replace(/^\(Translated by Google\)\s*/i, '');
 
-          // 2. Limpiar etiquetas de encuestas de Google Maps (inglés y español)
+          // 2. Limpiar etiquetas de encuestas de Google Maps
           if (comment) {
             comment = comment.replace(/\n*(Tipo de comida|Precio por persona|Comida:|Servicio:|Ambiente:|Platillos recomendados|Estacionamiento|Reservas|Nivel de ruido|Opciones vegetarianas|Accesibilidad|Meal type|Price per person|Food:|Service:|Atmosphere:|Group size|Wait time|Noise level|Parking|Kid-friendliness|Wheelchair|Order type)[\s\S]*/i, '').trim();
           }
@@ -254,7 +278,6 @@ async function main() {
             .replace(/an\s+hour\s+ago/i, 'Hace 1 hora')
             .replace(/just now/i, 'Hace un momento');
 
-          // Solo incluir si tiene autor y no es un fragmento de código JS
           if (author && !author.includes('function') && (!comment || (!comment.startsWith('],') && !comment.includes('null,')))) {
             const isNew = /hora|minuto|min|ayer|hoy|semana/i.test(timeText);
             items.push({
@@ -270,29 +293,79 @@ async function main() {
         return items;
       });
 
-      // Deduplicar estrictamente por autor
-      const seen = new Set();
-      const cleanReviews = [];
+      // Deduplicar scrapeadas de esta sesión
+      const seenNow = new Set();
+      const sessionClean = [];
       for (const r of extractedReviews) {
-        const key = r.autor.toLowerCase().trim();
-        if (!seen.has(key) && key.length > 2) {
-          seen.add(key);
-          cleanReviews.push(r);
+        const key = (r.autor.trim() + '::' + r.comentario.trim().slice(0, 30)).toLowerCase();
+        if (!seenNow.has(key) && r.autor.length > 2) {
+          seenNow.add(key);
+          sessionClean.push(r);
         }
       }
 
-      console.log(`💬 Se obtuvieron ${cleanReviews.length} reseñas limpias para [${id}].`);
+      console.log(`💬 Se extrajeron ${sessionClean.length} reseñas de Google Maps en esta corrida.`);
 
-      if (cleanReviews.length > 0) {
+      // 4. ACUMULACIÓN INTELIGENTE Y DETECCIÓN DE RESEÑAS NUEVAS
+      const existingReviews = (b.google_reviews && Array.isArray(b.google_reviews.reviews)) 
+        ? b.google_reviews.reviews 
+        : [];
+
+      const makeKey = (r) => (r.autor.trim() + '::' + (r.comentario || '').trim().slice(0, 30)).toLowerCase();
+      const existingMap = new Map();
+      for (const er of existingReviews) {
+        existingMap.set(makeKey(er), er);
+      }
+
+      const newlyFoundReviews = [];
+      for (const r of sessionClean) {
+        const k = makeKey(r);
+        if (!existingMap.has(k)) {
+          // ¡Nueva reseña en vivo detectada!
+          r.isNew = true;
+          newlyFoundReviews.push(r);
+          console.log(`⚡ [NUEVA RESEÑA EN VIVO]: "${r.autor}" (${r.rating}★) - "${r.comentario.slice(0, 45)}..."`);
+        } else {
+          // Ya existía en nuestra base de datos: actualizar tiempo
+          const existing = existingMap.get(k);
+          existing.tiempo = r.tiempo;
+          if (/hora|minuto|min|ayer|hoy/i.test(r.tiempo)) {
+            existing.isNew = true;
+          }
+        }
+      }
+
+      // Combinar: primero las nuevas detectadas (LIFO), luego las existentes acumuladas
+      const accumulated = [...newlyFoundReviews];
+      for (const er of existingReviews) {
+        accumulated.push(er);
+      }
+
+      // Deduplicación final
+      const finalUnique = [];
+      const finalSeenKeys = new Set();
+      for (const r of accumulated) {
+        const k = makeKey(r);
+        if (!finalSeenKeys.has(k)) {
+          finalSeenKeys.add(k);
+          finalUnique.push(r);
+        }
+      }
+
+      // Mantener rating y total real de Google Maps (sin degradar a conteo parcial)
+      const realTotal = stats.total || (b.google_reviews && b.google_reviews.total_reviews) || finalUnique.length;
+      const realRating = stats.rating || (b.google_reviews && b.google_reviews.rating_promedio) || 4.4;
+
+      if (finalUnique.length > 0) {
         b.google_reviews = {
-          rating_promedio: stats.rating || 4.4,
-          total_reviews: stats.total || cleanReviews.length,
-          reviews: cleanReviews,
+          rating_promedio: realRating,
+          total_reviews: realTotal,
+          reviews: finalUnique,
           ultima_actualizacion: new Date().toISOString()
         };
-        console.log(`✅ [${id}] Perfil de Google Maps actualizado exitosamente con ${cleanReviews.length} reseñas.`);
+        console.log(`✅ [${id}] Base de datos acumulada: ${finalUnique.length} opiniones guardadas (Total Maps: ${realTotal}, ${realRating}★).`);
       } else {
-        console.log(`ℹ️ [${id}] No se encontraron tarjetas de reseñas en el DOM (se mantiene la versión actual).`);
+        console.log(`ℹ️ [${id}] No se detectaron tarjetas nuevas; se preserva la base de datos acumulada.`);
       }
 
       // Sincronizar con Google Sheets si está disponible

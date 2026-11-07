@@ -416,9 +416,9 @@ function cleanAndFormatComment(text) {
     [/I ate huevos motuleños and it was very good, but vanilla Kids was 3[☆★]*/gi,
      "Comí huevos motuleños y estaban deliciosos, excelente sazón en los desayunos y muy buena presentación."],
     [/I think that here is normal to wait more than 30 minutes to be served[\s\S]*they should improve that\./gi,
-     "Excelente sabor y ambiente muy agradable. Los platillos tienen porciones bien servidas y los postres están riquísimos."],
+     "Creo que aquí es normal esperar más de 30 minutos a que te sirvan, las bebidas llegaron mucho después de la comida, las porciones no son tan abundantes. Éramos 3 o 4 mesas al momento de ordenar, así que no es que estuviera lleno, deberían mejorar eso."],
     [/Terrible horrible service[\s\S]*Overall, terrible experience\./gi,
-     "El servicio estuvo algo lento por la hora pico, pero la comida y el café muy ricos."],
+     "Servicio terrible y pésimo. Jamás volveremos. Una vez sentados, esperamos entre 10 y 15 minutos a que alguien se acercara a la mesa. Quisimos pedir jugos pero varios no estaban disponibles. Los jugos que sí había (verde y naranja) estaban aguados y de mal sabor. Mi hijo pidió hot cakes del menú y tampoco tenían. Pidió pan francés y le llevaron un waffle. Yo pedí huevos benedictinos sin jamón y me los llevaron con jamón."],
     [/Great atmosphere\.\s*Delicious food\.\s*Friendly staff\.\s*Value\.\s*Wonderful for breakfast and brunch\./gi,
      "Excelente ambiente, comida deliciosa y personal muy atento. Maravilloso lugar para desayunar en familia."]
   ];
