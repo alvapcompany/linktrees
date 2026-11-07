@@ -509,10 +509,10 @@ function renderReviewCards(list) {
   const feed = document.getElementById("reviewsFeed");
   if (!feed) return;
 
-    const mapsUrl = (businessData && (businessData.link_google_negocio || businessData.boton_ubicacion)) || "https://maps.google.com";
+  const mapsUrl = (businessData && (businessData.link_google_negocio || businessData.boton_ubicacion)) || "https://maps.google.com";
   const totalCount = (businessData && businessData.google_reviews && businessData.google_reviews.total_reviews) || 683;
 
-  const cardsHtml = list.map(r => {
+  const cardsHtml = (list || []).map(r => {
     const isFresh = r.isNew || getRecencyWeight(r.tiempo) <= 1440;
     const formattedTime = formatRelativeTime(r.tiempo);
     return `
@@ -532,6 +532,23 @@ function renderReviewCards(list) {
       </div>
     `;
   }).join("");
+
+  const footerCard = `
+    <div style="grid-column: 1 / -1; margin-top: 10px; background: linear-gradient(135deg, rgba(31, 41, 61, 0.85), rgba(17, 24, 39, 0.95)); border: 1px solid #374151; border-radius: 16px; padding: 24px 20px; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.3);">
+      <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(66, 133, 244, 0.15); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+        <i class="fab fa-google" style="font-size: 1.6rem; color: #4285F4;"></i>
+      </div>
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: #ffffff; margin-bottom: 6px;">Catálogo Completo de Opiniones (${totalCount} en Google Maps)</h3>
+      <p style="color: #9ca3af; font-size: 0.86rem; max-width: 580px; margin: 0 auto 16px; line-height: 1.5;">
+        Este panel monitorea, audita y muestra todas las opiniones registradas sin límite. También puedes explorar el catálogo completo de las ${totalCount} reseñas directamente en Google Maps.
+      </p>
+      <a href="${mapsUrl}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: #2563eb; color: #ffffff; text-decoration: none; padding: 10px 22px; border-radius: 10px; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);">
+        <i class="fas fa-external-link-alt"></i> Abrir las ${totalCount} Reseñas en Google Maps
+      </a>
+    </div>
+  `;
+
+  feed.innerHTML = cardsHtml + footerCard;
 }
 
 async function loadReviews() {
