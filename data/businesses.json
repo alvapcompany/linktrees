@@ -104,7 +104,7 @@
           "rating": 5,
           "tiempo": "Hace 3 horas",
           "isNew": true,
-          "comentario": "Comida: 5, Servicio: 5. Excelente sabor y atención de primera."
+          "comentario": "Comida: 5, Servicio: 5. Excelente lugar y atención de primera."
         },
         {
           "autor": "Fernando Medina Roman",
@@ -121,17 +121,10 @@
           "comentario": "Creo que aquí es normal esperar más de 30 minutos a que te sirvan, las bebidas llegaron mucho después de la comida, las porciones no son tan abundantes. Éramos 3 o 4 mesas al momento de ordenar, así que no es que estuviera lleno, deberían mejorar eso."
         },
         {
-          "autor": "Julissa Cardona",
-          "rating": 5,
-          "tiempo": "Hace 2 meses",
-          "isNew": true,
-          "comentario": "Fuimos por la noche y Lo ame! Y música en vivo, genial! Platos servidos con amor. Su sabor wow.. Después probamos por la mañana y wooow. Super rico el café capuchino caliente, la concha rellena uff. Los chilaquiles 7 chiles delis con sus frijolitos negros y quesito.. 🤤 Todo una delicia.."
-        },
-        {
           "autor": "jesus briceño mendez",
           "rating": 5,
           "tiempo": "Hace un mes",
-          "isNew": true,
+          "isNew": false,
           "comentario": "Un lugar con una onda super buen gusto mesas bien ejecutadas en distancia y estilo. El atencion de javier muy esmerada y atenta. La carta super extensa, la comida muy rica bien elaborada y presentada."
         },
         {
