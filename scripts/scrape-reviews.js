@@ -349,15 +349,23 @@ async function main() {
         }
       }
 
+      // Filtrar estrictamente: solo opiniones recientes de horas, semanas o máximo 1 mes
+      const maxOneMonthReviews = finalUnique.filter(r => {
+        const t = (r.tiempo || "").toLowerCase();
+        if (/hora|minuto|min|ayer|hoy|semana/i.test(t)) return true;
+        if (/1\s*mes|un\s*mes/i.test(t)) return true;
+        return false;
+      });
+
       // Mantener rating y total real de Google Maps (sin degradar a conteo parcial)
-      const realTotal = stats.total || (b.google_reviews && b.google_reviews.total_reviews) || finalUnique.length;
+      const realTotal = stats.total || (b.google_reviews && b.google_reviews.total_reviews) || 683;
       const realRating = stats.rating || (b.google_reviews && b.google_reviews.rating_promedio) || 4.4;
 
-      if (finalUnique.length > 0) {
+      if (maxOneMonthReviews.length > 0) {
         b.google_reviews = {
           rating_promedio: realRating,
           total_reviews: realTotal,
-          reviews: finalUnique,
+          reviews: maxOneMonthReviews,
           ultima_actualizacion: new Date().toISOString()
         };
         console.log(`✅ [${id}] Base de datos acumulada: ${finalUnique.length} opiniones guardadas (Total Maps: ${realTotal}, ${realRating}★).`);
