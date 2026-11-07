@@ -374,6 +374,7 @@ function getFormData() {
     estilo_botones: document.getElementById("estiloBotones") ? document.getElementById("estiloBotones").value : "icon_only",
     link_google_negocio: document.getElementById("linkGoogle").value || "",
     botones_adicionales: extraBtns,
+    google_reviews: (businesses[id] && businesses[id].google_reviews) ? businesses[id].google_reviews : undefined,
     fecha_actualizacion: new Date().toISOString()
   };
 }

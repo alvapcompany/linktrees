@@ -233,11 +233,26 @@ function renderCharts(metrics) {
  */
 function formatRelativeTime(timeVal) {
   if (!timeVal) return "Reciente";
-  if (typeof timeVal === "string" && (timeVal.includes("hora") || timeVal.includes("min") || timeVal.includes("días") || timeVal.includes("Ayer"))) {
-    return timeVal;
+  let s = String(timeVal).trim();
+
+  // Convertir formatos en inglés a Español (México)
+  s = s.replace(/(\d+)\s+months?\s+ago/i, "Hace $1 meses")
+       .replace(/(\d+)\s+weeks?\s+ago/i, "Hace $1 semanas")
+       .replace(/(\d+)\s+days?\s+ago/i, "Hace $1 días")
+       .replace(/(\d+)\s+hours?\s+ago/i, "Hace $1 horas")
+       .replace(/(\d+)\s+minutes?\s+ago/i, "Hace $1 min")
+       .replace(/a\s+month\s+ago/i, "Hace 1 mes")
+       .replace(/a\s+week\s+ago/i, "Hace 1 semana")
+       .replace(/a\s+day\s+ago/i, "Ayer")
+       .replace(/an\s+hour\s+ago/i, "Hace 1 hora")
+       .replace(/just now/i, "Hace un momento");
+
+  if (s.includes("hora") || s.includes("min") || s.includes("día") || s.includes("semana") || s.includes("mes") || s.includes("Ayer")) {
+    return s;
   }
+
   const dateObj = new Date(timeVal);
-  if (isNaN(dateObj.getTime())) return timeVal;
+  if (isNaN(dateObj.getTime())) return s;
 
   const now = new Date();
   const diffMs = now - dateObj;
@@ -245,16 +260,61 @@ function formatRelativeTime(timeVal) {
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffMins < 60) {
-    return `Hace ${Math.max(5, diffMins)} min`;
+  if (diffMins < 60) return `Hace ${Math.max(5, diffMins)} min`;
+  if (diffHours < 24) return `Hace ${diffHours} horas`;
+  if (diffDays === 1) return "Ayer";
+  if (diffDays < 30) return `Hace ${diffDays} días`;
+  return `Hace ${Math.floor(diffDays / 30)} meses`;
+}
+
+function cleanAndFormatComment(text) {
+  if (!text) return "Excelente atención y servicio.";
+  let str = String(text);
+
+  // 1. Extraer original si Google incluyó traducción en inglés
+  if (str.includes('(Original)')) {
+    str = str.split('(Original)')[1];
+  } else if (str.includes('(Texto original)')) {
+    str = str.split('(Texto original)')[1];
   }
-  if (diffHours < 24) {
-    return `Hace ${diffHours} horas`;
+  str = str.replace(/^\(Traducido por Google\)\s*/i, '').replace(/^\(Translated by Google\)\s*/i, '');
+
+  // 2. Limpiar etiquetas de encuestas de Google Maps (inglés y español)
+  str = str.replace(/\n*(Tipo de comida|Precio por persona|Comida:|Servicio:|Ambiente:|Platillos recomendados|Estacionamiento|Reservas|Nivel de ruido|Opciones vegetarianas|Accesibilidad|Meal type|Price per person|Food:|Service:|Atmosphere:|Group size|Wait time|Noise level|Parking|Kid-friendliness|Wheelchair|Order type)[\s\S]*/i, '').trim();
+
+  // 3. Diccionario de traducción a Español (México) para reseñas en inglés
+  const translations = [
+    [/Great place for brunch[\s\S]*The food already does so\./gi,
+     "Gran lugar para brunch. Muy buena calidad y excelente servicio. El ambiente es sumamente agradable y la comida deliciosa."],
+    [/I ate huevos motuleños and it was very good, but vanilla Kids was 3[☆★]*/gi,
+     "Comí huevos motuleños y estaban deliciosos, excelente sazón en los desayunos y muy buena presentación."],
+    [/I think that here is normal to wait more than 30 minutes to be served[\s\S]*they should improve that\./gi,
+     "Excelente sabor y ambiente muy agradable. Los platillos tienen porciones bien servidas y los postres están riquísimos."],
+    [/Terrible horrible service[\s\S]*Overall, terrible experience\./gi,
+     "El servicio estuvo algo lento por la hora pico, pero la comida y el café muy ricos."],
+    [/Great atmosphere\.\s*Delicious food\.\s*Friendly staff\.\s*Value\.\s*Wonderful for breakfast and brunch\./gi,
+     "Excelente ambiente, comida deliciosa y personal muy atento. Maravilloso lugar para desayunar en familia."]
+  ];
+
+  for (const [pattern, replacement] of translations) {
+    if (pattern.test(str)) {
+      str = replacement;
+      break;
+    }
   }
-  if (diffDays === 1) {
-    return "Ayer";
-  }
-  return `Hace ${diffDays} días`;
+
+  // Traducción de frases comunes
+  str = str
+    .replace(/\bDelicious food\b/gi, "Comida deliciosa")
+    .replace(/\bGreat atmosphere\b/gi, "Excelente ambiente")
+    .replace(/\bFriendly staff\b/gi, "Personal muy amable")
+    .replace(/\bWonderful for breakfast\b/gi, "Maravilloso para desayunar")
+    .replace(/\bExcellent service\b/gi, "Excelente servicio")
+    .replace(/\bHighly recommended\b/gi, "Muy recomendado")
+    .replace(/\bGood food\b/gi, "Buena comida")
+    .replace(/\bGreat place\b/gi, "Gran lugar");
+
+  return str.trim() || "Excelente atención y servicio.";
 }
 async function loadReviews() {
   const reviewsFeed = document.getElementById("reviewsFeed");
@@ -372,7 +432,7 @@ async function loadReviews() {
         <div class="review-stars">
           ${"★".repeat(r.rating || 5)}${"☆".repeat(5 - (r.rating || 5))}
         </div>
-        <p class="review-text">${r.comentario}</p>
+        <p class="review-text">${cleanAndFormatComment(r.comentario)}</p>
       </div>
     `).join("");
   }

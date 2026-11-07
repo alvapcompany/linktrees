@@ -43,7 +43,7 @@ async function main() {
       '--no-zygote',
       '--disable-gpu',
       '--window-size=1280,900',
-      '--lang=es-MX,es'
+      '--lang=es-419,es-MX,es'
     ]
   });
 
@@ -54,14 +54,22 @@ async function main() {
     const b = businesses[id];
     let googleUrl = b.link_google_negocio || b.boton_ubicacion;
 
+    // Si es enlace de writereview directo, convertir a enlace de ficha para poder inspeccionar las reseñas
+    if (googleUrl && googleUrl.includes('writereview?placeid=')) {
+      const pIdMatch = googleUrl.match(/placeid=([a-zA-Z0-9_-]+)/);
+      if (pIdMatch) {
+        googleUrl = `https://www.google.com/maps/place/?q=place_id:${pIdMatch[1]}`;
+      }
+    }
+
     // Verificar si es un enlace válido de Google Maps (incluyendo goo.gl y google.com)
     if (!googleUrl || (!googleUrl.includes('google.com') && !googleUrl.includes('goo.gl'))) {
       console.log(`⏩ Saltando [${id}] - No tiene enlace de Google Maps.`);
       continue;
     }
 
-    // Forzar idioma español en Google Maps
-    const targetUrl = googleUrl.includes('?') ? `${googleUrl}&hl=es` : `${googleUrl}?hl=es`;
+    // Forzar idioma español de México (es-419 y gl=MX)
+    const targetUrl = googleUrl.includes('?') ? `${googleUrl}&hl=es-419&gl=MX` : `${googleUrl}?hl=es-419&gl=MX`;
 
     console.log(`\n======================================================`);
     console.log(`🔍 Analizando negocio: "${b.nombre_negocio}" (${id})`);
@@ -71,16 +79,24 @@ async function main() {
       const page = await browser.newPage();
       await page.setViewport({ width: 1280, height: 900 });
       await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36');
-      await page.setExtraHTTPHeaders({ 'Accept-Language': 'es-MX,es;q=0.9,en;q=0.8' });
+      await page.setExtraHTTPHeaders({ 'Accept-Language': 'es-419,es-MX;q=0.9,es;q=0.8,en;q=0.1' });
 
-      // Inyectar cookie de consentimiento para evitar la pantalla de bloqueo de Google en servidores de GitHub
+      // Inyectar cookies de idioma Español México y consentimiento de Google
       try {
-        await page.setCookie({
-          name: 'SOCS',
-          value: 'CAESEwgDEgk2OTQ0NTgyNjMaAmVzIAEaBgiA_L2wBg',
-          domain: '.google.com',
-          path: '/'
-        });
+        await page.setCookie(
+          {
+            name: 'PREF',
+            value: 'hl=es-419&gl=MX',
+            domain: '.google.com',
+            path: '/'
+          },
+          {
+            name: 'SOCS',
+            value: 'CAESEwgDEgk2OTQ0NTgyNjMaAmVzIAEaBgiA_L2wBg',
+            domain: '.google.com',
+            path: '/'
+          }
+        );
       } catch (e) {}
 
       // Navegar a Google Maps
@@ -212,10 +228,31 @@ async function main() {
           const textEl = card.querySelector('span.wiI7pd, div.MyEned');
           let comment = textEl ? textEl.textContent.trim() : '';
 
-          // Filtrar metadatos añadidos por Google (Tipo de comida, Precio por persona, etc.)
-          if (comment) {
-            comment = comment.replace(/\n*(Tipo de comida|Precio por persona|Comida:|Servicio:|Ambiente:|Platillos recomendados|Estacionamiento|Reservas|Nivel de ruido)[\s\S]*/i, '').trim();
+          // 1. Extraer original si Google tradujo automáticamente
+          if (comment.includes('(Original)')) {
+            comment = comment.split('(Original)')[1];
+          } else if (comment.includes('(Texto original)')) {
+            comment = comment.split('(Texto original)')[1];
           }
+          comment = comment.replace(/^\(Traducido por Google\)\s*/i, '').replace(/^\(Translated by Google\)\s*/i, '');
+
+          // 2. Limpiar etiquetas de encuestas de Google Maps (inglés y español)
+          if (comment) {
+            comment = comment.replace(/\n*(Tipo de comida|Precio por persona|Comida:|Servicio:|Ambiente:|Platillos recomendados|Estacionamiento|Reservas|Nivel de ruido|Opciones vegetarianas|Accesibilidad|Meal type|Price per person|Food:|Service:|Atmosphere:|Group size|Wait time|Noise level|Parking|Kid-friendliness|Wheelchair|Order type)[\s\S]*/i, '').trim();
+          }
+
+          // 3. Traducir formato de tiempo en inglés a Español México
+          timeText = timeText
+            .replace(/(\d+)\s+months?\s+ago/i, 'Hace $1 meses')
+            .replace(/(\d+)\s+weeks?\s+ago/i, 'Hace $1 semanas')
+            .replace(/(\d+)\s+days?\s+ago/i, 'Hace $1 días')
+            .replace(/(\d+)\s+hours?\s+ago/i, 'Hace $1 horas')
+            .replace(/(\d+)\s+minutes?\s+ago/i, 'Hace $1 min')
+            .replace(/a\s+month\s+ago/i, 'Hace 1 mes')
+            .replace(/a\s+week\s+ago/i, 'Hace 1 semana')
+            .replace(/a\s+day\s+ago/i, 'Ayer')
+            .replace(/an\s+hour\s+ago/i, 'Hace 1 hora')
+            .replace(/just now/i, 'Hace un momento');
 
           // Solo incluir si tiene autor y no es un fragmento de código JS
           if (author && !author.includes('function') && (!comment || (!comment.startsWith('],') && !comment.includes('null,')))) {
