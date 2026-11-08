@@ -94,7 +94,28 @@
     "link_google_negocio": "https://search.google.com/local/writereview?placeid=ChIJbaosTyETiIYRESo-idjTaX0",
     "password": "VAINILLA123",
     "botones_adicionales": [],
-    "fecha_actualizacion": "2026-11-08T19:53:23.622Z"
+    "fecha_actualizacion": "2026-11-08T19:53:23.622Z",
+    "google_reviews": {
+      "rating_promedio": 4.8,
+      "total_reviews": 683,
+      "reviews": [
+        {
+          "autor": "jesus briceño mendez",
+          "rating": 5,
+          "tiempo": "Hace un mes",
+          "isNew": true,
+          "comentario": "Un lugar con una onda super buen gusto mesas bien ejecutadas en distancia y estilo. El atencion de javier muy esmerada y atenta. La carta super extensa, la comida muy rica bien elaborada y presentada."
+        },
+        {
+          "autor": "María José Corpus Salas",
+          "rating": 3,
+          "tiempo": "Hace un mes",
+          "isNew": true,
+          "comentario": "Asistí con mi familia un 16 de septiembre a las 10:00 A. M. Y, por supuesto, estaba lleno. Sin embargo, conseguimos un buen lugar. Había mucho bullicio y la música alta, así que no era muy cómodo platicar; la mesera era amable e intentó ser atenta, pero por alguna razón no pudo ser eficiente: olvidó traerme cubiertos, nunca me trajo el perchero que solicité desde que llegamos y tardó mucho en tomar mi orden.\nQuiero pensar que eso fue porque había más gente de lo habitual.\nLa comida por su parte es excelente: platillos bastos, ingredientes buenos y excelente sabor y presentación."
+        }
+      ],
+      "ultima_actualizacion": "2026-11-08T19:59:07.778Z"
+    }
   },
   "barbacoasofi": {
     "id": "barbacoasofi",
