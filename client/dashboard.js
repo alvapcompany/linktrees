@@ -27,11 +27,118 @@ const businessId = resolveDashboardBusinessId();
 let businessData = null;
 let timelineChart = null;
 let buttonsChart = null;
+let isRefreshingDashboard = false;
 
-document.addEventListener("DOMContentLoaded", async () => {
-  await loadBusinessInfo();
-  checkClientAuth();
-  await loadMetrics();
+function purgeBrowserCaches() {
+  try {
+    if ("caches" in window && typeof window.caches.keys === "function") {
+      window.caches.keys().then(keys => {
+        keys.forEach(k => window.caches.delete(k));
+      }).catch(() => {});
+    }
+    if ("serviceWorker" in navigator && typeof navigator.serviceWorker.getRegistrations === "function") {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(reg => reg.unregister());
+      }).catch(() => {});
+    }
+  } catch (e) {}
+}
+
+function decodeGitHubBase64Utf8(b64) {
+  const cleanB64 = (b64 || "").replace(/\s/g, "");
+  const binStr = atob(cleanB64);
+  const bytes = new Uint8Array(binStr.length);
+  for (let i = 0; i < binStr.length; i++) {
+    bytes[i] = binStr.charCodeAt(i);
+  }
+  return new TextDecoder("utf-8").decode(bytes);
+}
+
+function getBizTimestamp(b) {
+  if (!b || !b.fecha_actualizacion) return 0;
+  const t = new Date(b.fecha_actualizacion).getTime();
+  return Number.isFinite(t) ? t : 0;
+}
+
+function pickNewestBusiness(a, b) {
+  if (!a) return b || null;
+  if (!b) return a;
+  return getBizTimestamp(b) >= getBizTimestamp(a) ? b : a;
+}
+
+async function fetchGitHubContentsJson(owner, repo, filePath, token) {
+  const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${filePath}?_t=${Date.now()}`;
+  const headers = { "Accept": "application/vnd.github.v3+json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  let res = await fetch(url, { headers, cache: "no-store" });
+  if (res.status === 401 && headers["Authorization"]) {
+    delete headers["Authorization"];
+    res = await fetch(url, { headers, cache: "no-store" });
+  }
+  if (!res.ok) return null;
+  const fileData = await res.json();
+  return JSON.parse(decodeGitHubBase64Utf8(fileData.content || ""));
+}
+
+async function fetchFreshBusinessFromGitHubApi(id) {
+  const owner = (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.owner) ? CONFIG.github.owner : "alvapcompany";
+  const mainRepo = (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.repo) ? CONFIG.github.repo : "linktrees";
+  const token = (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.token) ? CONFIG.github.token.trim() : "";
+
+  try {
+    const isInsideLinktrees = window.location.pathname.includes("/linktrees/") || window.location.pathname.includes("/client/") || window.location.pathname.includes("/negocios/");
+    const segments = window.location.pathname.split("/").filter(Boolean);
+    const ignored = ["linktrees", "client", "negocios", "admin", "p"];
+    const pathSlug = (segments.length > 0 && !ignored.includes(segments[0].toLowerCase()) && !segments[0].endsWith(".html"))
+      ? segments[0]
+      : null;
+    const standaloneSlug = window.STANDALONE_REPO ? (pathSlug || id) : (!isInsideLinktrees ? pathSlug : null);
+
+    if (standaloneSlug) {
+      const standaloneBiz = await fetchGitHubContentsJson(owner, standaloneSlug, "business.json", token);
+      if (standaloneBiz && (standaloneBiz.id || standaloneBiz.nombre_negocio)) {
+        return standaloneBiz;
+      }
+    }
+
+    const allBiz = await fetchGitHubContentsJson(owner, mainRepo, "data/businesses.json", token);
+    if (allBiz && allBiz[id]) {
+      return allBiz[id];
+    }
+  } catch (e) {
+    console.warn("GitHub API live fetch omitido en dashboard:", e);
+  }
+  return null;
+}
+
+async function refreshDashboardState() {
+  if (isRefreshingDashboard) return;
+  isRefreshingDashboard = true;
+  try {
+    await loadBusinessInfo();
+    checkClientAuth();
+    await loadMetrics();
+  } finally {
+    isRefreshingDashboard = false;
+  }
+}
+
+purgeBrowserCaches();
+
+document.addEventListener("DOMContentLoaded", refreshDashboardState);
+
+window.addEventListener("pageshow", (e) => {
+  if (e.persisted) {
+    purgeBrowserCaches();
+    refreshDashboardState();
+  }
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    refreshDashboardState();
+  }
 });
 
 function escapeHtml(str) {
@@ -102,61 +209,77 @@ window.lockClientDashboard = function () {
 /**
  * Carga información del negocio
  */
-async function loadBusinessInfo() {
-  businessData = window.INITIAL_BUSINESS || null;
-  let loadedFromStandalone = false;
+async function fetchStaticFreshBusinessForDashboard() {
   const isInsideLinktrees = window.location.pathname.includes("/linktrees/") || window.location.pathname.includes("/client/") || window.location.pathname.includes("/negocios/");
+  const noCacheOpts = {
+    cache: "no-store",
+    headers: {
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      "Pragma": "no-cache"
+    }
+  };
 
-  // 1. Si es repositorio individual (o ruta raíz de cliente), leer ./business.json o ../business.json
   if (window.STANDALONE_REPO || !isInsideLinktrees) {
     for (const candidate of ["./business.json", "../business.json"]) {
       try {
-        const res = await fetch(`${candidate}?_t=${Date.now()}`, { cache: "no-store" });
+        const res = await fetch(`${candidate}?_t=${Date.now()}`, noCacheOpts);
         if (res.ok) {
           const parsed = await res.json();
           if (parsed && (parsed.id || parsed.nombre_negocio)) {
-            businessData = parsed;
-            loadedFromStandalone = true;
-            break;
+            return parsed;
           }
         }
       } catch (e) {}
     }
   }
 
-  // 2. Consultar repositorio principal data/businesses.json (local o remoto GitHub Pages)
-  if (!loadedFromStandalone) {
-    const mainCandidates = [];
-    if (window.location.pathname.includes("/negocios/")) {
-      mainCandidates.push("../../data/businesses.json");
-    } else if (isInsideLinktrees) {
-      mainCandidates.push("../data/businesses.json");
-    }
+  const mainCandidates = [];
+  if (window.location.pathname.includes("/negocios/")) {
+    mainCandidates.push("../../data/businesses.json");
+  } else if (isInsideLinktrees) {
+    mainCandidates.push("../data/businesses.json");
+  } else {
     mainCandidates.push("https://alvapcompany.github.io/linktrees/data/businesses.json");
-
-    for (const jsonPath of mainCandidates) {
-      try {
-        const res = await fetch(`${jsonPath}?_t=${Date.now()}`, { cache: "no-store" });
-        if (res.ok) {
-          const allBusinesses = await res.json();
-          if (allBusinesses && allBusinesses[businessId]) {
-            businessData = allBusinesses[businessId];
-            break;
-          }
-        }
-      } catch (e) {}
-    }
   }
 
-  // 3. Aplicar caché local solo si es más reciente que el JSON obtenido del servidor
+  for (const jsonPath of mainCandidates) {
+    const opts = jsonPath.startsWith("http") ? { cache: "no-store" } : noCacheOpts;
+    try {
+      const res = await fetch(`${jsonPath}?_t=${Date.now()}`, opts);
+      if (res.ok) {
+        const allBusinesses = await res.json();
+        if (allBusinesses && allBusinesses[businessId]) {
+          return allBusinesses[businessId];
+        }
+      }
+    } catch (e) {}
+  }
+  return null;
+}
+
+async function loadBusinessInfo() {
+  const [apiData, staticData] = await Promise.all([
+    fetchFreshBusinessFromGitHubApi(businessId),
+    fetchStaticFreshBusinessForDashboard()
+  ]);
+
+  const networkData = pickNewestBusiness(apiData, staticData);
+  businessData = networkData || window.INITIAL_BUSINESS || null;
+
+  // Purgar/actualizar caché local salvo que localStorage tenga una edición aún más reciente del admin
   try {
     const local = localStorage.getItem("alvap_biz_" + businessId);
     if (local) {
       const parsed = JSON.parse(local);
-      const isNewer = !businessData || (parsed.fecha_actualizacion && (!businessData.fecha_actualizacion || new Date(parsed.fecha_actualizacion) > new Date(businessData.fecha_actualizacion)));
-      if (isNewer) {
+      if (!networkData && parsed && parsed.nombre_negocio) {
+        businessData = pickNewestBusiness(window.INITIAL_BUSINESS || null, parsed);
+      } else if (networkData && parsed && getBizTimestamp(parsed) > getBizTimestamp(networkData)) {
         businessData = parsed;
+      } else if (networkData) {
+        localStorage.setItem("alvap_biz_" + businessId, JSON.stringify(networkData));
       }
+    } else if (networkData) {
+      localStorage.setItem("alvap_biz_" + businessId, JSON.stringify(networkData));
     }
   } catch (e) {}
 
@@ -201,7 +324,7 @@ async function loadMetrics() {
 
   if (gasUrl) {
     try {
-      const res = await fetch(`${gasUrl}?action=get_metrics&id=${encodeURIComponent(businessId)}`);
+      const res = await fetch(`${gasUrl}?action=get_metrics&id=${encodeURIComponent(businessId)}&_t=${Date.now()}`, { cache: "no-store" });
       const json = await res.json();
       if (json.success && json.data) {
         metrics = json.data;

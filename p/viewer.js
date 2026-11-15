@@ -6,6 +6,140 @@
 (function () {
   const urlParams = new URLSearchParams(window.location.search);
   const businessId = urlParams.get("id") || (window.INITIAL_BUSINESS ? window.INITIAL_BUSINESS.id : "alvap-studio");
+  let lastRenderedSignature = "";
+  let hasTrackedInitialView = false;
+
+  // Limpiar Cache Storage y Service Workers obsoletos en móviles (iOS/Android)
+  function purgeBrowserCaches() {
+    try {
+      if ("caches" in window && typeof window.caches.keys === "function") {
+        window.caches.keys().then(keys => {
+          keys.forEach(k => window.caches.delete(k));
+        }).catch(() => {});
+      }
+      if ("serviceWorker" in navigator && typeof navigator.serviceWorker.getRegistrations === "function") {
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          regs.forEach(reg => reg.unregister());
+        }).catch(() => {});
+      }
+    } catch (e) {}
+  }
+
+  function decodeGitHubBase64Utf8(b64) {
+    const cleanB64 = (b64 || "").replace(/\s/g, "");
+    const binStr = atob(cleanB64);
+    const bytes = new Uint8Array(binStr.length);
+    for (let i = 0; i < binStr.length; i++) {
+      bytes[i] = binStr.charCodeAt(i);
+    }
+    return new TextDecoder("utf-8").decode(bytes);
+  }
+
+  function getBizTimestamp(b) {
+    if (!b || !b.fecha_actualizacion) return 0;
+    const t = new Date(b.fecha_actualizacion).getTime();
+    return Number.isFinite(t) ? t : 0;
+  }
+
+  function pickNewestBusiness(a, b) {
+    if (!a) return b || null;
+    if (!b) return a;
+    return getBizTimestamp(b) >= getBizTimestamp(a) ? b : a;
+  }
+
+  function resolveStandaloneRepoSlug() {
+    if (window.STANDALONE_REPO) {
+      const segments = window.location.pathname.split("/").filter(Boolean);
+      const ignored = ["linktrees", "p", "negocios", "admin", "client"];
+      if (segments.length > 0 && !ignored.includes(segments[0].toLowerCase()) && !segments[0].endsWith(".html")) {
+        return segments[0];
+      }
+      if (window.INITIAL_BUSINESS && window.INITIAL_BUSINESS.github_repo) {
+        return String(window.INITIAL_BUSINESS.github_repo).split("/").pop();
+      }
+      return businessId;
+    }
+    const segments = window.location.pathname.split("/").filter(Boolean);
+    const ignored = ["linktrees", "p", "negocios", "admin", "client"];
+    if (segments.length > 0 && !ignored.includes(segments[0].toLowerCase()) && !segments[0].endsWith(".html")) {
+      return segments[0];
+    }
+    return null;
+  }
+
+  async function fetchGitHubContentsJson(owner, repo, filePath, token) {
+    const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${filePath}?_t=${Date.now()}`;
+    const headers = { "Accept": "application/vnd.github.v3+json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    let res = await fetch(url, { headers, cache: "no-store" });
+    if (res.status === 401 && headers["Authorization"]) {
+      delete headers["Authorization"];
+      res = await fetch(url, { headers, cache: "no-store" });
+    }
+    if (!res.ok) return null;
+    const fileData = await res.json();
+    const decoded = decodeGitHubBase64Utf8(fileData.content || "");
+    return JSON.parse(decoded);
+  }
+
+  async function fetchFreshBusinessFromGitHubApi(id) {
+    const owner = (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.owner) ? CONFIG.github.owner : "alvapcompany";
+    const mainRepo = (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.repo) ? CONFIG.github.repo : "linktrees";
+    const token = (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.token) ? CONFIG.github.token.trim() : "";
+
+    try {
+      const standaloneSlug = resolveStandaloneRepoSlug();
+      if (standaloneSlug) {
+        const standaloneBiz = await fetchGitHubContentsJson(owner, standaloneSlug, "business.json", token);
+        if (standaloneBiz && (standaloneBiz.id || standaloneBiz.nombre_negocio)) {
+          return standaloneBiz;
+        }
+      }
+      const dict = await fetchGitHubContentsJson(owner, mainRepo, "data/businesses.json", token);
+      if (dict && dict[id]) {
+        return dict[id];
+      }
+    } catch (e) {
+      console.warn("GitHub API live fetch omitido:", e);
+    }
+    return null;
+  }
+
+  async function fetchStaticFreshBusiness(id) {
+    const noCacheOpts = {
+      cache: "no-store",
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache"
+      }
+    };
+
+    if (window.STANDALONE_REPO) {
+      try {
+        const res = await fetch(`./business.json?_t=${Date.now()}`, noCacheOpts);
+        if (res.ok) {
+          const standaloneData = await res.json();
+          if (standaloneData && (standaloneData.id || standaloneData.nombre_negocio)) {
+            return standaloneData;
+          }
+        }
+      } catch (e) {}
+    }
+
+    try {
+      const jsonPath = window.location.pathname.includes("/negocios/") ? "../../data/businesses.json" : "../data/businesses.json";
+      const res = await fetch(`${jsonPath}?_t=${Date.now()}`, noCacheOpts);
+      if (res.ok) {
+        const dict = await res.json();
+        if (dict && dict[id]) {
+          return dict[id];
+        }
+      }
+    } catch (e) {}
+
+    return null;
+  }
 
   // Generar o recuperar ID anónimo de visitante para analíticas únicas
   let visitorId = localStorage.getItem("alvap_visitor_id");
@@ -14,62 +148,57 @@
     localStorage.setItem("alvap_visitor_id", visitorId);
   }
 
-  // Inicializar carga
+  purgeBrowserCaches();
+
+  // Inicializar carga y recargar en vivo al regresar desde segundo plano en iPhone/Android
   document.addEventListener("DOMContentLoaded", () => {
-    loadBusinessProfile(businessId);
+    loadBusinessProfile(businessId, false);
   });
 
-  async function loadBusinessProfile(id) {
-    let data = window.INITIAL_BUSINESS || null;
-    let loadedFromStandalone = false;
-
-    // 1. Si es un repositorio individual autónomo, leer ./business.json fresco evitando caché
-    if (window.STANDALONE_REPO) {
-      try {
-        const res = await fetch(`./business.json?_t=${Date.now()}`, { cache: "no-store" });
-        if (res.ok) {
-          const standaloneData = await res.json();
-          if (standaloneData && (standaloneData.id || standaloneData.nombre_negocio)) {
-            data = standaloneData;
-            loadedFromStandalone = true;
-          }
-        }
-      } catch (e) {
-        console.warn("Buscando business.json local sin éxito:", e);
-      }
+  window.addEventListener("pageshow", (e) => {
+    if (e.persisted) {
+      purgeBrowserCaches();
+      loadBusinessProfile(businessId, true);
     }
+  });
 
-    // 2. Buscar en data/businesses.json del repositorio principal evitando caché
-    if (!loadedFromStandalone) {
-      try {
-        const jsonPath = window.location.pathname.includes("/negocios/") ? "../../data/businesses.json" : "../data/businesses.json";
-        const res = await fetch(`${jsonPath}?_t=${Date.now()}`, { cache: "no-store" });
-        if (res.ok) {
-          const dict = await res.json();
-          if (dict && dict[id]) {
-            data = dict[id];
-          }
-        }
-      } catch (e) {
-        console.warn("Buscando en fuentes secundarias:", e);
-      }
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      loadBusinessProfile(businessId, true);
     }
+  });
 
-    // 2. Si no se encontró o hay cambios locales recientes en el navegador del admin
+  async function loadBusinessProfile(id, isSilentRefresh = false) {
+    // Consultar GitHub API en vivo (sin caché CDN) + JSON estático en paralelo
+    const [apiData, staticData] = await Promise.all([
+      fetchFreshBusinessFromGitHubApi(id),
+      fetchStaticFreshBusiness(id)
+    ]);
+
+    let networkData = pickNewestBusiness(apiData, staticData);
+    let data = networkData || window.INITIAL_BUSINESS || null;
+
+    // Respaldo / sincronización de localStorage sin permitir caché antigua sobre la red
     try {
       const localCache = localStorage.getItem("alvap_biz_" + id);
       if (localCache) {
         const parsed = JSON.parse(localCache);
-        if (!data || (parsed.fecha_actualizacion && (!data.fecha_actualizacion || new Date(parsed.fecha_actualizacion) > new Date(data.fecha_actualizacion)))) {
+        if (!networkData && parsed && parsed.nombre_negocio) {
+          data = pickNewestBusiness(window.INITIAL_BUSINESS || null, parsed);
+        } else if (networkData && parsed && getBizTimestamp(parsed) > getBizTimestamp(networkData)) {
           data = parsed;
+        } else if (networkData) {
+          localStorage.setItem("alvap_biz_" + id, JSON.stringify(networkData));
         }
+      } else if (networkData) {
+        localStorage.setItem("alvap_biz_" + id, JSON.stringify(networkData));
       }
     } catch (e) {}
 
-    // 3. Consultar Google Apps Script si está disponible
+    // Consultar Google Apps Script si aún faltan datos
     if ((!data || !data.nombre_negocio) && typeof CONFIG !== "undefined" && CONFIG.googleAppsScriptUrl) {
       try {
-        const gasRes = await fetch(`${CONFIG.googleAppsScriptUrl}?action=get_business&id=${encodeURIComponent(id)}&_t=${Date.now()}`);
+        const gasRes = await fetch(`${CONFIG.googleAppsScriptUrl}?action=get_business&id=${encodeURIComponent(id)}&_t=${Date.now()}`, { cache: "no-store" });
         const json = await gasRes.json();
         if (json.success && json.data) {
           data = json.data;
@@ -79,7 +208,7 @@
       }
     }
 
-    // Si sigue sin datos, usar plantilla de demostración
+    // Plantilla de demostración si no existe aún
     if (!data) {
       data = {
         id: id,
@@ -98,8 +227,16 @@
       };
     }
 
-    renderProfile(data);
-    trackEvent(data.id, "view", "pageview");
+    const signature = JSON.stringify(data);
+    if (!isSilentRefresh || signature !== lastRenderedSignature) {
+      lastRenderedSignature = signature;
+      renderProfile(data);
+    }
+
+    if (!isSilentRefresh && !hasTrackedInitialView) {
+      hasTrackedInitialView = true;
+      trackEvent(data.id, "view", "pageview");
+    }
   }
 
   function renderProfile(b) {
