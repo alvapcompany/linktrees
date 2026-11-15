@@ -26,15 +26,15 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 24px;
+      padding: 40px 20px 56px;
       background-image: 
         radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
         radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
     }
     .hero {
       text-align: center;
-      max-width: 650px;
+      width: 100%;
+      max-width: 960px;
     }
     .badge {
       display: inline-flex;
@@ -47,31 +47,32 @@
       color: #a5b4fc;
       font-size: 0.85rem;
       font-weight: 600;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
     h1 {
-      font-size: 2.8rem;
+      font-size: clamp(1.9rem, 4vw, 2.75rem);
       font-weight: 800;
       letter-spacing: -0.03em;
       line-height: 1.15;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       background: linear-gradient(135deg, #ffffff 40%, #c4b5fd 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    p {
-      font-size: 1.05rem;
-      opacity: 0.8;
+    .hero-sub {
+      font-size: 1.02rem;
+      opacity: 0.82;
       line-height: 1.6;
-      margin-bottom: 32px;
+      max-width: 720px;
+      margin: 0 auto 30px;
     }
     .portal-cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 18px;
       width: 100%;
-      max-width: 600px;
-      margin-bottom: 30px;
+      max-width: 680px;
+      margin: 0 auto 40px;
     }
     .portal-card {
       background: var(--card-bg);
@@ -109,7 +110,8 @@
     }
     .card-desc {
       font-size: 0.86rem;
-      opacity: 0.7;
+      opacity: 0.72;
+      line-height: 1.5;
     }
     .card-link {
       margin-top: 6px;
@@ -120,6 +122,135 @@
       align-items: center;
       gap: 5px;
     }
+
+    /* Hub de Repositorios Individuales Enlazados */
+    .repos-hub {
+      width: 100%;
+      text-align: left;
+      background: rgba(17, 24, 39, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 22px;
+      padding: 26px;
+      backdrop-filter: blur(14px);
+      margin-bottom: 32px;
+    }
+    .repos-hub-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .repos-hub-header h2 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+    .repos-hub-header p {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+    .repos-count-pill {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .repos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+    .repo-biz-card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .repo-biz-card:hover {
+      border-color: rgba(99, 102, 241, 0.55);
+      transform: translateY(-2px);
+    }
+    .repo-biz-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .repo-biz-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1px solid #334155;
+      background: #1e293b;
+      flex-shrink: 0;
+    }
+    .repo-biz-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .repo-biz-meta {
+      font-size: 0.76rem;
+      color: #94a3b8;
+      margin-top: 2px;
+      word-break: break-all;
+    }
+    .repo-biz-meta code {
+      color: #a5b4fc;
+      background: rgba(99, 102, 241, 0.12);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    .repo-biz-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .repo-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid #334155;
+      background: rgba(255, 255, 255, 0.04);
+      color: #e2e8f0;
+      transition: all 0.2s ease;
+    }
+    .repo-btn:hover {
+      background: rgba(99, 102, 241, 0.16);
+      border-color: #6366f1;
+      color: #ffffff;
+    }
+    .repo-btn-web {
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.08);
+    }
+    .repo-btn-dash {
+      border-color: rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+      background: rgba(245, 158, 11, 0.08);
+    }
+    .repo-btn-admin {
+      border-color: rgba(99, 102, 241, 0.4);
+      color: #a5b4fc;
+      background: rgba(99, 102, 241, 0.08);
+    }
     footer {
       font-size: 0.8rem;
       opacity: 0.5;
@@ -129,10 +260,10 @@
 <body>
   <div class="hero">
     <div class="badge">
-      <i class="fas fa-bolt"></i> Sistema Linktrees NFC 100% Gratis
+      <i class="fas fa-bolt"></i> Sistema Linktrees NFC • Multi-Repositorio
     </div>
     <h1>Plataforma de Perfiles & Analíticas Alvap Company</h1>
-    <p>Crea, personaliza y despliega Linktrees con repositorio individual propio en GitHub Pages, enlace centralizado para previsualizar y editar, y analíticas detalladas de clics por botón.</p>
+    <p class="hero-sub">Crea, personaliza y despliega cada Linktree en su propio repositorio independiente en GitHub Pages (con su Linktree público + Dashboard privado de clics), todos enlazados desde este repositorio central para previsualizarlos y editarlos en vivo.</p>
 
     <div class="portal-cards">
       <a href="admin/" class="portal-card">
@@ -140,7 +271,7 @@
           <i class="fas fa-sliders-h"></i>
         </div>
         <div class="card-title">Panel Administrativo</div>
-        <div class="card-desc">Crea y enlaza repositorios individuales por Linktree, previsualiza en vivo y haz auto-commit a GitHub.</div>
+        <div class="card-desc">Crea repositorios individuales por Linktree con su Dashboard, previsualiza en vivo y haz auto-commit a GitHub.</div>
         <div class="card-link">Entrar al Admin <i class="fas fa-arrow-right"></i></div>
       </a>
 
@@ -154,6 +285,20 @@
       </a>
     </div>
 
+    <!-- Directorio Vivo de Repositorios Enlazados -->
+    <section class="repos-hub">
+      <div class="repos-hub-header">
+        <div>
+          <h2>🌐 Repositorios de Clientes Enlazados (Linktrees & Dashboards)</h2>
+          <p>Acceso directo al Linktree web, al Dashboard de clics, al repositorio de GitHub y al editor de cada negocio.</p>
+        </div>
+        <span id="linkedReposCount" class="repos-count-pill">Cargando...</span>
+      </div>
+      <div id="linkedReposHubGrid" class="repos-grid">
+        <p style="color: #94a3b8; font-size: 0.88rem;">Cargando repositorios enlazados...</p>
+      </div>
+    </section>
+
     <footer>
       © 2026 Alvap Company • Soluciones Inteligentes para Tarjetas NFC
     </footer>
@@ -165,6 +310,79 @@
     if (params.has("id")) {
       window.location.href = "p/?id=" + encodeURIComponent(params.get("id"));
     }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    async function loadLinkedReposHub() {
+      const grid = document.getElementById("linkedReposHubGrid");
+      const countEl = document.getElementById("linkedReposCount");
+      try {
+        const res = await fetch(`data/businesses.json?_t=${Date.now()}`, { cache: "no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const businesses = await res.json();
+        const keys = Object.keys(businesses || {});
+        if (countEl) countEl.textContent = `${keys.length} repo(s) enlazados`;
+
+        if (keys.length === 0) {
+          grid.innerHTML = `<p style="color: #94a3b8; font-size: 0.88rem;">Aún no hay negocios registrados. Crea el primero desde el Panel Administrativo.</p>`;
+          return;
+        }
+
+        grid.innerHTML = keys.map(id => {
+          const b = businesses[id] || {};
+          const rawRepo = (b.github_repo || id).trim();
+          const hasSlash = rawRepo.includes("/");
+          const owner = hasSlash ? rawRepo.split("/")[0] : "alvapcompany";
+          const repoSlug = hasSlash ? rawRepo.split("/")[1] : rawRepo;
+          const fullSlug = `${owner}/${repoSlug}`;
+          const linktreeUrl = b.pages_url || `https://${owner.toLowerCase()}.github.io/${repoSlug}/`;
+          const dashboardUrl = b.dashboard_url || `${linktreeUrl}dashboard.html`;
+          const repoUrl = b.repo_url || `https://github.com/${owner}/${repoSlug}`;
+          const adminUrl = `admin/?id=${encodeURIComponent(id)}`;
+
+          return `
+            <article class="repo-biz-card">
+              <div class="repo-biz-top">
+                <img class="repo-biz-avatar" src="${escapeHtml(b.avatar_url || 'https://via.placeholder.com/100')}" alt="${escapeHtml(b.nombre_negocio || id)}">
+                <div style="min-width: 0;">
+                  <div class="repo-biz-name">${escapeHtml(b.nombre_negocio || id)}</div>
+                  <div class="repo-biz-meta">
+                    ${escapeHtml(b.categoria || "Linktree NFC")} • <code>${escapeHtml(fullSlug)}</code>
+                  </div>
+                </div>
+              </div>
+              <div class="repo-biz-actions">
+                <a href="${escapeHtml(linktreeUrl)}" target="_blank" rel="noopener noreferrer" class="repo-btn repo-btn-web">
+                  🌐 Abrir Linktree
+                </a>
+                <a href="${escapeHtml(dashboardUrl)}" target="_blank" rel="noopener noreferrer" class="repo-btn repo-btn-dash">
+                  📊 Abrir Dashboard
+                </a>
+                <a href="${escapeHtml(repoUrl)}" target="_blank" rel="noopener noreferrer" class="repo-btn">
+                  <i class="fab fa-github"></i> Ver Repositorio
+                </a>
+                <a href="${escapeHtml(adminUrl)}" class="repo-btn repo-btn-admin">
+                  ✏️ Editar en Admin
+                </a>
+              </div>
+            </article>
+          `;
+        }).join("");
+      } catch (e) {
+        if (countEl) countEl.textContent = "Sin conexión";
+        grid.innerHTML = `<p style="color: #f87171; font-size: 0.85rem;">No se pudo cargar el directorio de repositorios en este momento.</p>`;
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadLinkedReposHub);
   </script>
 </body>
 </html>

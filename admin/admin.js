@@ -54,6 +54,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   loadStoredSettings();
   renderThemeGrid();
   await loadBusinessesData();
+
+  const urlId = new URLSearchParams(window.location.search).get("id");
+  if (urlId && businesses[urlId]) {
+    currentId = urlId;
+  }
+
   initIdSelector();
   selectBusiness(currentId);
   renderLinkedReposDirectory();
@@ -116,22 +122,31 @@ function updateConnectionBadges(token, gasUrl) {
  * Carga los datos de los negocios desde data/businesses.json o localStorage
  */
 async function loadBusinessesData() {
+  const defaultOwner = ((document.getElementById("cfgGithubOwner") && document.getElementById("cfgGithubOwner").value) || "alvapcompany").trim();
+  let remoteBusinesses = {};
+
   try {
     const res = await fetch(`../data/businesses.json?_t=${Date.now()}`, { cache: "no-store" });
     if (res.ok) {
-      businesses = await res.json();
+      remoteBusinesses = await res.json();
     }
   } catch (e) {
     console.warn("Cargando desde almacenamiento local:", e);
   }
 
-  // Fusionar con cambios locales
+  let localParsed = {};
   const localList = localStorage.getItem("alvap_all_businesses");
   if (localList) {
     try {
-      const parsed = JSON.parse(localList);
-      businesses = { ...businesses, ...parsed };
+      localParsed = JSON.parse(localList) || {};
     } catch (e) {}
+  }
+
+  // Fusión inteligente: no sobrescribir negocios más recientes del servidor ni perder metadata de repos
+  if (typeof GitHubSync !== "undefined" && GitHubSync.mergeBusinessesMaps) {
+    businesses = GitHubSync.mergeBusinessesMaps(remoteBusinesses, localParsed, null, null, defaultOwner);
+  } else {
+    businesses = { ...localParsed, ...remoteBusinesses };
   }
 
   // Si no hay datos, inicializar demo
@@ -156,6 +171,23 @@ async function loadBusinessesData() {
       botones_adicionales: []
     };
   }
+
+  // Garantizar que todos los negocios tengan metadata normalizada de repo + dashboard
+  Object.keys(businesses).forEach(id => {
+    const b = businesses[id];
+    if (b && b.google_reviews) delete b.google_reviews;
+    const repoInfo = getResolvedRepoUrls(b.github_repo || id, id);
+    const isIndividual = b.deploy_individual_repo !== false;
+    businesses[id] = {
+      ...b,
+      id: b.id || id,
+      github_repo: b.github_repo || id,
+      deploy_individual_repo: isIndividual,
+      repo_url: b.repo_url || (isIndividual ? repoInfo.repoUrl : ""),
+      pages_url: b.pages_url || (isIndividual ? repoInfo.pagesUrl : ""),
+      dashboard_url: b.dashboard_url || (isIndividual ? repoInfo.dashboardUrl : "")
+    };
+  });
 }
 
 /**
@@ -241,12 +273,14 @@ function getResolvedRepoUrls(repoInput, idFallback) {
   const parsed = (typeof GitHubSync !== "undefined" && GitHubSync.parseRepoRef)
     ? GitHubSync.parseRepoRef(repoInput || idFallback, defaultOwner)
     : { owner: defaultOwner, repo: (repoInput || idFallback || "").trim() };
+  const pagesUrl = `https://${parsed.owner.toLowerCase()}.github.io/${parsed.repo}/`;
   return {
     owner: parsed.owner,
     repo: parsed.repo,
     fullSlug: `${parsed.owner}/${parsed.repo}`,
     repoUrl: `https://github.com/${parsed.owner}/${parsed.repo}`,
-    pagesUrl: `https://${parsed.owner.toLowerCase()}.github.io/${parsed.repo}/`
+    pagesUrl: pagesUrl,
+    dashboardUrl: `${pagesUrl}dashboard.html`
   };
 }
 
@@ -279,6 +313,12 @@ window.updateLinkedRepoPreviewLinks = function () {
     pagesLinkEl.href = info.pagesUrl;
     pagesLinkEl.textContent = info.pagesUrl;
   }
+
+  const dashLinkEl = document.getElementById("linkedDashboardUrl");
+  if (dashLinkEl) {
+    dashLinkEl.href = info.dashboardUrl;
+    dashLinkEl.textContent = info.dashboardUrl;
+  }
 };
 
 /**
@@ -300,6 +340,7 @@ window.renderLinkedReposDirectory = function () {
     const repoInfo = getResolvedRepoUrls(b.github_repo || id, id);
     const isIndividual = b.deploy_individual_repo !== false;
     const pagesUrl = b.pages_url || (isIndividual ? repoInfo.pagesUrl : `../p/?id=${encodeURIComponent(id)}`);
+    const dashboardUrl = b.dashboard_url || (isIndividual ? repoInfo.dashboardUrl : `../client/dashboard.html?id=${encodeURIComponent(id)}`);
 
     return `
       <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; background: ${isActive ? 'rgba(99, 102, 241, 0.14)' : '#111827'}; border: 1px solid ${isActive ? '#6366f1' : '#374151'}; border-radius: 12px; padding: 12px 14px;">
@@ -312,7 +353,7 @@ window.renderLinkedReposDirectory = function () {
             </div>
             <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 2px;">
               <i class="fab fa-github"></i> <code>${escapeHtml(repoInfo.fullSlug)}</code>
-              <span style="margin-left: 6px; color: ${isIndividual ? '#34d399' : '#fbbf24'};">• ${isIndividual ? 'Repo Individual' : 'Solo Principal'}</span>
+              <span style="margin-left: 6px; color: ${isIndividual ? '#34d399' : '#fbbf24'};">• ${isIndividual ? 'Repo Individual + Dashboard' : 'Solo Principal'}</span>
             </div>
           </div>
         </div>
@@ -320,14 +361,20 @@ window.renderLinkedReposDirectory = function () {
           <button type="button" class="btn btn-secondary btn-sm" onclick="selectBusinessFromDirectory('${escapeHtml(id)}')" title="Previsualizar y modificar en el editor">
             <i class="fas fa-eye"></i> Preview & Editar
           </button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="deploySingleBusinessRepo('${escapeHtml(id)}')" title="Crear o actualizar este repositorio con Linktree + Dashboard" style="border-color: #6366f1; color: #a5b4fc;">
+            <i class="fas fa-cloud-upload-alt"></i> Crear/Actualizar Repo
+          </button>
           <button type="button" class="btn btn-secondary btn-sm" onclick="pullFromClientRepo('${escapeHtml(id)}')" title="Leer cambios actuales desde su repositorio individual" style="border-color: #38bdf8; color: #38bdf8;">
             <i class="fas fa-sync-alt"></i> Leer Repo
           </button>
-          <a href="${escapeHtml(pagesUrl)}" target="_blank" class="btn btn-secondary btn-sm" title="Abrir página web en GitHub Pages" style="color: #34d399;">
-            <i class="fas fa-external-link-alt"></i> Web
+          <a href="${escapeHtml(pagesUrl)}" target="_blank" class="btn btn-secondary btn-sm" title="Abrir Linktree Web en GitHub Pages" style="color: #34d399;">
+            <i class="fas fa-external-link-alt"></i> Linktree Web
           </a>
-          <a href="../client/dashboard.html?id=${encodeURIComponent(id)}" target="_blank" class="btn btn-secondary btn-sm" title="Ver panel de clics del negocio" style="color: #fbbf24;">
-            <i class="fas fa-mouse-pointer"></i> Clics
+          <a href="${escapeHtml(dashboardUrl)}" target="_blank" class="btn btn-secondary btn-sm" title="Abrir Dashboard de Clics del negocio" style="color: #fbbf24;">
+            <i class="fas fa-chart-line"></i> Dashboard
+          </a>
+          <a href="${escapeHtml(repoInfo.repoUrl)}" target="_blank" class="btn btn-secondary btn-sm" title="Ver código del repositorio en GitHub" style="color: #cbd5e1;">
+            <i class="fab fa-github"></i> GitHub Repo
           </a>
         </div>
       </div>
@@ -482,6 +529,7 @@ function getFormData() {
     deploy_individual_repo: deployIndividual,
     repo_url: deployIndividual ? repoInfo.repoUrl : ((businesses[id] && businesses[id].repo_url) || ""),
     pages_url: deployIndividual ? repoInfo.pagesUrl : ((businesses[id] && businesses[id].pages_url) || ""),
+    dashboard_url: deployIndividual ? repoInfo.dashboardUrl : ((businesses[id] && businesses[id].dashboard_url) || ""),
     nombre_negocio: document.getElementById("nombreNegocio").value || "Mi Negocio",
     categoria: document.getElementById("categoria").value || "Comercio",
     descripcion: document.getElementById("descripcion").value || "",
@@ -666,10 +714,9 @@ async function saveToGoogleSheets() {
 }
 
 /**
- * Realiza el Auto-Commit a GitHub para alvapcompany
+ * Ejecuta el despliegue sincronizado de un negocio (repo individual con Linktree + Dashboard + enlace central)
  */
-async function autoCommitToGitHub() {
-  const data = getFormData();
+async function runSingleBusinessCommit(data) {
   const token = (document.getElementById("cfgGithubToken").value || "").trim();
   const owner = (document.getElementById("cfgGithubOwner").value || "alvapcompany").trim();
   const repo = (document.getElementById("cfgGithubRepo").value || "linktrees").trim();
@@ -680,7 +727,7 @@ async function autoCommitToGitHub() {
     return;
   }
 
-  showCommitModal(`Auto-Commit Multi-Repositorio`, "Iniciando despliegue sincronizado...");
+  showCommitModal(`Auto-Commit Multi-Repositorio [${data.id}]`, "Iniciando despliegue sincronizado...");
 
   try {
     appendCommitLog(`🔍 1. Verificando autenticación de GitHub para cuenta '${owner}'...`);
@@ -691,20 +738,27 @@ async function autoCommitToGitHub() {
     await GitHubSync.ensureRepository(owner, repo, token);
     appendCommitLog(`✅ Repositorio principal listo.`);
 
-    if (data.deploy_individual_repo && data.github_repo && data.github_repo.toLowerCase() !== repo.toLowerCase()) {
+    if (data.deploy_individual_repo !== false && data.github_repo && data.github_repo.toLowerCase() !== repo.toLowerCase()) {
       const repoInfo = getResolvedRepoUrls(data.github_repo, data.id);
-      appendCommitLog(`🌐 3. Creando/actualizando repositorio individual '${repoInfo.fullSlug}' con GitHub Pages...`);
+      appendCommitLog(`🌐 3. Creando/actualizando repositorio individual '${repoInfo.fullSlug}' (Linktree + Dashboard + GitHub Pages)...`);
     }
 
-    appendCommitLog(`🚀 4. Publicando configuración en repositorio individual y enlazando en '${owner}/${repo}'...`);
+    appendCommitLog(`🚀 4. Publicando business.json, index.html y dashboard.html, y enlazando en '${owner}/${repo}'...`);
     businesses[data.id] = data;
-    
+
     const result = await GitHubSync.autoCommitBusiness(owner, repo, data, businesses, token);
+    if (result.businesses) {
+      businesses = result.businesses;
+    }
+
     appendCommitLog(`✅ Commit realizado exitosamente! Hash: ${result.commitSha.substring(0, 7)}`);
     appendCommitLog(`🔗 Índice Central (${owner}/${repo}): ${result.liveUrl}`);
     if (result.individualPagesUrl) {
       appendCommitLog(`🌐 Repo Individual: ${result.individualRepoUrl}`);
-      appendCommitLog(`🚀 Web Propia Individual: ${result.individualPagesUrl}`);
+      appendCommitLog(`🚀 Linktree Individual: ${result.individualPagesUrl}`);
+    }
+    if (result.individualDashboardUrl) {
+      appendCommitLog(`📊 Dashboard del Cliente: ${result.individualDashboardUrl}`);
     }
 
     // También guardar en Google Sheets en segundo plano si está configurado
@@ -714,7 +768,7 @@ async function autoCommitToGitHub() {
       fetch(gasUrl, {
         method: "POST",
         headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify({ action: "save_business", data: data })
+        body: JSON.stringify({ action: "save_business", data: businesses[data.id] || data })
       }).then(() => {
         appendCommitLog(`✅ Sincronizado con Google Sheets.`);
       }).catch(() => {});
@@ -722,18 +776,104 @@ async function autoCommitToGitHub() {
 
     updateLinkedRepoPreviewLinks();
     renderLinkedReposDirectory();
-    setModalCompleted(true, "¡Linktree desplegado y enlazado con éxito!", result.liveUrl, result.individualPagesUrl, result.individualRepoUrl);
+    setModalCompleted(
+      true,
+      "¡Linktree y Dashboard desplegados y enlazados con éxito!",
+      result.liveUrl,
+      result.individualPagesUrl,
+      result.individualRepoUrl,
+      result.individualDashboardUrl
+    );
   } catch (err) {
     console.error("Error en auto-commit:", err);
     appendCommitLog(`❌ ERROR: ${err.message}`);
     setModalCompleted(false, "Fallo al realizar auto-commit");
   }
 
-  // Guardar en local
-  localStorage.setItem("alvap_biz_" + data.id, JSON.stringify(data));
+  localStorage.setItem("alvap_biz_" + data.id, JSON.stringify(businesses[data.id] || data));
   localStorage.setItem("alvap_all_businesses", JSON.stringify(businesses));
   initIdSelector();
 }
+
+/**
+ * Realiza el Auto-Commit a GitHub del negocio activo en el editor
+ */
+async function autoCommitToGitHub() {
+  const data = getFormData();
+  await runSingleBusinessCommit(data);
+}
+
+/**
+ * Crea o actualiza directamente el repositorio individual + Dashboard de un negocio del directorio
+ */
+window.deploySingleBusinessRepo = async function (id) {
+  if (!id || !businesses[id]) return;
+  const targetData = id === currentId
+    ? getFormData()
+    : { ...businesses[id], deploy_individual_repo: true, fecha_actualizacion: new Date().toISOString() };
+  await runSingleBusinessCommit(targetData);
+};
+
+/**
+ * Crea y sincroniza TODOS los repositorios individuales + dashboards y actualiza el enlace en el repo principal
+ */
+window.syncAllReposToGitHub = async function () {
+  const token = (document.getElementById("cfgGithubToken").value || "").trim();
+  const owner = (document.getElementById("cfgGithubOwner").value || "alvapcompany").trim();
+  const repo = (document.getElementById("cfgGithubRepo").value || "linktrees").trim();
+
+  if (!token) {
+    alert("⚠️ Se requiere un Personal Access Token de GitHub con permisos de 'repo'. Configúralo en la pestaña 'Conexiones'.");
+    switchTab("tabConnections");
+    return;
+  }
+
+  // Conservar ediciones activas antes de sincronizar todo
+  if (currentId) {
+    businesses[currentId] = getFormData();
+  }
+
+  showCommitModal("Sincronización Masiva Multi-Repositorio", "Creando y enlazando todos los repositorios + Dashboards...");
+
+  try {
+    appendCommitLog(`🔍 Verificando autenticación para '${owner}'...`);
+    const user = await GitHubSync.verifyAuth(token);
+    appendCommitLog(`✅ Conectado como: ${user.login}`);
+
+    const result = await GitHubSync.deployAllBusinesses(owner, repo, businesses, token, (msg) => {
+      appendCommitLog(msg);
+    });
+
+    if (result.businesses) {
+      businesses = result.businesses;
+    }
+
+    Object.keys(businesses).forEach(bizId => {
+      localStorage.setItem("alvap_biz_" + bizId, JSON.stringify(businesses[bizId]));
+    });
+    localStorage.setItem("alvap_all_businesses", JSON.stringify(businesses));
+
+    initIdSelector();
+    updateLinkedRepoPreviewLinks();
+    renderLinkedReposDirectory();
+
+    const hubUrl = `https://${owner.toLowerCase()}.github.io/${repo}/`;
+    const activeBiz = businesses[currentId] || {};
+    appendCommitLog(`🎉 ¡Listo! Se sincronizaron ${result.deployedCount} repositorio(s) individuales con su Linktree y Dashboard.`);
+    setModalCompleted(
+      true,
+      `¡${result.deployedCount} repositorios sincronizados y enlazados!`,
+      hubUrl,
+      activeBiz.pages_url || null,
+      activeBiz.repo_url || null,
+      activeBiz.dashboard_url || null
+    );
+  } catch (err) {
+    console.error("Error en sincronización masiva:", err);
+    appendCommitLog(`❌ ERROR: ${err.message}`);
+    setModalCompleted(false, "Fallo en sincronización masiva");
+  }
+};
 
 /**
  * Importa la configuración actual desde el repositorio individual enlazado al editor central
@@ -766,7 +906,8 @@ window.pullFromClientRepo = async function (targetId) {
       github_repo: repoInput,
       deploy_individual_repo: true,
       repo_url: repoInfo.repoUrl,
-      pages_url: repoInfo.pagesUrl
+      pages_url: repoInfo.pagesUrl,
+      dashboard_url: repoInfo.dashboardUrl
     };
     businesses[id] = merged;
     localStorage.setItem("alvap_biz_" + id, JSON.stringify(merged));
@@ -815,6 +956,7 @@ window.linkExistingRepoPrompt = async function () {
     deploy_individual_repo: true,
     repo_url: repoInfo.repoUrl,
     pages_url: repoInfo.pagesUrl,
+    dashboard_url: repoInfo.dashboardUrl,
     nombre_negocio: (imported && imported.nombre_negocio) || (businesses[newId] && businesses[newId].nombre_negocio) || `Linktree (${newId})`,
     categoria: (imported && imported.categoria) || (businesses[newId] && businesses[newId].categoria) || "Comercio Local",
     descripcion: (imported && imported.descripcion) || (businesses[newId] && businesses[newId].descripcion) || "Perfil oficial interactivo NFC.",
@@ -862,6 +1004,7 @@ window.createNewBusinessId = function () {
     deploy_individual_repo: true,
     repo_url: repoInfo.repoUrl,
     pages_url: repoInfo.pagesUrl,
+    dashboard_url: repoInfo.dashboardUrl,
     nombre_negocio: "Nuevo Negocio (" + newId + ")",
     categoria: "Comercio Local",
     descripcion: "Descripción de los servicios ofrecidos.",
@@ -968,7 +1111,11 @@ window.openStandalonePreview = function () {
 
 window.openClientDashboardInNewTab = function () {
   const data = getFormData();
-  window.open(`../client/dashboard.html?id=${data.id}`, "_blank");
+  localStorage.setItem("alvap_biz_" + data.id, JSON.stringify(data));
+  const targetUrl = (data.deploy_individual_repo !== false && data.dashboard_url)
+    ? data.dashboard_url
+    : `../client/dashboard.html?id=${encodeURIComponent(data.id)}`;
+  window.open(targetUrl, "_blank");
 };
 
 /**
@@ -982,6 +1129,8 @@ function showCommitModal(title, initialStatus) {
   document.getElementById("modalLiveUrlBox").style.display = "none";
   const indWrap = document.getElementById("modalIndividualUrlWrap");
   if (indWrap) indWrap.style.display = "none";
+  const indDash = document.getElementById("modalIndividualDashboardLink");
+  if (indDash) indDash.style.display = "none";
   document.getElementById("modalCloseBtn").style.display = "none";
   if (m) m.classList.add("active");
 }
@@ -995,7 +1144,7 @@ function appendCommitLog(text) {
   box.scrollTop = box.scrollHeight;
 }
 
-function setModalCompleted(success, finalMsg, liveUrl, individualPagesUrl, individualRepoUrl) {
+function setModalCompleted(success, finalMsg, liveUrl, individualPagesUrl, individualRepoUrl, individualDashboardUrl) {
   document.getElementById("modalStatusText").textContent = finalMsg;
   document.getElementById("modalCloseBtn").style.display = "inline-flex";
 
@@ -1008,10 +1157,19 @@ function setModalCompleted(success, finalMsg, liveUrl, individualPagesUrl, indiv
 
     const indWrap = document.getElementById("modalIndividualUrlWrap");
     const indPages = document.getElementById("modalIndividualPagesLink");
+    const indDash = document.getElementById("modalIndividualDashboardLink");
     const indRepo = document.getElementById("modalIndividualRepoLink");
-    if (indWrap && individualPagesUrl) {
-      indPages.href = individualPagesUrl;
-      indPages.textContent = individualPagesUrl;
+    if (indWrap && (individualPagesUrl || individualDashboardUrl || individualRepoUrl)) {
+      if (indPages && individualPagesUrl) {
+        indPages.href = individualPagesUrl;
+        indPages.textContent = individualPagesUrl;
+        indPages.style.display = "block";
+      }
+      if (indDash && individualDashboardUrl) {
+        indDash.href = individualDashboardUrl;
+        indDash.textContent = individualDashboardUrl;
+        indDash.style.display = "block";
+      }
       if (indRepo && individualRepoUrl) {
         indRepo.href = individualRepoUrl;
         indRepo.textContent = "Ver Repo: " + individualRepoUrl;

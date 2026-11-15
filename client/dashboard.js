@@ -4,7 +4,25 @@
  */
 
 const params = new URLSearchParams(window.location.search);
-const businessId = params.get("id") || "alvap-studio";
+
+function resolveDashboardBusinessId() {
+  const queryId = params.get("id");
+  if (queryId) return queryId;
+  if (window.STANDALONE_BUSINESS_ID) return window.STANDALONE_BUSINESS_ID;
+  if (window.INITIAL_BUSINESS && window.INITIAL_BUSINESS.id) return window.INITIAL_BUSINESS.id;
+
+  const segments = window.location.pathname.split("/").filter(Boolean);
+  if (segments.length > 0) {
+    const first = segments[0];
+    const ignored = ["linktrees", "client", "negocios", "admin", "p"];
+    if (!ignored.includes(first.toLowerCase()) && !first.endsWith(".html")) {
+      return first;
+    }
+  }
+  return "alvap-studio";
+}
+
+const businessId = resolveDashboardBusinessId();
 
 let businessData = null;
 let timelineChart = null;
@@ -85,21 +103,62 @@ window.lockClientDashboard = function () {
  * Carga información del negocio
  */
 async function loadBusinessInfo() {
+  businessData = window.INITIAL_BUSINESS || null;
+  let loadedFromStandalone = false;
+  const isInsideLinktrees = window.location.pathname.includes("/linktrees/") || window.location.pathname.includes("/client/") || window.location.pathname.includes("/negocios/");
+
+  // 1. Si es repositorio individual (o ruta raíz de cliente), leer ./business.json o ../business.json
+  if (window.STANDALONE_REPO || !isInsideLinktrees) {
+    for (const candidate of ["./business.json", "../business.json"]) {
+      try {
+        const res = await fetch(`${candidate}?_t=${Date.now()}`, { cache: "no-store" });
+        if (res.ok) {
+          const parsed = await res.json();
+          if (parsed && (parsed.id || parsed.nombre_negocio)) {
+            businessData = parsed;
+            loadedFromStandalone = true;
+            break;
+          }
+        }
+      } catch (e) {}
+    }
+  }
+
+  // 2. Consultar repositorio principal data/businesses.json (local o remoto GitHub Pages)
+  if (!loadedFromStandalone) {
+    const mainCandidates = [];
+    if (window.location.pathname.includes("/negocios/")) {
+      mainCandidates.push("../../data/businesses.json");
+    } else if (isInsideLinktrees) {
+      mainCandidates.push("../data/businesses.json");
+    }
+    mainCandidates.push("https://alvapcompany.github.io/linktrees/data/businesses.json");
+
+    for (const jsonPath of mainCandidates) {
+      try {
+        const res = await fetch(`${jsonPath}?_t=${Date.now()}`, { cache: "no-store" });
+        if (res.ok) {
+          const allBusinesses = await res.json();
+          if (allBusinesses && allBusinesses[businessId]) {
+            businessData = allBusinesses[businessId];
+            break;
+          }
+        }
+      } catch (e) {}
+    }
+  }
+
+  // 3. Aplicar caché local solo si es más reciente que el JSON obtenido del servidor
   try {
-    const jsonPath = window.location.pathname.includes("/negocios/") ? "../../data/businesses.json" : "../data/businesses.json";
-    const res = await fetch(`${jsonPath}?_t=${Date.now()}`, { cache: "no-store" });
-    if (res.ok) {
-      const allBusinesses = await res.json();
-      if (allBusinesses[businessId]) businessData = allBusinesses[businessId];
+    const local = localStorage.getItem("alvap_biz_" + businessId);
+    if (local) {
+      const parsed = JSON.parse(local);
+      const isNewer = !businessData || (parsed.fecha_actualizacion && (!businessData.fecha_actualizacion || new Date(parsed.fecha_actualizacion) > new Date(businessData.fecha_actualizacion)));
+      if (isNewer) {
+        businessData = parsed;
+      }
     }
   } catch (e) {}
-
-  if (!businessData) {
-    try {
-      const local = localStorage.getItem("alvap_biz_" + businessId);
-      if (local) businessData = JSON.parse(local);
-    } catch (e) {}
-  }
 
   if (!businessData) {
     businessData = {
@@ -115,10 +174,16 @@ async function loadBusinessInfo() {
   document.getElementById("bizCategory").textContent = businessData.categoria || "Portal de Métricas y Clics por Botón";
   document.getElementById("bizAvatar").src = businessData.avatar_url || "https://via.placeholder.com/150";
 
-  const fallbackPublicUrl = `${window.location.origin}${window.location.pathname.replace(/\/client\/.*|\/dashboard\.html.*/, "")}/p/?id=${businessId}`;
-  const targetPublicUrl = (businessData.deploy_individual_repo !== false && businessData.pages_url)
-    ? businessData.pages_url
-    : fallbackPublicUrl;
+  const fallbackPublicUrl = `https://alvapcompany.github.io/linktrees/p/?id=${encodeURIComponent(businessId)}`;
+  const owner = (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.owner) ? CONFIG.github.owner.toLowerCase() : "alvapcompany";
+  const repoSlug = (businessData.github_repo || businessId).trim();
+  const repoPagesFallback = repoSlug.includes("/")
+    ? `https://${repoSlug.split("/")[0].toLowerCase()}.github.io/${repoSlug.split("/")[1]}/`
+    : `https://${owner}.github.io/${repoSlug}/`;
+  const targetPublicUrl = businessData.deploy_individual_repo === false
+    ? fallbackPublicUrl
+    : (businessData.pages_url || repoPagesFallback);
+
   const viewBtn = document.getElementById("btnViewProfile");
   if (viewBtn) viewBtn.href = targetPublicUrl;
 }
