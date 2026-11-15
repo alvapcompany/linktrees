@@ -1,6 +1,10 @@
 {
   "alvap-studio": {
     "id": "alvap-studio",
+    "github_repo": "alvap-studio",
+    "deploy_individual_repo": true,
+    "repo_url": "https://github.com/alvapcompany/alvap-studio",
+    "pages_url": "https://alvapcompany.github.io/alvap-studio/",
     "nombre_negocio": "Alvap Digital Studio",
     "categoria": "Agencia Digital & NFC",
     "descripcion": "Soluciones digitales de alto impacto, tarjetas inteligentes NFC y diseño web.",
@@ -43,6 +47,10 @@
   },
   "tacos-el-pastor": {
     "id": "tacos-el-pastor",
+    "github_repo": "tacos-el-pastor",
+    "deploy_individual_repo": true,
+    "repo_url": "https://github.com/alvapcompany/tacos-el-pastor",
+    "pages_url": "https://alvapcompany.github.io/tacos-el-pastor/",
     "nombre_negocio": "Taquería El Pastor Real",
     "categoria": "Restaurante & Comida",
     "descripcion": "Los mejores tacos al pastor y cortes al carbón de la ciudad. Abierto desde las 6:00 PM.",
@@ -71,6 +79,10 @@
   },
   "vainilla-saltillo": {
     "id": "vainilla-saltillo",
+    "github_repo": "vainilla-saltillo",
+    "deploy_individual_repo": true,
+    "repo_url": "https://github.com/alvapcompany/vainilla-saltillo",
+    "pages_url": "https://alvapcompany.github.io/vainilla-saltillo/",
     "nombre_negocio": "Vainilla | Cocina Contemporánea",
     "categoria": "Desayunos, Comidas y Cenas",
     "descripcion": "Cocina contemporánea en Saltillo. Disfruta los mejores desayunos, comidas y cenas en un ambiente exclusivo.",
@@ -94,24 +106,14 @@
     "link_google_negocio": "https://search.google.com/local/writereview?placeid=ChIJbaosTyETiIYRESo-idjTaX0",
     "password": "VAINILLA123",
     "botones_adicionales": [],
-    "fecha_actualizacion": "2026-11-08T19:53:23.622Z",
-    "google_reviews": {
-      "rating_promedio": 4.8,
-      "total_reviews": 683,
-      "reviews": [
-        {
-          "autor": "María José Corpus Salas",
-          "rating": 3,
-          "tiempo": "Hace un mes",
-          "isNew": true,
-          "comentario": "Asistí con mi familia un 16 de septiembre a las 10:00 A. M. Y, por supuesto, estaba lleno. Sin embargo, conseguimos un buen lugar. Había mucho bullicio y la música alta, así que no era muy cómodo platicar; la mesera era amable e intentó ser atenta, pero por alguna razón no pudo ser eficiente: olvidó traerme cubiertos, nunca me trajo el perchero que solicité desde que llegamos y tardó mucho en tomar mi orden.\nQuiero pensar que eso fue porque había más gente de lo habitual.\nLa comida por su parte es excelente: platillos bastos, ingredientes buenos y excelente sabor y presentación."
-        }
-      ],
-      "ultima_actualizacion": "2026-11-15T13:03:31.932Z"
-    }
+    "fecha_actualizacion": "2026-11-08T19:53:23.622Z"
   },
   "barbacoasofi": {
     "id": "barbacoasofi",
+    "github_repo": "barbacoasofi",
+    "deploy_individual_repo": true,
+    "repo_url": "https://github.com/alvapcompany/barbacoasofi",
+    "pages_url": "https://alvapcompany.github.io/barbacoasofi/",
     "nombre_negocio": "Nuevo Negocio (barbacoasofi)",
     "categoria": "Comercio Local",
     "descripcion": "Descripción de los servicios ofrecidos.",

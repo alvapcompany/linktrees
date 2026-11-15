@@ -21,19 +21,38 @@
 
   async function loadBusinessProfile(id) {
     let data = window.INITIAL_BUSINESS || null;
+    let loadedFromStandalone = false;
 
-    // 1. Siempre intentar buscar la versión más fresca en data/businesses.json evitando caché
-    try {
-      const jsonPath = window.location.pathname.includes("/negocios/") ? "../../data/businesses.json" : "../data/businesses.json";
-      const res = await fetch(`${jsonPath}?_t=${Date.now()}`, { cache: "no-store" });
-      if (res.ok) {
-        const dict = await res.json();
-        if (dict && dict[id]) {
-          data = dict[id];
+    // 1. Si es un repositorio individual autónomo, leer ./business.json fresco evitando caché
+    if (window.STANDALONE_REPO) {
+      try {
+        const res = await fetch(`./business.json?_t=${Date.now()}`, { cache: "no-store" });
+        if (res.ok) {
+          const standaloneData = await res.json();
+          if (standaloneData && (standaloneData.id || standaloneData.nombre_negocio)) {
+            data = standaloneData;
+            loadedFromStandalone = true;
+          }
         }
+      } catch (e) {
+        console.warn("Buscando business.json local sin éxito:", e);
       }
-    } catch (e) {
-      console.warn("Buscando en fuentes secundarias:", e);
+    }
+
+    // 2. Buscar en data/businesses.json del repositorio principal evitando caché
+    if (!loadedFromStandalone) {
+      try {
+        const jsonPath = window.location.pathname.includes("/negocios/") ? "../../data/businesses.json" : "../data/businesses.json";
+        const res = await fetch(`${jsonPath}?_t=${Date.now()}`, { cache: "no-store" });
+        if (res.ok) {
+          const dict = await res.json();
+          if (dict && dict[id]) {
+            data = dict[id];
+          }
+        }
+      } catch (e) {
+        console.warn("Buscando en fuentes secundarias:", e);
+      }
     }
 
     // 2. Si no se encontró o hay cambios locales recientes en el navegador del admin

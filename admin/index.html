@@ -75,20 +75,26 @@
     <section class="editor-panel">
       
       <!-- Selector de ID y Crear Nuevo -->
-      <div class="editor-header">
+      <div class="editor-header" style="flex-wrap: wrap; gap: 10px;">
         <div class="id-selector-box">
           <label style="font-size: 0.85rem; font-weight: 700; color: #9ca3af;">ID Negocio:</label>
           <select id="businessSelect"></select>
           <button class="btn btn-secondary btn-sm" onclick="createNewBusinessId()" title="Crear un nuevo Linktree con ID único">
             <i class="fas fa-plus"></i> Nuevo ID
           </button>
+          <button class="btn btn-secondary btn-sm" onclick="linkExistingRepoPrompt()" title="Importar o enlazar un repositorio GitHub existente" style="border-color: #6366f1; color: #a5b4fc;">
+            <i class="fas fa-link"></i> Enlazar Repo
+          </button>
+        </div>
+        <div id="activeRepoBadge" class="brand-badge" style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.4); color: #a5b4fc; padding: 6px 12px; font-size: 0.78rem;">
+          <i class="fab fa-github"></i> Repo: --
         </div>
       </div>
 
       <!-- Barra de Pestañas -->
-      <div class="tabs-nav">
+      <div class="tabs-nav" style="flex-wrap: wrap;">
         <button class="tab-btn active" data-tab="tabInfo" onclick="switchTab('tabInfo')">
-          <i class="fas fa-store"></i> Información & Marca
+          <i class="fas fa-store"></i> Información & Repos
         </button>
         <button class="tab-btn" data-tab="tabButtons" onclick="switchTab('tabButtons')">
           <i class="fas fa-link"></i> Botones & Redes
@@ -140,17 +146,67 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label><i class="fab fa-google" style="color: #4285F4;"></i> Enlace de Google Maps / Reseñas</label>
-              <input type="url" id="linkGoogle" class="form-control" placeholder="https://maps.google.com/?q=Mi+Negocio (Para mostrar reseñas en vivo)">
+              <label><i class="fab fa-google" style="color: #4285F4;"></i> Enlace de Google Maps / Perfil</label>
+              <input type="url" id="linkGoogle" class="form-control" placeholder="https://maps.google.com/?q=Mi+Negocio">
             </div>
             <div class="form-group">
               <label><i class="fas fa-key" style="color: #6366f1;"></i> Contraseña del Panel de Cliente (Privado)</label>
               <input type="text" id="businessPassword" class="form-control" placeholder="Ej: vainilla2026 (Dejar vacío para acceso público)">
               <small style="color: #94a3b8; font-size: 0.75rem; margin-top: 4px; display: block;">
-                🔒 Si defines una clave, el cliente deberá ingresarla para ver su panel. Se guarda en Google Sheets.
+                🔒 Si defines una clave, el cliente deberá ingresarla para ver su panel de clics.
               </small>
             </div>
           </div>
+        </div>
+
+        <!-- Sección Multi-Repositorio del Cliente -->
+        <div class="form-section" style="border-color: rgba(99, 102, 241, 0.4);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <div class="section-title" style="margin-bottom: 0;"><i class="fab fa-github" style="color: #a5b4fc;"></i> 🌐 Repositorio del Cliente (Enlace & Preview)</div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="pullFromClientRepo()" style="border-color: #38bdf8; color: #38bdf8;">
+              <i class="fas fa-cloud-download-alt"></i> Sincronizar desde Repo
+            </button>
+          </div>
+          <p style="font-size: 0.8rem; color: #9ca3af; margin-bottom: 14px;">
+            Cada Linktree se despliega en su propio repositorio individual en GitHub y queda enlazado al repositorio principal (<code>alvapcompany/linktrees</code>) para previsualizarlo y editarlo desde aquí.
+          </p>
+
+          <div class="form-group">
+            <label>Repositorio Individual en GitHub (ej. <code>vainilla-saltillo</code> o <code>usuario/repo</code>)</label>
+            <input type="text" id="githubRepoName" class="form-control" placeholder="Ej: vainilla-saltillo" oninput="updateLinkedRepoPreviewLinks()">
+          </div>
+
+          <div class="form-group" style="display: flex; align-items: center; gap: 10px; background: #111827; padding: 10px 14px; border-radius: 10px; border: 1px solid #374151;">
+            <input type="checkbox" id="deployIndividualRepo" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: #6366f1;">
+            <label for="deployIndividualRepo" style="margin: 0; cursor: pointer; color: #e5e7eb; font-size: 0.84rem;">
+              Desplegar en su propio repositorio independiente al hacer <strong>Auto-Commit</strong>
+            </label>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #111827; padding: 12px 14px; border-radius: 10px; border: 1px solid #374151; font-size: 0.78rem;">
+            <div>
+              <div style="color: #9ca3af; margin-bottom: 4px;"><i class="fab fa-github"></i> Repositorio GitHub:</div>
+              <a id="linkedRepoUrl" href="#" target="_blank" style="color: #a5b4fc; word-break: break-all; text-decoration: none; font-weight: 600;">--</a>
+            </div>
+            <div>
+              <div style="color: #9ca3af; margin-bottom: 4px;"><i class="fas fa-globe"></i> GitHub Pages Individual:</div>
+              <a id="linkedPagesUrl" href="#" target="_blank" style="color: #34d399; word-break: break-all; text-decoration: none; font-weight: 600;">--</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Directorio Central de Repositorios Enlazados -->
+        <div class="form-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <div class="section-title" style="margin-bottom: 0;"><i class="fas fa-network-wired" style="color: #10b981;"></i> 🗂️ Repositorios de Linktrees Enlazados</div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="linkExistingRepoPrompt()">
+              <i class="fas fa-plus"></i> Enlazar Otro Repo
+            </button>
+          </div>
+          <p style="font-size: 0.8rem; color: #9ca3af; margin-bottom: 14px;">
+            Selecciona cualquier Linktree enlazado para previsualizarlo en el teléfono de la derecha, traer los cambios de su repositorio o modificar sus botones.
+          </p>
+          <div id="linkedReposDirectory" style="display: flex; flex-direction: column; gap: 10px;"></div>
         </div>
       </div>
 
@@ -311,9 +367,15 @@
               <input type="text" id="cfgGithubOwner" class="form-control" value="alvapcompany">
             </div>
             <div class="form-group">
-              <label>Nombre del Repositorio</label>
+              <label>Nombre del Repositorio Principal (Índice Central)</label>
               <input type="text" id="cfgGithubRepo" class="form-control" value="linktrees">
             </div>
+          </div>
+          <div style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); padding: 10px 14px; border-radius: 10px; font-size: 0.8rem; color: #c7d2fe;">
+            <i class="fas fa-sitemap"></i> <strong>Arquitectura Multi-Repositorio:</strong> El repositorio principal guarda el directorio enlazado en <code>data/businesses.json</code>, mientras que cada negocio tiene su propio repositorio independiente con GitHub Pages propio.
+            <button type="button" class="btn btn-secondary btn-sm" onclick="switchTab('tabInfo')" style="margin-top: 8px; display: inline-flex;">
+              <i class="fas fa-network-wired"></i> Administrar Repositorios Enlazados
+            </button>
           </div>
         </div>
 
@@ -344,6 +406,12 @@
         <span class="preview-label">
           <span class="live-pulse"></span> Vista Previa en Vivo
         </span>
+        <span id="previewRepoBadge" style="font-size: 0.74rem; color: #a5b4fc; font-weight: 600; border-left: 1px solid #4b5563; padding-left: 10px;">
+          --
+        </span>
+        <button type="button" onclick="openStandalonePreview()" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 0.72rem; border-radius: 14px;" title="Abrir GitHub Pages individual del repositorio enlazado">
+          <i class="fas fa-external-link-alt"></i> Repo Web
+        </button>
       </div>
 
       <!-- Marco del Smartphone -->
@@ -367,10 +435,16 @@
       <div id="commitLogs" class="commit-log-box"></div>
 
       <div id="modalLiveUrlBox" style="display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 14px; border-radius: 12px; margin-top: 15px;">
-        <div style="font-weight: 700; color: #10b981; font-size: 0.9rem; margin-bottom: 4px;">
-          <i class="fas fa-check-circle"></i> ¡Página en línea!
+        <div style="font-weight: 700; color: #10b981; font-size: 0.9rem; margin-bottom: 6px;">
+          <i class="fas fa-check-circle"></i> ¡Enlazado y publicado en línea!
         </div>
-        <a id="modalLiveLink" href="#" target="_blank" style="color: #6ee7b7; font-size: 0.85rem; word-break: break-all;"></a>
+        <div style="font-size: 0.8rem; color: #9ca3af;">Repositorio Principal (Enlace central):</div>
+        <a id="modalLiveLink" href="#" target="_blank" style="color: #6ee7b7; font-size: 0.85rem; word-break: break-all; display: block; margin-bottom: 8px;"></a>
+        <div id="modalIndividualUrlWrap" style="display: none; padding-top: 8px; border-top: 1px solid rgba(16, 185, 129, 0.25);">
+          <div style="font-size: 0.8rem; color: #9ca3af;">GitHub Pages Individual del Negocio:</div>
+          <a id="modalIndividualPagesLink" href="#" target="_blank" style="color: #93c5fd; font-size: 0.85rem; word-break: break-all; display: block; margin-bottom: 4px;"></a>
+          <a id="modalIndividualRepoLink" href="#" target="_blank" style="color: #a5b4fc; font-size: 0.78rem; word-break: break-all; display: block;"></a>
+        </div>
       </div>
 
       <div style="text-align: right; margin-top: 20px;">
@@ -380,7 +454,7 @@
   </div>
 
   <script src="../config.js"></script>
-  <script src="../assets/github-sync.js"></script>
-  <script src="admin.js"></script>
+  <script src="../assets/github-sync.js?v=2.0"></script>
+  <script src="admin.js?v=2.0"></script>
 </body>
 </html>

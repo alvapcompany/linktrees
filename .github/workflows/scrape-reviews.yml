@@ -1,9 +1,6 @@
 name: Scraper de Reseñas de Google Maps
 
 on:
-  schedule:
-    # Se ejecuta automáticamente cada 6 horas (00:00, 06:00, 12:00, 18:00 UTC)
-    - cron: '0 */6 * * *'
   workflow_dispatch:
     # Permite ejecutarlo manualmente con 1 clic desde GitHub cuando tú quieras
 

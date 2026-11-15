@@ -56,6 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadBusinessesData();
   initIdSelector();
   selectBusiness(currentId);
+  renderLinkedReposDirectory();
   setupEventListeners();
   updateLivePreview();
 });
@@ -65,8 +66,8 @@ document.addEventListener("DOMContentLoaded", async () => {
  */
 function loadStoredSettings() {
   const defaultToken = (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.token) ? CONFIG.github.token : ""; const defaultGas = (typeof CONFIG !== "undefined" && CONFIG.googleAppsScriptUrl) ? CONFIG.googleAppsScriptUrl : ""; let ghToken = localStorage.getItem("alvap_github_token") || defaultToken;
-  const ghOwner = localStorage.getItem("alvap_github_owner") || "alvapcompany";
-  const ghRepo = localStorage.getItem("alvap_github_repo") || "linktrees";
+  const ghOwner = localStorage.getItem("alvap_github_owner") || (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.owner) || "alvapcompany";
+  const ghRepo = localStorage.getItem("alvap_github_repo") || (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.repo) || "linktrees";
   let gasUrl = localStorage.getItem("alvap_gas_url") || defaultGas;
 
   const tokenInput = document.getElementById("cfgGithubToken");
@@ -116,7 +117,7 @@ function updateConnectionBadges(token, gasUrl) {
  */
 async function loadBusinessesData() {
   try {
-    const res = await fetch("../data/businesses.json");
+    const res = await fetch(`../data/businesses.json?_t=${Date.now()}`, { cache: "no-store" });
     if (res.ok) {
       businesses = await res.json();
     }
@@ -198,6 +199,12 @@ function selectBusiness(id) {
   if (document.getElementById("businessPassword")) {
     document.getElementById("businessPassword").value = b.password || "";
   }
+  if (document.getElementById("githubRepoName")) {
+    document.getElementById("githubRepoName").value = b.github_repo || id;
+  }
+  if (document.getElementById("deployIndividualRepo")) {
+    document.getElementById("deployIndividualRepo").checked = b.deploy_individual_repo !== false;
+  }
 
   // Botones principales
   document.getElementById("btnWhatsapp").value = b.boton_whatsapp || "";
@@ -221,8 +228,118 @@ function selectBusiness(id) {
 
   selectThemeCard(b.tema || "modern-dark");
   renderDynamicButtonsList(b.botones_adicionales || []);
+  updateLinkedRepoPreviewLinks();
+  renderLinkedReposDirectory();
   updateLivePreview();
 }
+
+/**
+ * Calcula las URLs del repositorio individual enlazado
+ */
+function getResolvedRepoUrls(repoInput, idFallback) {
+  const defaultOwner = ((document.getElementById("cfgGithubOwner") && document.getElementById("cfgGithubOwner").value) || "alvapcompany").trim();
+  const parsed = (typeof GitHubSync !== "undefined" && GitHubSync.parseRepoRef)
+    ? GitHubSync.parseRepoRef(repoInput || idFallback, defaultOwner)
+    : { owner: defaultOwner, repo: (repoInput || idFallback || "").trim() };
+  return {
+    owner: parsed.owner,
+    repo: parsed.repo,
+    fullSlug: `${parsed.owner}/${parsed.repo}`,
+    repoUrl: `https://github.com/${parsed.owner}/${parsed.repo}`,
+    pagesUrl: `https://${parsed.owner.toLowerCase()}.github.io/${parsed.repo}/`
+  };
+}
+
+/**
+ * Actualiza los enlaces visuales e indicadores del repositorio individual enlazado
+ */
+window.updateLinkedRepoPreviewLinks = function () {
+  const id = (document.getElementById("businessId") && document.getElementById("businessId").value) || currentId;
+  const repoInput = (document.getElementById("githubRepoName") && document.getElementById("githubRepoName").value) || id;
+  const info = getResolvedRepoUrls(repoInput, id);
+
+  const badge = document.getElementById("activeRepoBadge");
+  if (badge) {
+    badge.innerHTML = `<i class="fab fa-github"></i> Repo: ${escapeHtml(info.fullSlug)}`;
+  }
+
+  const previewBadge = document.getElementById("previewRepoBadge");
+  if (previewBadge) {
+    previewBadge.textContent = info.fullSlug;
+  }
+
+  const repoLinkEl = document.getElementById("linkedRepoUrl");
+  if (repoLinkEl) {
+    repoLinkEl.href = info.repoUrl;
+    repoLinkEl.textContent = info.fullSlug;
+  }
+
+  const pagesLinkEl = document.getElementById("linkedPagesUrl");
+  if (pagesLinkEl) {
+    pagesLinkEl.href = info.pagesUrl;
+    pagesLinkEl.textContent = info.pagesUrl;
+  }
+};
+
+/**
+ * Renderiza el directorio central de todos los repositorios de Linktrees enlazados
+ */
+window.renderLinkedReposDirectory = function () {
+  const container = document.getElementById("linkedReposDirectory");
+  if (!container) return;
+
+  const keys = Object.keys(businesses);
+  if (keys.length === 0) {
+    container.innerHTML = `<p style="color: #9ca3af; font-size: 0.85rem;">No hay negocios registrados aún.</p>`;
+    return;
+  }
+
+  container.innerHTML = keys.map(id => {
+    const b = businesses[id];
+    const isActive = id === currentId;
+    const repoInfo = getResolvedRepoUrls(b.github_repo || id, id);
+    const isIndividual = b.deploy_individual_repo !== false;
+    const pagesUrl = b.pages_url || (isIndividual ? repoInfo.pagesUrl : `../p/?id=${encodeURIComponent(id)}`);
+
+    return `
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; background: ${isActive ? 'rgba(99, 102, 241, 0.14)' : '#111827'}; border: 1px solid ${isActive ? '#6366f1' : '#374151'}; border-radius: 12px; padding: 12px 14px;">
+        <div style="display: flex; align-items: center; gap: 10px; min-width: 190px;">
+          <img src="${escapeHtml(b.avatar_url || 'https://via.placeholder.com/80')}" alt="${escapeHtml(b.nombre_negocio || id)}" style="width: 38px; height: 38px; border-radius: 10px; object-fit: cover; border: 1px solid #4b5563;">
+          <div>
+            <div style="font-weight: 700; font-size: 0.9rem; color: #f9fafb; display: flex; align-items: center; gap: 6px;">
+              ${escapeHtml(b.nombre_negocio || id)}
+              ${isActive ? '<span style="font-size: 0.68rem; background: #6366f1; color: #fff; padding: 2px 6px; border-radius: 6px;">En Editor</span>' : ''}
+            </div>
+            <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 2px;">
+              <i class="fab fa-github"></i> <code>${escapeHtml(repoInfo.fullSlug)}</code>
+              <span style="margin-left: 6px; color: ${isIndividual ? '#34d399' : '#fbbf24'};">• ${isIndividual ? 'Repo Individual' : 'Solo Principal'}</span>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="selectBusinessFromDirectory('${escapeHtml(id)}')" title="Previsualizar y modificar en el editor">
+            <i class="fas fa-eye"></i> Preview & Editar
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="pullFromClientRepo('${escapeHtml(id)}')" title="Leer cambios actuales desde su repositorio individual" style="border-color: #38bdf8; color: #38bdf8;">
+            <i class="fas fa-sync-alt"></i> Leer Repo
+          </button>
+          <a href="${escapeHtml(pagesUrl)}" target="_blank" class="btn btn-secondary btn-sm" title="Abrir página web en GitHub Pages" style="color: #34d399;">
+            <i class="fas fa-external-link-alt"></i> Web
+          </a>
+          <a href="../client/dashboard.html?id=${encodeURIComponent(id)}" target="_blank" class="btn btn-secondary btn-sm" title="Ver panel de clics del negocio" style="color: #fbbf24;">
+            <i class="fas fa-mouse-pointer"></i> Clics
+          </a>
+        </div>
+      </div>
+    `;
+  }).join("");
+};
+
+window.selectBusinessFromDirectory = function (id) {
+  const select = document.getElementById("businessSelect");
+  if (select) select.value = id;
+  selectBusiness(id);
+};
 
 /**
  * Selecciona visualmente la tarjeta de tema
@@ -354,8 +471,17 @@ function getFormData() {
     }
   });
 
+  const repoInputVal = document.getElementById("githubRepoName") ? document.getElementById("githubRepoName").value.trim() : "";
+  const deployIndividual = document.getElementById("deployIndividualRepo") ? document.getElementById("deployIndividualRepo").checked : true;
+  const effectiveRepo = repoInputVal || id;
+  const repoInfo = getResolvedRepoUrls(effectiveRepo, id);
+
   return {
     id: id,
+    github_repo: effectiveRepo,
+    deploy_individual_repo: deployIndividual,
+    repo_url: deployIndividual ? repoInfo.repoUrl : ((businesses[id] && businesses[id].repo_url) || ""),
+    pages_url: deployIndividual ? repoInfo.pagesUrl : ((businesses[id] && businesses[id].pages_url) || ""),
     nombre_negocio: document.getElementById("nombreNegocio").value || "Mi Negocio",
     categoria: document.getElementById("categoria").value || "Comercio",
     descripcion: document.getElementById("descripcion").value || "",
@@ -379,7 +505,6 @@ function getFormData() {
     link_google_negocio: document.getElementById("linkGoogle").value || "",
     password: document.getElementById("businessPassword") ? document.getElementById("businessPassword").value.trim() : "",
     botones_adicionales: extraBtns,
-    google_reviews: (businesses[id] && businesses[id].google_reviews) ? businesses[id].google_reviews : undefined,
     fecha_actualizacion: new Date().toISOString()
   };
 }
@@ -555,28 +680,37 @@ async function autoCommitToGitHub() {
     return;
   }
 
-  showCommitModal(`Auto-Commit a GitHub (${owner}/${repo})`, "Iniciando proceso de despliegue...");
+  showCommitModal(`Auto-Commit Multi-Repositorio`, "Iniciando despliegue sincronizado...");
 
   try {
     appendCommitLog(`🔍 1. Verificando autenticación de GitHub para cuenta '${owner}'...`);
     const user = await GitHubSync.verifyAuth(token);
     appendCommitLog(`✅ Conectado como: ${user.login} (${user.name || 'Sin nombre'})`);
 
-    appendCommitLog(`📁 2. Verificando repositorio '${owner}/${repo}'...`);
+    appendCommitLog(`📁 2. Verificando repositorio principal '${owner}/${repo}'...`);
     await GitHubSync.ensureRepository(owner, repo, token);
-    appendCommitLog(`✅ Repositorio listo y configurado.`);
+    appendCommitLog(`✅ Repositorio principal listo.`);
 
-    appendCommitLog(`🚀 3. Empaquetando datos y generando HTML para ID '${data.id}'...`);
+    if (data.deploy_individual_repo && data.github_repo && data.github_repo.toLowerCase() !== repo.toLowerCase()) {
+      const repoInfo = getResolvedRepoUrls(data.github_repo, data.id);
+      appendCommitLog(`🌐 3. Creando/actualizando repositorio individual '${repoInfo.fullSlug}' con GitHub Pages...`);
+    }
+
+    appendCommitLog(`🚀 4. Publicando configuración en repositorio individual y enlazando en '${owner}/${repo}'...`);
     businesses[data.id] = data;
     
     const result = await GitHubSync.autoCommitBusiness(owner, repo, data, businesses, token);
     appendCommitLog(`✅ Commit realizado exitosamente! Hash: ${result.commitSha.substring(0, 7)}`);
-    appendCommitLog(`🌐 Enlace público en GitHub Pages: ${result.liveUrl}`);
+    appendCommitLog(`🔗 Índice Central (${owner}/${repo}): ${result.liveUrl}`);
+    if (result.individualPagesUrl) {
+      appendCommitLog(`🌐 Repo Individual: ${result.individualRepoUrl}`);
+      appendCommitLog(`🚀 Web Propia Individual: ${result.individualPagesUrl}`);
+    }
 
     // También guardar en Google Sheets en segundo plano si está configurado
     const gasUrl = (document.getElementById("cfgGasUrl").value || "").trim();
     if (gasUrl) {
-      appendCommitLog(`☁️ 4. Sincronizando respaldo con Google Sheets...`);
+      appendCommitLog(`☁️ 5. Sincronizando respaldo con Google Sheets...`);
       fetch(gasUrl, {
         method: "POST",
         headers: { "Content-Type": "text/plain" },
@@ -586,7 +720,9 @@ async function autoCommitToGitHub() {
       }).catch(() => {});
     }
 
-    setModalCompleted(true, "¡Linktree publicado y commiteado con éxito!", result.liveUrl);
+    updateLinkedRepoPreviewLinks();
+    renderLinkedReposDirectory();
+    setModalCompleted(true, "¡Linktree desplegado y enlazado con éxito!", result.liveUrl, result.individualPagesUrl, result.individualRepoUrl);
   } catch (err) {
     console.error("Error en auto-commit:", err);
     appendCommitLog(`❌ ERROR: ${err.message}`);
@@ -594,15 +730,116 @@ async function autoCommitToGitHub() {
   }
 
   // Guardar en local
-  localStorage.setItem("alvap_biz_" + data.id, JSON.stringify(data)); localStorage.setItem("alvap_all_businesses", JSON.stringify(businesses));
+  localStorage.setItem("alvap_biz_" + data.id, JSON.stringify(data));
+  localStorage.setItem("alvap_all_businesses", JSON.stringify(businesses));
   initIdSelector();
 }
 
 /**
- * Crea un nuevo ID de negocio
+ * Importa la configuración actual desde el repositorio individual enlazado al editor central
+ */
+window.pullFromClientRepo = async function (targetId) {
+  const id = targetId || (document.getElementById("businessId") && document.getElementById("businessId").value) || currentId;
+  if (targetId && businesses[targetId]) {
+    selectBusinessFromDirectory(targetId);
+  }
+
+  const token = (document.getElementById("cfgGithubToken").value || "").trim();
+  const owner = (document.getElementById("cfgGithubOwner").value || "alvapcompany").trim();
+  const repoInput = targetId
+    ? ((businesses[id] && businesses[id].github_repo) || id)
+    : ((document.getElementById("githubRepoName") && document.getElementById("githubRepoName").value.trim()) || id);
+
+  if (!token) {
+    alert("⚠️ Configura el Token de GitHub primero para leer el repositorio.");
+    switchTab("tabConnections");
+    return;
+  }
+
+  try {
+    const remoteData = await GitHubSync.fetchBusinessFromRepo(owner, repoInput, token);
+    const repoInfo = getResolvedRepoUrls(repoInput, id);
+    const merged = {
+      ...(businesses[id] || {}),
+      ...remoteData,
+      id: id,
+      github_repo: repoInput,
+      deploy_individual_repo: true,
+      repo_url: repoInfo.repoUrl,
+      pages_url: repoInfo.pagesUrl
+    };
+    businesses[id] = merged;
+    localStorage.setItem("alvap_biz_" + id, JSON.stringify(merged));
+    localStorage.setItem("alvap_all_businesses", JSON.stringify(businesses));
+    initIdSelector();
+    selectBusiness(id);
+    alert(`✅ Configuración sincronizada desde '${repoInfo.fullSlug}' y cargada en la vista previa.`);
+  } catch (err) {
+    alert(`⚠️ No se pudo importar desde el repositorio '${repoInput}':\n${err.message}\n\nSi el repositorio aún no tiene 'business.json', haz clic en "Auto-Commit a GitHub" para crearlo e inicializarlo.`);
+  }
+};
+
+/**
+ * Enlaza un repositorio individual existente (o crea un nuevo Linktree vinculado a ese repo)
+ */
+window.linkExistingRepoPrompt = async function () {
+  const raw = prompt("Ingresa el nombre del repositorio en GitHub a enlazar (ej. mi-cafeteria o usuario/mi-cafeteria):");
+  if (!raw) return;
+
+  const defaultOwner = ((document.getElementById("cfgGithubOwner") && document.getElementById("cfgGithubOwner").value) || "alvapcompany").trim();
+  const parsed = GitHubSync.parseRepoRef(raw, defaultOwner);
+  if (!parsed.repo) {
+    alert("Nombre de repositorio inválido.");
+    return;
+  }
+
+  const newId = parsed.repo.toLowerCase().replace(/[^a-z0-9_-]/g, "-");
+  const repoRef = parsed.owner.toLowerCase() === defaultOwner.toLowerCase() ? parsed.repo : `${parsed.owner}/${parsed.repo}`;
+  const repoInfo = getResolvedRepoUrls(repoRef, newId);
+  const token = (document.getElementById("cfgGithubToken").value || "").trim();
+
+  let imported = null;
+  if (token) {
+    try {
+      imported = await GitHubSync.fetchBusinessFromRepo(defaultOwner, repoRef, token);
+    } catch (e) {
+      // Si el repo aún no tiene business.json o no existe, se inicializará como plantilla lista para Auto-Commit
+    }
+  }
+
+  businesses[newId] = {
+    ...(businesses[newId] || {}),
+    ...(imported || {}),
+    id: newId,
+    github_repo: repoRef,
+    deploy_individual_repo: true,
+    repo_url: repoInfo.repoUrl,
+    pages_url: repoInfo.pagesUrl,
+    nombre_negocio: (imported && imported.nombre_negocio) || (businesses[newId] && businesses[newId].nombre_negocio) || `Linktree (${newId})`,
+    categoria: (imported && imported.categoria) || (businesses[newId] && businesses[newId].categoria) || "Comercio Local",
+    descripcion: (imported && imported.descripcion) || (businesses[newId] && businesses[newId].descripcion) || "Perfil oficial interactivo NFC.",
+    avatar_url: (imported && imported.avatar_url) || (businesses[newId] && businesses[newId].avatar_url) || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200",
+    tema: (imported && imported.tema) || (businesses[newId] && businesses[newId].tema) || "modern-dark",
+    color_primario: (imported && imported.color_primario) || "#6366f1",
+    color_acento: (imported && imported.color_acento) || "#a855f7",
+    botones_adicionales: (imported && imported.botones_adicionales) || []
+  };
+
+  initIdSelector();
+  selectBusiness(newId);
+
+  if (imported) {
+    alert(`✅ Repositorio '${repoInfo.fullSlug}' enlazado e importado en tiempo real al editor y vista previa.\n\nHaz clic en "Auto-Commit a GitHub" para guardar el enlace en el repositorio principal.`);
+  } else {
+    alert(`🔗 Repositorio '${repoInfo.fullSlug}' enlazado al editor.\n\nEdita sus botones en la izquierda y haz clic en "Auto-Commit a GitHub" para crearlo/actualizarlo y publicarlo en GitHub Pages.`);
+  }
+};
+
+/**
+ * Crea un nuevo ID de negocio (y le asigna su repositorio individual por defecto)
  */
 window.createNewBusinessId = function () {
-  const newIdRaw = prompt("Ingresa el identificador único (ID) para el nuevo negocio (ej. tacos-el-pastor, alvap-beauty):");
+  const newIdRaw = prompt("Ingresa el identificador único (ID) para el nuevo negocio y su repositorio (ej. tacos-el-pastor, alvap-beauty):");
   if (!newIdRaw) return;
 
   const newId = newIdRaw.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "-");
@@ -617,8 +854,14 @@ window.createNewBusinessId = function () {
     return;
   }
 
+  const repoInfo = getResolvedRepoUrls(newId, newId);
+
   businesses[newId] = {
     id: newId,
+    github_repo: newId,
+    deploy_individual_repo: true,
+    repo_url: repoInfo.repoUrl,
+    pages_url: repoInfo.pagesUrl,
     nombre_negocio: "Nuevo Negocio (" + newId + ")",
     categoria: "Comercio Local",
     descripcion: "Descripción de los servicios ofrecidos.",
@@ -640,7 +883,7 @@ window.createNewBusinessId = function () {
 
   initIdSelector();
   selectBusiness(newId);
-  alert(`¡ID '${newId}' creado! Ahora personaliza sus botones y realiza el Auto-Commit para publicarlo.`);
+  alert(`¡ID '${newId}' creado con repositorio individual '${repoInfo.fullSlug}'! Personaliza sus botones y haz Auto-Commit para publicarlo en ambos repositorios.`);
 };
 
 /**
@@ -685,6 +928,8 @@ function setupEventListeners() {
       localStorage.setItem("alvap_gas_url", gas);
 
       updateConnectionBadges(token, gas);
+      updateLinkedRepoPreviewLinks();
+      renderLinkedReposDirectory();
       alert("✅ Conexiones guardadas exitosamente.");
     });
   }
@@ -712,6 +957,15 @@ window.previewInNewTab = function () {
   window.open(`../p/?id=${data.id}`, "_blank");
 };
 
+window.openStandalonePreview = function () {
+  const data = getFormData();
+  if (data.pages_url) {
+    window.open(data.pages_url, "_blank");
+  } else {
+    window.open(`../p/?id=${data.id}`, "_blank");
+  }
+};
+
 window.openClientDashboardInNewTab = function () {
   const data = getFormData();
   window.open(`../client/dashboard.html?id=${data.id}`, "_blank");
@@ -726,6 +980,8 @@ function showCommitModal(title, initialStatus) {
   document.getElementById("modalStatusText").textContent = initialStatus;
   document.getElementById("commitLogs").innerHTML = "";
   document.getElementById("modalLiveUrlBox").style.display = "none";
+  const indWrap = document.getElementById("modalIndividualUrlWrap");
+  if (indWrap) indWrap.style.display = "none";
   document.getElementById("modalCloseBtn").style.display = "none";
   if (m) m.classList.add("active");
 }
@@ -739,7 +995,7 @@ function appendCommitLog(text) {
   box.scrollTop = box.scrollHeight;
 }
 
-function setModalCompleted(success, finalMsg, liveUrl) {
+function setModalCompleted(success, finalMsg, liveUrl, individualPagesUrl, individualRepoUrl) {
   document.getElementById("modalStatusText").textContent = finalMsg;
   document.getElementById("modalCloseBtn").style.display = "inline-flex";
 
@@ -749,6 +1005,19 @@ function setModalCompleted(success, finalMsg, liveUrl) {
     link.href = liveUrl;
     link.textContent = liveUrl;
     urlBox.style.display = "block";
+
+    const indWrap = document.getElementById("modalIndividualUrlWrap");
+    const indPages = document.getElementById("modalIndividualPagesLink");
+    const indRepo = document.getElementById("modalIndividualRepoLink");
+    if (indWrap && individualPagesUrl) {
+      indPages.href = individualPagesUrl;
+      indPages.textContent = individualPagesUrl;
+      if (indRepo && individualRepoUrl) {
+        indRepo.href = individualRepoUrl;
+        indRepo.textContent = "Ver Repo: " + individualRepoUrl;
+      }
+      indWrap.style.display = "block";
+    }
   }
 }
 

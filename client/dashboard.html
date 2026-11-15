@@ -3,62 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel del Cliente | Métricas & Reseñas Alvap</title>
-  <link rel="stylesheet" href="dashboard.css?v=5.3">
+  <title>Panel del Cliente | Métricas & Clics Alvap</title>
+  <link rel="stylesheet" href="dashboard.css?v=6.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    .review-filters {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-      margin-top: 14px;
-    }
-    .review-filter-btn {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      font-size: 0.8rem;
-      font-weight: 600;
-      padding: 8px 16px;
-      border-radius: 20px;
-      background: #1f293d !important;
-      color: #94a3b8 !important;
-      border: 1px solid #374151 !important;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      transition: all 0.2s ease;
-      outline: none;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    }
-    .review-filter-btn:hover {
-      color: #f8fafc !important;
-      background: #27354f !important;
-      border-color: #4b5563 !important;
-      transform: translateY(-1px);
-    }
-    .review-filter-btn.active {
-      background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
-      color: #ffffff !important;
-      border-color: #6366f1 !important;
-      box-shadow: 0 2px 12px rgba(99, 102, 241, 0.4) !important;
-    }
-    .review-filter-btn .filter-count {
-      background: rgba(0, 0, 0, 0.28);
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 0.74rem;
-      font-weight: 700;
-    }
-    .review-filter-btn.active .filter-count {
-      background: rgba(255, 255, 255, 0.22);
-      color: #ffffff;
-    }
-  </style>
 </head>
 <body>
 
@@ -69,7 +20,7 @@
         <i class="fas fa-lock"></i>
       </div>
       <h2 id="lockBizName" style="font-size: 1.3rem; font-weight: 700; color: #fff; margin-bottom: 6px;">Panel Privado</h2>
-      <p style="font-size: 0.85rem; color: #9ca3af; margin-bottom: 22px;">Ingresa la contraseña asignada a tu negocio para consultar métricas y reseñas de Google Maps.</p>
+      <p style="font-size: 0.85rem; color: #9ca3af; margin-bottom: 22px;">Ingresa la contraseña asignada a tu negocio para consultar métricas y clics por botón.</p>
       
       <form id="clientLoginForm" onsubmit="handleClientLogin(event)">
         <div style="margin-bottom: 14px;">
@@ -191,58 +142,56 @@
       </div>
     </section>
 
-    <!-- Sección de Reseñas de Google y Scraper -->
-    <section class="reviews-section">
-      <div class="reviews-header">
+    <!-- Sección 1: Desglose Detallado de Clics por Botón -->
+    <section class="buttons-breakdown-section">
+      <div class="breakdown-header">
         <div>
           <h2 style="font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-            <i class="fab fa-google" style="color: #4285F4;"></i> Reseñas & Reputación en Google Maps
+            <i class="fas fa-mouse-pointer" style="color: #10b981;"></i> 🎯 Desglose Detallado de Clics por Botón
           </h2>
-          <p style="font-size: 0.85rem; color: #9ca3af; margin-top: 4px;">Monitorea en tiempo real lo que tus clientes opinan de tu negocio.</p>
+          <p style="font-size: 0.85rem; color: #9ca3af; margin-top: 4px;">
+            Conteo exacto de cuántos clics recibe cada enlace configurado en tu Linktree NFC.
+          </p>
         </div>
-        <button id="btnScrapeReviews" class="btn btn-secondary" onclick="triggerReviewScraper()">
-          <i class="fas fa-sync-alt"></i> Sincronizar Reseñas en Vivo
-        </button>
+        <div class="breakdown-summary-pills">
+          <div class="summary-pill">
+            <span class="pill-label">🏆 Más Clicado:</span>
+            <strong id="topButtonBadge">--</strong>
+          </div>
+          <div class="summary-pill">
+            <span class="pill-label">🔗 Botones Activos:</span>
+            <strong id="activeButtonsCount">0</strong>
+          </div>
+          <div class="summary-pill">
+            <span class="pill-label">📊 Total Clics:</span>
+            <strong id="breakdownTotalClicks">0</strong>
+          </div>
+        </div>
       </div>
 
-      <!-- Barra de Resumen de Calificación -->
-      <div class="reviews-summary-bar">
-        <div id="ratingBig" class="rating-big">4.4</div>
+      <!-- Tarjetas por Botón -->
+      <div id="buttonsBreakdownList" class="buttons-breakdown-grid"></div>
+    </section>
+
+    <!-- Sección 2: Diagnóstico y Sugerencias de Mejora -->
+    <section class="suggestions-section">
+      <div class="breakdown-header" style="margin-bottom: 16px;">
         <div>
-          <div id="starsHeader" style="color: #fbbf24; font-size: 1.2rem; letter-spacing: 2px;">★★★★☆</div>
-          <div id="totalReviewsText" style="font-size: 0.85rem; color: #9ca3af; margin-top: 2px;">Basado en 683 opiniones verificadas de Google Maps</div>
+          <h2 style="font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-lightbulb" style="color: #fbbf24;"></i> 💡 Diagnóstico y Sugerencias para Mejorar tus Resultados
+          </h2>
+          <p style="font-size: 0.85rem; color: #9ca3af; margin-top: 4px;">
+            Recomendaciones automáticas basadas en el rendimiento real de cada botón de tu negocio.
+          </p>
         </div>
       </div>
 
-      <!-- Filtros recomendados de reseñas -->
-      <div class="review-filters">
-        <button type="button" class="review-filter-btn active" data-filter="all" onclick="filterReviews('all')">
-          <i class="fas fa-list-ul"></i> Todas <span class="filter-count" id="countAll">0</span>
-        </button>
-        <button type="button" class="review-filter-btn" data-filter="fresh" onclick="filterReviews('fresh')">
-          <i class="fas fa-bolt" style="color: #34d399;"></i> ⚡ En Vivo <span class="filter-count" id="countFresh">0</span>
-        </button>
-        <button type="button" class="review-filter-btn" data-filter="5stars" onclick="filterReviews('5stars')">
-          <i class="fas fa-star" style="color: #fbbf24;"></i> 5 Estrellas <span class="filter-count" id="count5Stars">0</span>
-        </button>
-        <button type="button" class="review-filter-btn" data-filter="4stars" onclick="filterReviews('4stars')">
-          <i class="fas fa-star" style="color: #f59e0b;"></i> 4 Estrellas <span class="filter-count" id="count4Stars">0</span>
-        </button>
-        <button type="button" class="review-filter-btn" data-filter="critical" onclick="filterReviews('critical')">
-          <i class="fas fa-exclamation-triangle" style="color: #f87171;"></i> Críticas (1-3★) <span class="filter-count" id="countCritical">0</span>
-        </button>
-        <button type="button" class="review-filter-btn" data-filter="comments" onclick="filterReviews('comments')">
-          <i class="fas fa-comment-dots" style="color: #60a5fa;"></i> Con Opinión <span class="filter-count" id="countComments">0</span>
-        </button>
-      </div>
-
-      <!-- Tarjetas de Reseñas Recientes -->
-      <div id="reviewsFeed" class="reviews-feed"></div>
+      <div id="smartSuggestionsGrid" class="suggestions-grid"></div>
     </section>
 
   </div>
 
   <script src="../config.js"></script>
-  <script src="dashboard.js?v=5.3"></script>
+  <script src="dashboard.js?v=6.0"></script>
 </body>
 </html>
