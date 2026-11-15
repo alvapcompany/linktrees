@@ -86,9 +86,19 @@ const GitHubSync = {
   async ensurePagesEnabled(owner, repo, token) {
     const headers = this.getHeaders(token);
     try {
-      const checkRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/pages`, { headers });
+      const checkRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/pages?_t=${Date.now()}`, {
+        headers,
+        cache: "no-store"
+      });
       if (checkRes.ok) {
-        return await checkRes.json();
+        const pageInfo = await checkRes.json();
+        if (pageInfo.status === "errored") {
+          await fetch(`https://api.github.com/repos/${owner}/${repo}/pages/builds`, {
+            method: "POST",
+            headers
+          }).catch(() => {});
+        }
+        return pageInfo;
       }
       if (checkRes.status === 404) {
         const enableRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/pages`, {
@@ -111,7 +121,7 @@ const GitHubSync = {
   },
 
   /**
-   * Comprueba si el repositorio existe; si no, lo crea automáticamente y activa GitHub Pages
+   * Comprueba si el repositorio existe; si no, lo crea automáticamente
    */
   async ensureRepository(owner, repo, token) {
     const checkRes = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
@@ -152,8 +162,8 @@ const GitHubSync = {
       const created = await createRes.json();
 
       // Breve espera para que GitHub inicialice la rama main tras auto_init
+      // (Pages se activa tras subir index.html y dashboard.html para evitar builds fallidos en vacío)
       await new Promise(resolve => setTimeout(resolve, 1500));
-      await this.ensurePagesEnabled(owner, repo, token);
 
       return created;
     }
