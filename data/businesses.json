@@ -60,6 +60,10 @@
   },
   "vainilla-saltillo": {
     "id": "vainilla-saltillo",
+    "github_repo": "vainilla-saltillo",
+    "deploy_individual_repo": true,
+    "repo_url": "https://github.com/alvapcompany/vainilla-saltillo",
+    "pages_url": "https://alvapcompany.github.io/vainilla-saltillo/",
     "nombre_negocio": "Vainilla | Cocina Contemporánea",
     "categoria": "Desayunos, Comidas y Cenas",
     "descripcion": "Cocina contemporánea en Saltillo. Disfruta los mejores desayunos, comidas y cenas en un ambiente exclusivo.",
@@ -83,7 +87,7 @@
     "link_google_negocio": "https://search.google.com/local/writereview?placeid=ChIJbaosTyETiIYRESo-idjTaX0",
     "password": "VAINILLA123",
     "botones_adicionales": [],
-    "fecha_actualizacion": "2026-11-09T16:05:10.501Z"
+    "fecha_actualizacion": "2026-11-15T19:13:20.517Z"
   },
   "barbacoasofi": {
     "id": "barbacoasofi",
