@@ -1,7 +1,7 @@
 # 🚀 Sistema de Linktrees Inteligentes NFC & Panel de Analíticas
 ### Desarrollado para **Alvap Company** • Arquitectura Multi-Repositorio
 
-Plataforma central para crear, previsualizar, modificar y desplegar **Linktrees con repositorio individual propio** en GitHub Pages, incluyendo su **Dashboard de Clics por Botón** dentro de cada repositorio.
+Plataforma central para crear, previsualizar, modificar y desplegar **Linktrees con repositorio individual propio** en GitHub Pages, incluyendo su **Dashboard de Clics por Botón y Sugerencias de Mejora** dentro de cada repositorio.
 
 ---
 
@@ -29,4 +29,4 @@ Plataforma central para crear, previsualizar, modificar y desplegar **Linktrees 
 Cada repositorio creado o sincronizado desde el Panel Admin contiene:
 - `business.json`: Configuración actualizada del negocio (tema, botones, enlaces y contraseña).
 - `index.html`: Linktree público optimizado para tarjetas NFC y QR.
-- `dashboard.html` y `dashboard/index.html`: Panel privado de métricas con desglose exacto de clics por botón.
+- `dashboard.html` y `dashboard/index.html`: Panel privado de métricas con desglose exacto de clics por botón y sugerencias de rendimiento.
