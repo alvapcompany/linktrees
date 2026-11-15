@@ -213,8 +213,7 @@ body {
 }
 
 /* Sección de Desglose de Clics por Botón */
-.buttons-breakdown-section,
-.suggestions-section {
+.buttons-breakdown-section {
   background: var(--panel-bg);
   border: 1px solid var(--border-color);
   border-radius: 18px;
@@ -394,47 +393,6 @@ body {
 
 .btn-stat-footer strong {
   color: #e5e7eb;
-}
-
-/* Sugerencias Automáticas */
-.suggestions-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 14px;
-}
-
-.suggestion-card {
-  background: #111827;
-  border: 1px solid var(--border-color);
-  border-radius: 14px;
-  padding: 16px 18px;
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-
-.suggestion-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-
-.suggestion-card h4 {
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: #f9fafb;
-  margin-bottom: 4px;
-}
-
-.suggestion-card p {
-  font-size: 0.82rem;
-  color: #9ca3af;
-  line-height: 1.45;
 }
 
 /* Sección QR y NFC */

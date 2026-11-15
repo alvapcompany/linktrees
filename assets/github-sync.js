@@ -439,7 +439,7 @@ const GitHubSync = {
     return `# 🚀 Sistema de Linktrees Inteligentes NFC & Panel de Analíticas
 ### Desarrollado para **Alvap Company** • Arquitectura Multi-Repositorio
 
-Plataforma central para crear, previsualizar, modificar y desplegar **Linktrees con repositorio individual propio** en GitHub Pages, incluyendo su **Dashboard de Clics por Botón y Sugerencias de Mejora** dentro de cada repositorio.
+Plataforma central para crear, previsualizar, modificar y desplegar **Linktrees con repositorio individual propio** en GitHub Pages, incluyendo su **Dashboard de Clics por Botón** dentro de cada repositorio.
 
 ---
 
@@ -464,7 +464,7 @@ ${rows}
 Cada repositorio creado o sincronizado desde el Panel Admin contiene:
 - \`business.json\`: Configuración actualizada del negocio (tema, botones, enlaces y contraseña).
 - \`index.html\`: Linktree público optimizado para tarjetas NFC y QR.
-- \`dashboard.html\` y \`dashboard/index.html\`: Panel privado de métricas con desglose exacto de clics por botón y sugerencias de rendimiento.
+- \`dashboard.html\` y \`dashboard/index.html\`: Panel privado de métricas con desglose exacto de clics por botón.
 `;
   },
 
@@ -672,7 +672,7 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(b.nombre_negocio || b.id)} | Panel de Clics y Métricas</title>
-  <link rel="stylesheet" href="${coreBase}/client/dashboard.css?v=7.0">
+  <link rel="stylesheet" href="${coreBase}/client/dashboard.css?v=8.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -834,22 +834,6 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
       <div id="buttonsBreakdownList" class="buttons-breakdown-grid"></div>
     </section>
 
-    <!-- Sección 2: Diagnóstico y Sugerencias de Mejora -->
-    <section class="suggestions-section">
-      <div class="breakdown-header" style="margin-bottom: 16px;">
-        <div>
-          <h2 style="font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-lightbulb" style="color: #fbbf24;"></i> 💡 Diagnóstico y Sugerencias para Mejorar tus Resultados
-          </h2>
-          <p style="font-size: 0.85rem; color: #9ca3af; margin-top: 4px;">
-            Recomendaciones automáticas basadas en el rendimiento real de cada botón de tu negocio.
-          </p>
-        </div>
-      </div>
-
-      <div id="smartSuggestionsGrid" class="suggestions-grid"></div>
-    </section>
-
   </div>
 
   <script>
@@ -858,7 +842,7 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
     window.INITIAL_BUSINESS = ${safeJson};
   </script>
   <script src="${coreBase}/config.js"></script>
-  <script src="${coreBase}/client/dashboard.js?v=7.0"></script>
+  <script src="${coreBase}/client/dashboard.js?v=8.0"></script>
 </body>
 </html>`;
   },

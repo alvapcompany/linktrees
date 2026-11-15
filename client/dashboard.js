@@ -1,6 +1,6 @@
 /**
  * CLIENT DASHBOARD LOGIC - ALVAP COMPANY
- * Visualización de Vistas, Desglose Detallado de Clics por Botón y Sugerencias de Mejora
+ * Visualización de Vistas y Desglose Detallado de Clics por Botón
  */
 
 const params = new URLSearchParams(window.location.search);
@@ -262,10 +262,9 @@ async function loadMetrics() {
   document.getElementById("kpiTotalClicks").textContent = metrics.total_clicks;
   document.getElementById("kpiCtr").textContent = metrics.ctr_percent + "%";
 
-  // Renderizar gráficos, desglose por botón y sugerencias
+  // Renderizar gráficos y desglose por botón
   renderCharts(metrics, channelsData);
   renderButtonsBreakdown(metrics, channelsData);
-  renderSmartSuggestions(metrics, channelsData);
 }
 
 /**
@@ -557,77 +556,4 @@ function renderButtonsBreakdown(metrics, channelsData) {
       </div>
     `;
   }).join("");
-}
-
-/**
- * Genera sugerencias de mejora inteligentes basadas en los clics reales por botón
- */
-function renderSmartSuggestions(metrics, channelsData) {
-  const container = document.getElementById("smartSuggestionsGrid");
-  if (!container) return;
-
-  const suggestions = [];
-  const sorted = channelsData.slice().sort((a, b) => b.clicks - a.clicks);
-  const topBtn = sorted[0];
-  const zeroBtns = sorted.filter(c => c.clicks === 0);
-  const ctr = parseFloat(metrics.ctr_percent) || 0;
-
-  if (topBtn && topBtn.clicks > 0) {
-    suggestions.push({
-      icon: "fas fa-trophy",
-      bg: "rgba(16, 185, 129, 0.15)",
-      color: "#34d399",
-      title: `Potencia tu canal estrella: ${topBtn.label}`,
-      text: `${topBtn.label} concentra el ${topBtn.sharePercent}% de tus interacciones (${topBtn.clicks} clics). Mantenlo como primer botón visible y usa un llamado a la acción directo.`
-    });
-  }
-
-  if (zeroBtns.length > 0) {
-    const names = zeroBtns.map(z => z.label).slice(0, 3).join(", ");
-    suggestions.push({
-      icon: "fas fa-bullseye",
-      bg: "rgba(245, 158, 11, 0.15)",
-      color: "#fbbf24",
-      title: `${zeroBtns.length} botón(es) sin clics registrados`,
-      text: `Los enlaces (${names}) tienen 0 clics. Prueba cambiar el estilo de botones a "Botón Completo Coloreado" o elimina los enlaces que tus clientes no usen para evitar distracciones.`
-    });
-  }
-
-  if (ctr < 35) {
-    suggestions.push({
-      icon: "fas fa-bolt",
-      bg: "rgba(99, 102, 241, 0.15)",
-      color: "#818cf8",
-      title: "Sube tu tasa de interacción (CTR)",
-      text: `Tu CTR actual es de ${ctr}%. Dejar entre 3 y 5 botones clave (ej. WhatsApp con mensaje prellenado + Menú + Mapa) suele elevar los clics por encima del 45%.`
-    });
-  } else {
-    suggestions.push({
-      icon: "fas fa-chart-line",
-      bg: "rgba(99, 102, 241, 0.15)",
-      color: "#818cf8",
-      title: "Excelente tasa de conversión",
-      text: `Tu CTR actual es de ${ctr}%, muy saludable para tarjetas NFC. Aprovecha para agregar una promoción temporal en tu Botón Destacado Extra y medir sus clics.`
-    });
-  }
-
-  suggestions.push({
-    icon: "fas fa-wifi",
-    bg: "rgba(56, 189, 248, 0.15)",
-    color: "#38bdf8",
-    title: "Enlace NFC corto y repositorio propio",
-    text: "Apunta tus tarjetas NFC directamente a la URL corta de tu repositorio individual en GitHub Pages para lograr carga instantánea al acercar el teléfono."
-  });
-
-  container.innerHTML = suggestions.map(s => `
-    <div class="suggestion-card">
-      <div class="suggestion-icon" style="background: ${s.bg}; color: ${s.color};">
-        <i class="${s.icon}"></i>
-      </div>
-      <div>
-        <h4>${escapeHtml(s.title)}</h4>
-        <p>${escapeHtml(s.text)}</p>
-      </div>
-    </div>
-  `).join("");
 }
