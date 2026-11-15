@@ -1,7 +1,7 @@
 # 🚀 Sistema de Linktrees Inteligentes NFC & Panel de Analíticas
 ### Desarrollado para **Alvap Company** • Arquitectura Multi-Repositorio
 
-Plataforma central para crear, previsualizar, modificar y desplegar **Linktrees con repositorio individual propio** en GitHub Pages, incluyendo su **Dashboard de Clics por Botón** dentro de cada repositorio.
+Plataforma central para crear, previsualizar, modificar y desplegar **Linktrees con repositorio individual propio** en GitHub Pages, incluyendo su **Dashboard de Clics por Botón y Sugerencias de Mejora** dentro de cada repositorio.
 
 ---
 
@@ -20,7 +20,7 @@ Plataforma central para crear, previsualizar, modificar y desplegar **Linktrees 
 | **Alvap Digital Studio** | `alvap-studio` | [alvap-studio](https://github.com/alvapcompany/alvap-studio) | [Abrir Linktree](https://alvapcompany.github.io/alvap-studio/) | [Ver Dashboard](https://alvapcompany.github.io/alvap-studio/dashboard.html) | [Editar](https://alvapcompany.github.io/linktrees/admin/?id=alvap-studio) |
 | **Taquería El Pastor Real** | `tacos-el-pastor` | [tacos-el-pastor](https://github.com/alvapcompany/tacos-el-pastor) | [Abrir Linktree](https://alvapcompany.github.io/tacos-el-pastor/) | [Ver Dashboard](https://alvapcompany.github.io/tacos-el-pastor/dashboard.html) | [Editar](https://alvapcompany.github.io/linktrees/admin/?id=tacos-el-pastor) |
 | **Vainilla \| Cocina Contemporánea** | `vainilla-saltillo` | [vainilla-saltillo](https://github.com/alvapcompany/vainilla-saltillo) | [Abrir Linktree](https://alvapcompany.github.io/vainilla-saltillo/) | [Ver Dashboard](https://alvapcompany.github.io/vainilla-saltillo/dashboard.html) | [Editar](https://alvapcompany.github.io/linktrees/admin/?id=vainilla-saltillo) |
-| **Nuevo Negocio (barbacoasofi)** | `barbacoasofi` | [barbacoasofi](https://github.com/alvapcompany/barbacoasofi) | [Abrir Linktree](https://alvapcompany.github.io/barbacoasofi/) | [Ver Dashboard](https://alvapcompany.github.io/barbacoasofi/dashboard.html) | [Editar](https://alvapcompany.github.io/linktrees/admin/?id=barbacoasofi) |
+| **(barbacoasofi)** | `barbacoasofi` | [barbacoasofi](https://github.com/alvapcompany/barbacoasofi) | [Abrir Linktree](https://alvapcompany.github.io/barbacoasofi/) | [Ver Dashboard](https://alvapcompany.github.io/barbacoasofi/dashboard.html) | [Editar](https://alvapcompany.github.io/linktrees/admin/?id=barbacoasofi) |
 
 ---
 
@@ -29,4 +29,4 @@ Plataforma central para crear, previsualizar, modificar y desplegar **Linktrees 
 Cada repositorio creado o sincronizado desde el Panel Admin contiene:
 - `business.json`: Configuración actualizada del negocio (tema, botones, enlaces y contraseña).
 - `index.html`: Linktree público optimizado para tarjetas NFC y QR.
-- `dashboard.html` y `dashboard/index.html`: Panel privado de métricas con desglose exacto de clics por botón.
+- `dashboard.html` y `dashboard/index.html`: Panel privado de métricas con desglose exacto de clics por botón y sugerencias de rendimiento.
