@@ -438,18 +438,19 @@
   function trackEvent(bId, type, buttonId) {
     const cleanBizId = (bId || businessId || "").trim().toLowerCase();
     const cleanBtnId = (buttonId || "").trim().toLowerCase();
+    const todayKey = new Date().toISOString().split("T")[0];
 
     // 1. Guardar en registro local por día y por botón para reflejo inmediato en dashboard
     try {
       const statsKey = "alvap_stats_" + cleanBizId;
-      const stats = JSON.parse(localStorage.getItem(statsKey) || '{"views":0,"clicks":{},"visitors":[],"views_by_date":{},"clicks_by_date":{}}');
+      const stats = JSON.parse(localStorage.getItem(statsKey) || '{"views":0,"clicks":{},"visitors":[],"views_by_date":{},"clicks_by_date":{},"clicks_by_date_button":{}}');
       stats.views = Number(stats.views) || 0;
       stats.clicks = (stats.clicks && typeof stats.clicks === "object") ? stats.clicks : {};
       stats.visitors = Array.isArray(stats.visitors) ? stats.visitors : [];
       stats.views_by_date = (stats.views_by_date && typeof stats.views_by_date === "object") ? stats.views_by_date : {};
       stats.clicks_by_date = (stats.clicks_by_date && typeof stats.clicks_by_date === "object") ? stats.clicks_by_date : {};
+      stats.clicks_by_date_button = (stats.clicks_by_date_button && typeof stats.clicks_by_date_button === "object") ? stats.clicks_by_date_button : {};
 
-      const todayKey = new Date().toISOString().split("T")[0];
       if (type === "view") {
         stats.views += 1;
         if (!stats.visitors.includes(visitorId)) stats.visitors.push(visitorId);
@@ -457,6 +458,10 @@
       } else if (type === "click" && cleanBtnId) {
         stats.clicks[cleanBtnId] = (Number(stats.clicks[cleanBtnId]) || 0) + 1;
         stats.clicks_by_date[todayKey] = (Number(stats.clicks_by_date[todayKey]) || 0) + 1;
+        if (!stats.clicks_by_date_button[todayKey] || typeof stats.clicks_by_date_button[todayKey] !== "object") {
+          stats.clicks_by_date_button[todayKey] = {};
+        }
+        stats.clicks_by_date_button[todayKey][cleanBtnId] = (Number(stats.clicks_by_date_button[todayKey][cleanBtnId]) || 0) + 1;
       }
       localStorage.setItem(statsKey, JSON.stringify(stats));
     } catch (e) {}
@@ -472,7 +477,7 @@
           action: "track",
           id: cleanBizId,
           type: type || "view",
-          button: cleanBtnId,
+          button: (type === "click" && cleanBtnId) ? `${cleanBtnId}__${todayKey}` : cleanBtnId,
           visitor: visitorId || "anon",
           ua: (navigator.userAgent || "").substring(0, 160),
           ref: document.referrer || "direct",

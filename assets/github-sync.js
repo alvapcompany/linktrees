@@ -734,6 +734,24 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
       </div>
     </header>
 
+    <!-- Barra de Filtros por Día, Semana, Mes e Histórico -->
+    <section class="filter-bar-card">
+      <div class="filter-bar-left">
+        <span class="filter-bar-title"><i class="fas fa-calendar-alt" style="color: #6366f1;"></i> Filtrar por periodo:</span>
+        <div class="period-Quick-btns">
+          <button type="button" id="filterBtnDay" class="period-btn" onclick="setDashboardPeriod('day')">📅 Hoy</button>
+          <button type="button" id="filterBtnWeek" class="period-btn" onclick="setDashboardPeriod('week')">📆 Semana (7d)</button>
+          <button type="button" id="filterBtnMonth" class="period-btn" onclick="setDashboardPeriod('month')">🗓️ Mes (30d)</button>
+          <button type="button" id="filterBtnAll" class="period-btn active" onclick="setDashboardPeriod('all')">📊 Todo</button>
+        </div>
+      </div>
+      <div class="filter-bar-right">
+        <label for="customDateFilter" class="filter-date-label">Día exacto:</label>
+        <input type="date" id="customDateFilter" class="filter-date-input" onchange="setCustomDashboardDate(this.value)">
+        <span id="activePeriodBadge" class="active-period-badge">Mostrando: Histórico completo</span>
+      </div>
+    </section>
+
     <!-- KPI Grid de Métricas Clave -->
     <section class="kpi-grid">
       <div class="kpi-card">
@@ -794,7 +812,7 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
       <div class="chart-card">
         <div class="chart-header">
           <div class="chart-title"><i class="fas fa-chart-area" style="color: #6366f1;"></i> Visitas vs Clics en el Tiempo</div>
-          <span style="font-size: 0.78rem; color: #9ca3af;">Últimos 7 días</span>
+          <span id="timelinePeriodSubtitle" style="font-size: 0.78rem; color: #9ca3af;">Historial por fecha</span>
         </div>
         <div class="chart-container">
           <canvas id="timelineChart"></canvas>
@@ -840,6 +858,48 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
       </div>
 
       <div id="buttonsBreakdownList" class="buttons-breakdown-grid"></div>
+    </section>
+
+    <!-- Sección 2: Tabla de Conteo por Filas (Día / Semana / Mes) Respaldada por Columnas -->
+    <section class="buttons-breakdown-section" style="margin-top: 24px;">
+      <div class="breakdown-header">
+        <div>
+          <h2 style="font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-table" style="color: #6366f1;"></i> 📋 Registro por Filas (Fecha / Semana / Mes) y Columnas por Botón
+          </h2>
+          <p style="font-size: 0.84rem; color: #9ca3af; margin-top: 4px;">
+            Acomodo estructurado por fila diaria y columnas individuales de cada botón (compatible con filtros de Google Sheets y Excel).
+          </p>
+        </div>
+        <div>
+          <button type="button" onclick="exportDailyTableCsv()" class="btn btn-secondary" style="font-size: 0.82rem; padding: 9px 14px;">
+            <i class="fas fa-file-csv" style="color: #10b981;"></i> Descargar CSV (Sheets / Excel)
+          </button>
+        </div>
+      </div>
+      <div class="daily-table-wrapper">
+        <table class="daily-metrics-table">
+          <thead>
+            <tr>
+              <th>Fecha (Día)</th>
+              <th>Semana</th>
+              <th>Mes</th>
+              <th>Vistas</th>
+              <th>Clics Totales</th>
+              <th>CTR</th>
+              <th>WhatsApp</th>
+              <th>Instagram</th>
+              <th>Facebook</th>
+              <th>Google Maps</th>
+              <th>Enlace Extra</th>
+              <th>Insignia Google</th>
+            </tr>
+          </thead>
+          <tbody id="dailyMetricsTableBody">
+            <tr><td colspan="12" style="text-align: center; padding: 20px; color: #9ca3af;">Cargando registros...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
   </div>

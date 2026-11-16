@@ -28,6 +28,9 @@ let businessData = null;
 let timelineChart = null;
 let buttonsChart = null;
 let isRefreshingDashboard = false;
+let currentPeriod = "all";
+let customSelectedDate = "";
+let cachedRawDataset = null;
 
 function purgeBrowserCaches() {
   try {
@@ -345,6 +348,392 @@ function mergeNumericMapsMax(mapA, mapB, lowercaseKeys) {
   return merged;
 }
 
+function getTodayDateStr() {
+  return new Date().toISOString().split("T")[0];
+}
+
+function getIsoWeekStr(dateStr) {
+  const parts = String(dateStr || "").split("-");
+  if (parts.length !== 3) return "";
+  const d = new Date(Date.UTC(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])));
+  if (isNaN(d.getTime())) return "";
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  return d.getUTCFullYear() + "-W" + (weekNo < 10 ? "0" + weekNo : String(weekNo));
+}
+
+function getMonthStr(dateStr) {
+  return String(dateStr || "").substring(0, 7);
+}
+
+function stripButtonDateSuffix(rawKey) {
+  const clean = String(rawKey || "").trim().toLowerCase();
+  const match = clean.match(/^(.+?)__(\d{4}-\d{2}-\d{2})$/);
+  if (match) {
+    return { cleanKey: match[1], dateKey: match[2] };
+  }
+  return { cleanKey: clean, dateKey: null };
+}
+
+function sumBtnAliases(clicksMap, aliases) {
+  if (!clicksMap) return 0;
+  let total = 0;
+  Object.keys(clicksMap).forEach(k => {
+    const base = k.toLowerCase().replace(/__\d{4}-\d{2}-\d{2}$/, "");
+    const norm = base.replace(/^btn_/, "");
+    if (aliases.includes(base) || aliases.includes(norm) || (aliases.includes("google_reviews") && base.includes("google_review"))) {
+      total += (Number(clicksMap[k]) || 0);
+    }
+  });
+  return total;
+}
+
+function buildDailyLedger(cloudMetrics, localStats) {
+  const byDate = {};
+
+  function ensureDateRow(rawDate) {
+    const m = String(rawDate || "").match(/^(\d{4}-\d{2}-\d{2})/);
+    const dateKey = m ? m[1] : getTodayDateStr();
+    if (!byDate[dateKey]) {
+      byDate[dateKey] = {
+        fecha: dateKey,
+        semana: getIsoWeekStr(dateKey),
+        mes: getMonthStr(dateKey),
+        views: 0,
+        unique_visitors: 0,
+        total_clicks: 0,
+        clicks_by_button: {}
+      };
+    }
+    return byDate[dateKey];
+  }
+
+  // A. Filas estructuradas desde Google Apps Script (Metricas_Por_Dia)
+  const hasCloudDailyRows = Boolean(cloudMetrics && Array.isArray(cloudMetrics.daily_rows) && cloudMetrics.daily_rows.length > 0);
+  if (hasCloudDailyRows) {
+    cloudMetrics.daily_rows.forEach(r => {
+      const row = ensureDateRow(r.fecha);
+      row.views = Math.max(row.views, Number(r.views) || 0);
+      row.unique_visitors = Math.max(row.unique_visitors, Number(r.unique_visitors) || 0);
+      row.total_clicks = Math.max(row.total_clicks, Number(r.total_clicks) || 0);
+      const btns = r.clicks_by_button || {};
+      Object.keys(btns).forEach(bk => {
+        const cleanBk = String(bk).trim().toLowerCase();
+        if (cleanBk) {
+          row.clicks_by_button[cleanBk] = Math.max(Number(row.clicks_by_button[cleanBk]) || 0, Number(btns[bk]) || 0);
+        }
+      });
+    });
+  }
+
+  // B. Mapas por fecha de Google Apps Script
+  if (cloudMetrics && cloudMetrics.views_by_date) {
+    Object.keys(cloudMetrics.views_by_date).forEach(d => {
+      const row = ensureDateRow(d);
+      row.views = Math.max(row.views, Number(cloudMetrics.views_by_date[d]) || 0);
+    });
+  }
+  if (cloudMetrics && cloudMetrics.clicks_by_date) {
+    Object.keys(cloudMetrics.clicks_by_date).forEach(d => {
+      const row = ensureDateRow(d);
+      row.total_clicks = Math.max(row.total_clicks, Number(cloudMetrics.clicks_by_date[d]) || 0);
+    });
+  }
+
+  // C. Clics por botón desde GAS (incluye formato con fecha whatsapp__YYYY-MM-DD y respaldo legado)
+  if (cloudMetrics && cloudMetrics.clicks_by_button) {
+    const undatedCloud = {};
+    const datedPlaced = {};
+
+    Object.keys(cloudMetrics.clicks_by_button).forEach(rawK => {
+      const val = Number(cloudMetrics.clicks_by_button[rawK]) || 0;
+      if (val <= 0) return;
+      const parsed = stripButtonDateSuffix(rawK);
+      if (parsed.dateKey) {
+        const row = ensureDateRow(parsed.dateKey);
+        row.clicks_by_button[parsed.cleanKey] = Math.max(Number(row.clicks_by_button[parsed.cleanKey]) || 0, val);
+        datedPlaced[parsed.cleanKey] = (datedPlaced[parsed.cleanKey] || 0) + val;
+      } else if (!hasCloudDailyRows) {
+        undatedCloud[parsed.cleanKey] = (undatedCloud[parsed.cleanKey] || 0) + val;
+      }
+    });
+
+    if (!hasCloudDailyRows) {
+      const sortedDates = Object.keys(byDate).sort();
+      const targetFallbackDate = sortedDates.length ? sortedDates[sortedDates.length - 1] : getTodayDateStr();
+      Object.keys(undatedCloud).forEach(btnK => {
+        const rem = Math.max(0, undatedCloud[btnK] - (datedPlaced[btnK] || 0));
+        if (rem > 0) {
+          const row = ensureDateRow(targetFallbackDate);
+          row.clicks_by_button[btnK] = Math.max(Number(row.clicks_by_button[btnK]) || 0, rem);
+        }
+      });
+    }
+  }
+
+  // D. Datos locales del dispositivo (views_by_date, clicks_by_date, clicks_by_date_button)
+  if (localStats) {
+    if (localStats.views_by_date) {
+      Object.keys(localStats.views_by_date).forEach(d => {
+        const row = ensureDateRow(d);
+        row.views = Math.max(row.views, Number(localStats.views_by_date[d]) || 0);
+      });
+    }
+    if (localStats.clicks_by_date) {
+      Object.keys(localStats.clicks_by_date).forEach(d => {
+        const row = ensureDateRow(d);
+        row.total_clicks = Math.max(row.total_clicks, Number(localStats.clicks_by_date[d]) || 0);
+      });
+    }
+    if (localStats.clicks_by_date_button) {
+      Object.keys(localStats.clicks_by_date_button).forEach(d => {
+        const row = ensureDateRow(d);
+        const dayBtns = localStats.clicks_by_date_button[d] || {};
+        Object.keys(dayBtns).forEach(bk => {
+          const cleanBk = stripButtonDateSuffix(bk).cleanKey;
+          if (cleanBk) {
+            row.clicks_by_button[cleanBk] = Math.max(Number(row.clicks_by_button[cleanBk]) || 0, Number(dayBtns[bk]) || 0);
+          }
+        });
+      });
+    } else if (localStats.clicks) {
+      const sortedDates = Object.keys(byDate).sort();
+      const targetFallbackDate = sortedDates.length ? sortedDates[sortedDates.length - 1] : getTodayDateStr();
+      Object.keys(localStats.clicks).forEach(bk => {
+        const cleanBk = stripButtonDateSuffix(bk).cleanKey;
+        const val = Number(localStats.clicks[bk]) || 0;
+        if (cleanBk && val > 0) {
+          const alreadySummed = Object.values(byDate).reduce((acc, r) => acc + (Number(r.clicks_by_button[cleanBk]) || 0), 0);
+          if (val > alreadySummed) {
+            const row = ensureDateRow(targetFallbackDate);
+            row.clicks_by_button[cleanBk] = (Number(row.clicks_by_button[cleanBk]) || 0) + (val - alreadySummed);
+          }
+        }
+      });
+    }
+  }
+
+  return Object.values(byDate).map(row => {
+    const sumBtns = Object.values(row.clicks_by_button).reduce((a, b) => a + (Number(b) || 0), 0);
+    row.total_clicks = Math.max(row.total_clicks, sumBtns);
+    row.unique_visitors = row.unique_visitors > 0 ? row.unique_visitors : row.views;
+    return row;
+  }).sort((a, b) => a.fecha.localeCompare(b.fecha));
+}
+
+function filterLedgerByPeriod(ledger, period, exactDate) {
+  if (!Array.isArray(ledger)) return [];
+  const today = getTodayDateStr();
+  const todayTime = new Date(today + "T00:00:00Z").getTime();
+
+  return ledger.filter(row => {
+    if (period === "all" || !period) return true;
+    if (period === "day") return row.fecha === today;
+    if (period === "custom") return exactDate ? row.fecha === exactDate : true;
+
+    const rowTime = new Date(row.fecha + "T00:00:00Z").getTime();
+    if (!isFinite(rowTime) || !isFinite(todayTime)) return true;
+    const diffDays = (todayTime - rowTime) / 86400000;
+
+    if (period === "week") return diffDays >= 0 && diffDays < 7;
+    if (period === "month") return diffDays >= 0 && diffDays < 30;
+    return true;
+  });
+}
+
+function aggregateFilteredMetrics(filteredRows, cloudMetrics, localStats, period) {
+  let views = 0;
+  let clicks = 0;
+  const clicksByButton = {};
+  const viewsByDate = {};
+  const clicksByDate = {};
+
+  filteredRows.forEach(r => {
+    views += Number(r.views) || 0;
+    clicks += Number(r.total_clicks) || 0;
+    viewsByDate[r.fecha] = Number(r.views) || 0;
+    clicksByDate[r.fecha] = Number(r.total_clicks) || 0;
+    Object.keys(r.clicks_by_button || {}).forEach(bk => {
+      clicksByButton[bk] = (clicksByButton[bk] || 0) + (Number(r.clicks_by_button[bk]) || 0);
+    });
+  });
+
+  let uniqueVisitors = 0;
+  if (period === "all") {
+    const localVisitorsCount = (localStats && Array.isArray(localStats.visitors)) ? localStats.visitors.length : 0;
+    views = Math.max(views, Number(cloudMetrics && cloudMetrics.total_views) || 0, Number(localStats && localStats.views) || 0);
+    clicks = Math.max(clicks, Number(cloudMetrics && cloudMetrics.total_clicks) || 0);
+    uniqueVisitors = Math.max(Number(cloudMetrics && cloudMetrics.unique_visitors) || 0, localVisitorsCount, views > 0 ? 1 : 0);
+  } else {
+    const summedVisitors = filteredRows.reduce((acc, r) => acc + (Number(r.unique_visitors) || Number(r.views) || 0), 0);
+    uniqueVisitors = views > 0 ? Math.max(1, Math.min(views, summedVisitors || views)) : 0;
+  }
+
+  const ctrPercent = views > 0 ? Number(((clicks / views) * 100).toFixed(1)) : 0;
+
+  return {
+    total_views: views,
+    unique_visitors: uniqueVisitors,
+    total_clicks: clicks,
+    ctr_percent: ctrPercent,
+    clicks_by_button: clicksByButton,
+    views_by_date: viewsByDate,
+    clicks_by_date: clicksByDate
+  };
+}
+
+function updateFilterUiState(period, exactDate) {
+  const mapBtn = {
+    day: "filterBtnDay",
+    week: "filterBtnWeek",
+    month: "filterBtnMonth",
+    all: "filterBtnAll"
+  };
+  Object.keys(mapBtn).forEach(k => {
+    const el = document.getElementById(mapBtn[k]);
+    if (el) el.classList.toggle("active", k === period);
+  });
+
+  if (period !== "custom") {
+    const dateInput = document.getElementById("customDateFilter");
+    if (dateInput) dateInput.value = "";
+  }
+
+  const badge = document.getElementById("activePeriodBadge");
+  const subtitle = document.getElementById("timelinePeriodSubtitle");
+  let labelText = "Histórico completo";
+  let subText = "Historial por fecha";
+
+  if (period === "day") {
+    labelText = `Hoy (${getTodayDateStr()})`;
+    subText = "Actividad de hoy";
+  } else if (period === "week") {
+    labelText = "Últimos 7 días";
+    subText = "Últimos 7 días";
+  } else if (period === "month") {
+    labelText = "Últimos 30 días";
+    subText = "Últimos 30 días";
+  } else if (period === "custom" && exactDate) {
+    labelText = `Día ${exactDate}`;
+    subText = `Día ${exactDate}`;
+  }
+
+  if (badge) badge.textContent = "Mostrando: " + labelText;
+  if (subtitle) subtitle.textContent = subText;
+}
+
+function renderDailyMetricsTable(rows) {
+  const tbody = document.getElementById("dailyMetricsTableBody");
+  window.__lastDailyRows = rows || [];
+  if (!tbody) return;
+
+  if (!rows || rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; padding: 24px; color: #9ca3af;">No hay vistas o clics registrados en el periodo seleccionado.</td></tr>`;
+    return;
+  }
+
+  const descRows = rows.slice().reverse();
+  tbody.innerHTML = descRows.map(r => {
+    const ctr = r.views > 0 ? ((r.total_clicks / r.views) * 100).toFixed(1) + "%" : "0%";
+    const cWa = sumBtnAliases(r.clicks_by_button, ["whatsapp", "btn_whatsapp"]);
+    const cIg = sumBtnAliases(r.clicks_by_button, ["instagram", "btn_instagram"]);
+    const cFb = sumBtnAliases(r.clicks_by_button, ["facebook", "btn_facebook"]);
+    const cMaps = sumBtnAliases(r.clicks_by_button, ["ubicacion", "btn_ubicacion", "maps"]);
+    const cExtra = sumBtnAliases(r.clicks_by_button, ["extra", "btn_extra"]);
+    const cReviews = sumBtnAliases(r.clicks_by_button, ["google_reviews", "google_reviews_badge", "btn_google_review"]);
+
+    return `
+      <tr>
+        <td><strong>${escapeHtml(r.fecha)}</strong></td>
+        <td><span class="daily-pill-code">${escapeHtml(r.semana)}</span></td>
+        <td><span class="daily-pill-code">${escapeHtml(r.mes)}</span></td>
+        <td>${Number(r.views) || 0}</td>
+        <td><strong style="color: #34d399;">${Number(r.total_clicks) || 0}</strong></td>
+        <td>${ctr}</td>
+        <td>${cWa}</td>
+        <td>${cIg}</td>
+        <td>${cFb}</td>
+        <td>${cMaps}</td>
+        <td>${cExtra}</td>
+        <td>${cReviews}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function applyDashboardView() {
+  if (!cachedRawDataset) return;
+  const { ledger, cloudMetrics, localStats } = cachedRawDataset;
+  const filteredRows = filterLedgerByPeriod(ledger, currentPeriod, customSelectedDate);
+  const metrics = aggregateFilteredMetrics(filteredRows, cloudMetrics, localStats, currentPeriod);
+
+  updateFilterUiState(currentPeriod, customSelectedDate);
+
+  const channelsData = buildChannelsAnalytics(metrics);
+  document.getElementById("kpiTotalViews").textContent = metrics.total_views;
+  document.getElementById("kpiUniqueVisitors").textContent = metrics.unique_visitors;
+  document.getElementById("kpiTotalClicks").textContent = metrics.total_clicks;
+  document.getElementById("kpiCtr").textContent = metrics.ctr_percent + "%";
+
+  renderCharts(metrics, channelsData);
+  renderButtonsBreakdown(metrics, channelsData);
+  renderDailyMetricsTable(filteredRows);
+}
+
+window.setDashboardPeriod = function (period) {
+  currentPeriod = period || "all";
+  customSelectedDate = "";
+  applyDashboardView();
+};
+
+window.setCustomDashboardDate = function (dateStr) {
+  if (!dateStr) {
+    currentPeriod = "all";
+    customSelectedDate = "";
+  } else {
+    currentPeriod = "custom";
+    customSelectedDate = dateStr;
+  }
+  applyDashboardView();
+};
+
+window.exportDailyTableCsv = function () {
+  const rows = (window.__lastDailyRows || []).slice().reverse();
+  const headers = ["Fecha", "Semana", "Mes", "Negocio", "Vistas", "Clics Totales", "CTR", "WhatsApp", "Instagram", "Facebook", "Google Maps", "Enlace Extra", "Insignia Google"];
+  const lines = [headers.join(",")];
+
+  rows.forEach(r => {
+    const ctr = r.views > 0 ? ((r.total_clicks / r.views) * 100).toFixed(1) + "%" : "0%";
+    const vals = [
+      r.fecha,
+      r.semana,
+      r.mes,
+      businessId,
+      Number(r.views) || 0,
+      Number(r.total_clicks) || 0,
+      ctr,
+      sumBtnAliases(r.clicks_by_button, ["whatsapp", "btn_whatsapp"]),
+      sumBtnAliases(r.clicks_by_button, ["instagram", "btn_instagram"]),
+      sumBtnAliases(r.clicks_by_button, ["facebook", "btn_facebook"]),
+      sumBtnAliases(r.clicks_by_button, ["ubicacion", "btn_ubicacion", "maps"]),
+      sumBtnAliases(r.clicks_by_button, ["extra", "btn_extra"]),
+      sumBtnAliases(r.clicks_by_button, ["google_reviews", "google_reviews_badge", "btn_google_review"])
+    ];
+    lines.push(vals.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","));
+  });
+
+  const csvContent = "\uFEFF" + lines.join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `metricas_${businessId}_${currentPeriod || "all"}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 /**
  * Carga y computa métricas de vistas y clics consolidando nube (GAS) + dispositivo local
  */
@@ -379,45 +768,10 @@ async function loadMetrics() {
     }
   } catch (e) {}
 
-  // 3. Consolidar nube + local (sin datos falsos de demostración)
-  const mergedClicksByButton = mergeNumericMapsMax(
-    cloudMetrics && cloudMetrics.clicks_by_button,
-    localStats && localStats.clicks,
-    true
-  );
-  const sumButtonClicks = Object.values(mergedClicksByButton).reduce((a, b) => a + (Number(b) || 0), 0);
-  const totalClicks = Math.max(Number(cloudMetrics && cloudMetrics.total_clicks) || 0, sumButtonClicks);
-  const totalViews = Math.max(Number(cloudMetrics && cloudMetrics.total_views) || 0, Number(localStats && localStats.views) || 0);
-  const localVisitorsCount = (localStats && Array.isArray(localStats.visitors)) ? localStats.visitors.length : 0;
-  const uniqueVisitors = Math.max(
-    Number(cloudMetrics && cloudMetrics.unique_visitors) || 0,
-    localVisitorsCount,
-    totalViews > 0 ? 1 : 0
-  );
-  const ctrPercent = totalViews > 0 ? Number(((totalClicks / totalViews) * 100).toFixed(1)) : 0;
-
-  const metrics = {
-    total_views: totalViews,
-    unique_visitors: uniqueVisitors,
-    total_clicks: totalClicks,
-    ctr_percent: ctrPercent,
-    clicks_by_button: mergedClicksByButton,
-    views_by_date: mergeNumericMapsMax(cloudMetrics && cloudMetrics.views_by_date, localStats && localStats.views_by_date, false),
-    clicks_by_date: mergeNumericMapsMax(cloudMetrics && cloudMetrics.clicks_by_date, localStats && localStats.clicks_by_date, false)
-  };
-
-  // Construir datos consolidados de botones activos del negocio
-  const channelsData = buildChannelsAnalytics(metrics);
-
-  // Actualizar tarjetas de KPI
-  document.getElementById("kpiTotalViews").textContent = metrics.total_views;
-  document.getElementById("kpiUniqueVisitors").textContent = metrics.unique_visitors;
-  document.getElementById("kpiTotalClicks").textContent = metrics.total_clicks;
-  document.getElementById("kpiCtr").textContent = metrics.ctr_percent + "%";
-
-  // Renderizar gráficos y desglose por botón
-  renderCharts(metrics, channelsData);
-  renderButtonsBreakdown(metrics, channelsData);
+  // 3. Construir registro estructurado por día/semana/mes y aplicar el filtro activo
+  const ledger = buildDailyLedger(cloudMetrics, localStats);
+  cachedRawDataset = { ledger, cloudMetrics, localStats };
+  applyDashboardView();
 }
 
 /**
@@ -509,7 +863,7 @@ function buildChannelsAnalytics(metrics) {
   const mapped = definitions.map(ch => {
     let clicks = 0;
     Object.keys(rawClicks).forEach(k => {
-      const kLower = k.toLowerCase();
+      const kLower = k.toLowerCase().replace(/__\d{4}-\d{2}-\d{2}$/, "");
       const kNorm = kLower.replace(/^btn_/, "");
       const matchesAlias = ch.aliases.includes(kLower) || ch.aliases.includes(kNorm);
       const matchesGoogle = ch.id === "google_reviews" && kLower.includes("google_review");

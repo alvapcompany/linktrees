@@ -7,6 +7,7 @@
 // Nombres de las hojas en Google Sheets
 const SHEET_BUSINESSES = "Negocios";
 const SHEET_METRICS = "Metricas";
+const SHEET_DAILY_METRICS = "Metricas_Por_Dia";
 const SHEET_REVIEWS = "Reseñas_Cache";
 
 /**
@@ -60,6 +61,34 @@ function initSheets() {
     sheetMetrics.getRange(1, 1, 1, 7).setFontWeight("bold").setBackground("#dcfce7");
   }
 
+  // Hoja Estructurada por Filas (Fecha / Semana / Mes / Negocio) y Columnas por Botón
+  let sheetDaily = ss.getSheetByName(SHEET_DAILY_METRICS);
+  if (!sheetDaily) {
+    sheetDaily = ss.insertSheet(SHEET_DAILY_METRICS);
+    sheetDaily.appendRow([
+      "fecha",
+      "semana",
+      "mes",
+      "business_id",
+      "vistas_totales",
+      "visitantes_unicos",
+      "clics_totales",
+      "clics_whatsapp",
+      "clics_instagram",
+      "clics_facebook",
+      "clics_ubicacion",
+      "clics_extra",
+      "clics_google_reviews",
+      "otros_botones_json",
+      "ultima_actualizacion"
+    ]);
+    sheetDaily.getRange(1, 1, 1, 15).setFontWeight("bold").setBackground("#dbeafe");
+    sheetDaily.setFrozenRows(1);
+    try {
+      sheetDaily.getRange(1, 1, 1, 15).createFilter();
+    } catch (e) {}
+  }
+
   // Hoja de Reseñas en Caché
   let sheetReviews = ss.getSheetByName(SHEET_REVIEWS);
   if (!sheetReviews) {
@@ -99,7 +128,7 @@ function doGet(e) {
     if (action === "get_metrics") {
       const id = params.id;
       if (!id) return jsonResponse({ success: false, error: "ID requerido" });
-      const metrics = getBusinessMetrics(id);
+      const metrics = getBusinessMetrics(id, params.period, params.date);
       return jsonResponse({ success: true, data: metrics });
     }
 
@@ -300,77 +329,342 @@ function parseBusinessRow(row) {
   };
 }
 
+function normalizeDateKey(rawVal) {
+  if (!rawVal) return new Date().toISOString().split("T")[0];
+  if (Object.prototype.toString.call(rawVal) === "[object Date]" && !isNaN(rawVal.getTime())) {
+    return Utilities.formatDate(rawVal, "UTC", "yyyy-MM-dd");
+  }
+  const str = String(rawVal).trim();
+  const m = str.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (m) return m[1];
+  const parsed = new Date(str);
+  if (!isNaN(parsed.getTime())) {
+    return Utilities.formatDate(parsed, "UTC", "yyyy-MM-dd");
+  }
+  return new Date().toISOString().split("T")[0];
+}
+
+function getIsoWeekString(dateStr) {
+  const parts = String(dateStr || "").split("-");
+  if (parts.length !== 3) return "";
+  const d = new Date(Date.UTC(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  return d.getUTCFullYear() + "-W" + (weekNo < 10 ? "0" + weekNo : String(weekNo));
+}
+
+function getMonthString(dateStr) {
+  return String(dateStr || "").substring(0, 7);
+}
+
+function parseButtonAndDate(rawButton, fallbackDate) {
+  const raw = String(rawButton || "").trim().toLowerCase();
+  const match = raw.match(/^(.+?)__(\d{4}-\d{2}-\d{2})$/);
+  if (match) {
+    return { button: match[1], dateKey: match[2] };
+  }
+  return { button: raw, dateKey: fallbackDate };
+}
+
+function mapButtonToDailyColumnIndex(cleanBoton) {
+  const b = String(cleanBoton || "").toLowerCase().replace(/^btn_/, "");
+  if (b === "whatsapp") return 7;
+  if (b === "instagram") return 8;
+  if (b === "facebook") return 9;
+  if (b === "ubicacion" || b === "maps") return 10;
+  if (b === "extra") return 11;
+  if (b.indexOf("google_review") !== -1) return 12;
+  return -1;
+}
+
+function applyEventToDailyRow(row, tipo, cleanBoton, visitorId, nowIso) {
+  let meta = { visitors: [], clicks: {} };
+  try {
+    const parsed = row[13] ? JSON.parse(row[13]) : {};
+    meta.visitors = Array.isArray(parsed.visitors) ? parsed.visitors : [];
+    meta.clicks = (parsed.clicks && typeof parsed.clicks === "object") ? parsed.clicks : {};
+  } catch (e) {
+    meta = { visitors: [], clicks: {} };
+  }
+
+  if (visitorId && visitorId !== "anon" && meta.visitors.indexOf(visitorId) === -1) {
+    meta.visitors.push(visitorId);
+  }
+
+  if (tipo === "view") {
+    row[4] = (Number(row[4]) || 0) + 1;
+  } else if (tipo === "click") {
+    row[6] = (Number(row[6]) || 0) + 1;
+    const colIdx = mapButtonToDailyColumnIndex(cleanBoton);
+    if (colIdx >= 7 && colIdx <= 12) {
+      row[colIdx] = (Number(row[colIdx]) || 0) + 1;
+    } else if (cleanBoton) {
+      meta.clicks[cleanBoton] = (Number(meta.clicks[cleanBoton]) || 0) + 1;
+    }
+  }
+
+  row[5] = Math.max(Number(row[5]) || 0, meta.visitors.length, (Number(row[4]) || 0) > 0 ? 1 : 0);
+  row[13] = JSON.stringify(meta);
+  row[14] = nowIso;
+  return row;
+}
+
+function upsertDailyMetricsRow(dateKey, cleanBizId, tipo, cleanBoton, visitorId, nowIso) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheetDaily = ss.getSheetByName(SHEET_DAILY_METRICS);
+  if (!sheetDaily) {
+    initSheets();
+    sheetDaily = ss.getSheetByName(SHEET_DAILY_METRICS);
+  }
+
+  const rows = sheetDaily.getDataRange().getValues();
+  let foundRowNum = -1;
+  let existingRow = null;
+
+  for (let i = 1; i < rows.length; i++) {
+    if (normalizeDateKey(rows[i][0]) === dateKey && String(rows[i][3]).trim().toLowerCase() === cleanBizId) {
+      foundRowNum = i + 1;
+      existingRow = rows[i].slice(0, 15);
+      while (existingRow.length < 15) existingRow.push("");
+      existingRow[0] = dateKey;
+      existingRow[1] = existingRow[1] || getIsoWeekString(dateKey);
+      existingRow[2] = existingRow[2] || getMonthString(dateKey);
+      existingRow[3] = cleanBizId;
+      break;
+    }
+  }
+
+  if (!existingRow) {
+    existingRow = [
+      dateKey,
+      getIsoWeekString(dateKey),
+      getMonthString(dateKey),
+      cleanBizId,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      JSON.stringify({ visitors: [], clicks: {} }),
+      nowIso
+    ];
+  }
+
+  applyEventToDailyRow(existingRow, tipo, cleanBoton, visitorId, nowIso);
+
+  if (foundRowNum > 0) {
+    sheetDaily.getRange(foundRowNum, 1, 1, 15).setValues([existingRow]);
+  } else {
+    sheetDaily.appendRow(existingRow);
+  }
+}
+
+function syncDailySheetFromRawMetrics() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheetDaily = ss.getSheetByName(SHEET_DAILY_METRICS);
+  const sheetMetrics = ss.getSheetByName(SHEET_METRICS);
+  if (!sheetDaily || !sheetMetrics) return;
+  if (sheetDaily.getLastRow() > 1) return;
+
+  const rows = sheetMetrics.getDataRange().getValues();
+  if (rows.length <= 1) return;
+
+  const mapByDayBiz = {};
+  const orderedKeys = [];
+  const nowIso = new Date().toISOString();
+
+  for (let i = 1; i < rows.length; i++) {
+    const cleanBizId = String(rows[i][1] || "").trim().toLowerCase();
+    if (!cleanBizId) continue;
+
+    const fallbackDate = normalizeDateKey(rows[i][0]);
+    const tipo = String(rows[i][2] || "view").trim().toLowerCase();
+    const parsedBtn = parseButtonAndDate(rows[i][3], fallbackDate);
+    const dateKey = parsedBtn.dateKey;
+    const visitor = String(rows[i][4] || "anon").trim();
+    const key = dateKey + "|" + cleanBizId;
+
+    if (!mapByDayBiz[key]) {
+      orderedKeys.push(key);
+      mapByDayBiz[key] = [
+        dateKey,
+        getIsoWeekString(dateKey),
+        getMonthString(dateKey),
+        cleanBizId,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        JSON.stringify({ visitors: [], clicks: {} }),
+        nowIso
+      ];
+    }
+
+    applyEventToDailyRow(mapByDayBiz[key], tipo, parsedBtn.button, visitor, nowIso);
+  }
+
+  if (orderedKeys.length > 0) {
+    const batch = orderedKeys.map(k => mapByDayBiz[k]);
+    sheetDaily.getRange(2, 1, batch.length, 15).setValues(batch);
+  }
+}
+
 /**
- * Registra una visita o clic en la hoja Metricas
+ * Registra una visita o clic en la hoja Metricas y actualiza la fila diaria en Metricas_Por_Dia
  */
 function recordEvent(event) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName(SHEET_METRICS);
-  const now = new Date().toISOString();
+  const nowIso = new Date().toISOString();
+  const fallbackDate = nowIso.split("T")[0];
+  const cleanBizId = String(event.business_id || "").trim().toLowerCase();
+  const tipo = String(event.tipo_evento || "view").trim().toLowerCase();
+  const parsedBtn = parseButtonAndDate(event.target_boton, fallbackDate);
+  const cleanBoton = parsedBtn.button || "";
+  const visitor = String(event.visitor_id || "anon").trim();
 
   sheet.appendRow([
-    now,
-    event.business_id || "",
-    event.tipo_evento || "view",
-    event.target_boton || "",
-    event.visitor_id || "anon",
-    (event.user_agent || "").substring(0, 200),
+    nowIso,
+    cleanBizId,
+    tipo,
+    cleanBoton,
+    visitor,
+    String(event.user_agent || "").substring(0, 200),
     event.referencia || ""
   ]);
+
+  if (cleanBizId) {
+    syncDailySheetFromRawMetrics();
+    upsertDailyMetricsRow(parsedBtn.dateKey, cleanBizId, tipo, cleanBoton, visitor, nowIso);
+  }
+}
+
+function matchesRequestedPeriod(dateKey, period, targetDate) {
+  const p = String(period || "all").toLowerCase();
+  if (p === "all" || !p) return true;
+
+  const today = new Date().toISOString().split("T")[0];
+  if (p === "day") return dateKey === today;
+  if (p === "custom" && targetDate) return dateKey === normalizeDateKey(targetDate);
+
+  const rowTime = new Date(dateKey + "T00:00:00Z").getTime();
+  const todayTime = new Date(today + "T00:00:00Z").getTime();
+  if (!isFinite(rowTime) || !isFinite(todayTime)) return true;
+  const diffDays = (todayTime - rowTime) / 86400000;
+
+  if (p === "week") return diffDays >= 0 && diffDays < 7;
+  if (p === "month") return diffDays >= 0 && diffDays < 30;
+  return true;
 }
 
 /**
- * Obtiene métricas agregadas para un negocio
+ * Obtiene métricas agregadas y filas diarias estructuradas para un negocio
  */
-function getBusinessMetrics(id) {
+function getBusinessMetrics(id, period, targetDate) {
+  syncDailySheetFromRawMetrics();
+
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(SHEET_METRICS);
-  const rows = sheet.getDataRange().getValues();
+  const sheetDaily = ss.getSheetByName(SHEET_DAILY_METRICS);
+  const cleanId = String(id || "").trim().toLowerCase();
 
   let totalViews = 0;
   let totalClicks = 0;
-  const visitors = new Set();
+  const uniqueVisitorsSet = new Set();
   const clicksByButton = {};
   const viewsByDate = {};
   const clicksByDate = {};
+  const dailyRows = [];
 
-  const cleanId = id.toLowerCase();
+  if (sheetDaily && sheetDaily.getLastRow() > 1) {
+    const rows = sheetDaily.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) {
+      const rowId = String(rows[i][3] || "").trim().toLowerCase();
+      if (rowId !== cleanId) continue;
 
-  for (let i = 1; i < rows.length; i++) {
-    const rowId = String(rows[i][1]).toLowerCase();
-    if (rowId === cleanId) {
-      const timestamp = rows[i][0];
-      const tipo = String(rows[i][2]).toLowerCase();
-      const boton = String(rows[i][3]).toLowerCase() || "otros";
-      const visitor = String(rows[i][4]);
-      
-      const dateKey = timestamp ? String(timestamp).split("T")[0].substring(0, 10) : "Hoy";
+      const dateKey = normalizeDateKey(rows[i][0]);
+      if (!matchesRequestedPeriod(dateKey, period, targetDate)) continue;
 
-      if (visitor && visitor !== "anon") {
-        visitors.add(visitor);
-      }
+      const views = Number(rows[i][4]) || 0;
+      const visitorsRow = Number(rows[i][5]) || 0;
+      const clicksTotalRow = Number(rows[i][6]) || 0;
 
-      if (tipo === "view") {
-        totalViews++;
-        viewsByDate[dateKey] = (viewsByDate[dateKey] || 0) + 1;
-      } else if (tipo === "click") {
-        totalClicks++;
-        clicksByButton[boton] = (clicksByButton[boton] || 0) + 1;
-        clicksByDate[dateKey] = (clicksByDate[dateKey] || 0) + 1;
-      }
+      let meta = { visitors: [], clicks: {} };
+      try {
+        const parsed = rows[i][13] ? JSON.parse(rows[i][13]) : {};
+        meta.visitors = Array.isArray(parsed.visitors) ? parsed.visitors : [];
+        meta.clicks = (parsed.clicks && typeof parsed.clicks === "object") ? parsed.clicks : {};
+      } catch (e) {}
+
+      meta.visitors.forEach(v => {
+        if (v && v !== "anon") uniqueVisitorsSet.add(String(v));
+      });
+
+      const rowButtons = {
+        whatsapp: Number(rows[i][7]) || 0,
+        instagram: Number(rows[i][8]) || 0,
+        facebook: Number(rows[i][9]) || 0,
+        ubicacion: Number(rows[i][10]) || 0,
+        extra: Number(rows[i][11]) || 0,
+        google_reviews: Number(rows[i][12]) || 0
+      };
+
+      Object.keys(meta.clicks).forEach(extraKey => {
+        const kClean = String(extraKey).trim().toLowerCase();
+        if (kClean) {
+          rowButtons[kClean] = (rowButtons[kClean] || 0) + (Number(meta.clicks[extraKey]) || 0);
+        }
+      });
+
+      totalViews += views;
+      totalClicks += clicksTotalRow;
+      viewsByDate[dateKey] = (viewsByDate[dateKey] || 0) + views;
+      clicksByDate[dateKey] = (clicksByDate[dateKey] || 0) + clicksTotalRow;
+
+      Object.keys(rowButtons).forEach(btnKey => {
+        if (rowButtons[btnKey] > 0) {
+          clicksByButton[btnKey] = (clicksByButton[btnKey] || 0) + rowButtons[btnKey];
+        }
+      });
+
+      dailyRows.push({
+        fecha: dateKey,
+        semana: String(rows[i][1] || getIsoWeekString(dateKey)),
+        mes: String(rows[i][2] || getMonthString(dateKey)),
+        business_id: cleanId,
+        views: views,
+        unique_visitors: visitorsRow,
+        total_clicks: clicksTotalRow,
+        clicks_by_button: rowButtons
+      });
     }
   }
+
+  dailyRows.sort(function (a, b) {
+    return a.fecha < b.fecha ? -1 : (a.fecha > b.fecha ? 1 : 0);
+  });
 
   const ctr = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(1) : 0;
 
   return {
     total_views: totalViews,
-    unique_visitors: visitors.size || totalViews,
+    unique_visitors: uniqueVisitorsSet.size || totalViews,
     total_clicks: totalClicks,
     ctr_percent: Number(ctr),
     clicks_by_button: clicksByButton,
     views_by_date: viewsByDate,
-    clicks_by_date: clicksByDate
+    clicks_by_date: clicksByDate,
+    daily_rows: dailyRows
   };
 }
 

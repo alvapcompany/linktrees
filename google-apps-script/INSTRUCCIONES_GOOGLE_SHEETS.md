@@ -31,6 +31,10 @@ Esta base de datos es **100% gratuita para siempre**, no requiere tarjetas de cr
 
 ---
 
-### Paso 4: Conectar la URL en el Panel
+### Paso 4: Conectar la URL en el Panel y Estructura por Filas/Columnas
 Pega esa URL en el archivo de configuración `config.js` o directamente en la pestaña de **Ajustes** dentro del panel administrativo.
 ¡A partir de ahí, todo se guardará automáticamente en tiempo real!
+
+Además, la pestaña **`Metricas_Por_Dia`** organiza automáticamente cada conteo **por filas (Día / Semana / Mes / ID de Negocio)** y **respaldado por columnas individuales por botón** (`vistas_totales`, `visitantes_unicos`, `clics_totales`, `clics_whatsapp`, `clics_instagram`, `clics_facebook`, `clics_ubicacion`, `clics_extra`, `clics_google_reviews`), con filtro nativo activado en los encabezados para filtrar directamente en Google Sheets por **Día**, **Semana** (`YYYY-Www`) o **Mes** (`YYYY-MM`).
+
+> 💡 Si ya tenías implementada una versión anterior de `Code.gs`, vuelve a pegar el código actualizado de `google-apps-script/Code.gs`, guarda y elige **Implementar > Administrar implementaciones > Editar (lápiz) > Nueva versión > Implementar** (conservando la misma URL `/exec`). Al consultar métricas, el script migrará automáticamente tu historial de `Metricas` hacia `Metricas_Por_Dia`.
