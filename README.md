@@ -21,6 +21,7 @@ Plataforma central para crear, previsualizar, modificar y desplegar **Linktrees 
 | **Taquería El Pastor Real** | `tacos-el-pastor` | [tacos-el-pastor](https://github.com/alvapcompany/tacos-el-pastor) | [Abrir Linktree](https://alvapcompany.github.io/tacos-el-pastor/) | [Ver Dashboard](https://alvapcompany.github.io/tacos-el-pastor/dashboard.html) | [Editar](https://alvapcompany.github.io/linktrees/admin/?id=tacos-el-pastor) |
 | **Vainilla \| Cocina Contemporánea** | `vainilla-saltillo` | [vainilla-saltillo](https://github.com/alvapcompany/vainilla-saltillo) | [Abrir Linktree](https://alvapcompany.github.io/vainilla-saltillo/) | [Ver Dashboard](https://alvapcompany.github.io/vainilla-saltillo/dashboard.html) | [Editar](https://alvapcompany.github.io/linktrees/admin/?id=vainilla-saltillo) |
 | **(barbacoasofi)** | `barbacoasofi` | [barbacoasofi](https://github.com/alvapcompany/barbacoasofi) | [Abrir Linktree](https://alvapcompany.github.io/barbacoasofi/) | [Ver Dashboard](https://alvapcompany.github.io/barbacoasofi/dashboard.html) | [Editar](https://alvapcompany.github.io/linktrees/admin/?id=barbacoasofi) |
+| **Daniel Aleman** | `daniel-aleman` | [daniel-aleman](https://github.com/alvapcompany/daniel-aleman) | [Abrir Linktree](https://alvapcompany.github.io/daniel-aleman/) | [Ver Dashboard](https://alvapcompany.github.io/daniel-aleman/dashboard.html) | [Editar](https://alvapcompany.github.io/linktrees/admin/?id=daniel-aleman) |
 
 ---
 
