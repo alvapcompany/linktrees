@@ -235,7 +235,7 @@
 
     if (!isSilentRefresh && !hasTrackedInitialView) {
       hasTrackedInitialView = true;
-      trackEvent(data.id, "view", "pageview");
+      trackEvent(data.id || id, "view", "pageview");
     }
   }
 
@@ -328,6 +328,7 @@
       });
     }
 
+    const effectiveBizId = b.id || businessId;
     const reviewUrl = b.link_google_negocio || b.boton_ubicacion || "#";
 
     app.innerHTML = `
@@ -341,7 +342,7 @@
         ${b.categoria ? `<span class="business-category">${b.categoria}</span>` : ""}
         ${b.descripcion ? `<p class="business-desc">${b.descripcion}</p>` : ""}
         
-        <a href="${reviewUrl}" target="_blank" rel="noopener noreferrer" class="google-badge" onclick="trackClick('${b.id}', 'google_reviews_badge')">
+        <a href="${reviewUrl}" target="_blank" rel="noopener noreferrer" class="google-badge" onclick="trackClick('${effectiveBizId}', 'google_reviews_badge')">
           <i class="fab fa-google" style="color: #4285F4;"></i>
           <span>4.9</span>
           <span class="stars">★★★★★</span>
@@ -366,7 +367,7 @@
                class="link-btn ${estilo === 'full_card' ? 'link-btn-full' : ''}" 
                style="${cardStyle}"
                data-btn-id="${btn.id}"
-               onclick="return handleButtonClick(event, '${b.id}', '${btn.id}', '${btn.url}')">
+               onclick="return handleButtonClick(event, '${effectiveBizId}', '${btn.id}', '${btn.url}')">
               <div class="link-icon-box ${btn.customClass || ''}" style="${iconStyle}">
                 <i class="${btn.icon}"></i>
               </div>
@@ -432,51 +433,63 @@
   };
 
   /**
-   * Envía telemetría a Google Apps Script (100% Gratis)
+   * Envía telemetría a Google Apps Script (100% Gratis, sin bloqueo CORS preflight)
    */
   function trackEvent(bId, type, buttonId) {
-    const payload = {
-      action: "track_event",
-      business_id: bId,
-      tipo_evento: type,
-      target_boton: buttonId,
-      visitor_id: visitorId,
-      user_agent: navigator.userAgent,
-      referencia: document.referrer || "direct"
-    };
+    const cleanBizId = (bId || businessId || "").trim().toLowerCase();
+    const cleanBtnId = (buttonId || "").trim().toLowerCase();
 
-    // 1. Guardar en registro local para que el panel cliente offline/local también lo muestre
+    // 1. Guardar en registro local por día y por botón para reflejo inmediato en dashboard
     try {
-      const statsKey = "alvap_stats_" + bId;
-      const stats = JSON.parse(localStorage.getItem(statsKey) || '{"views":0,"clicks":{},"visitors":[]}');
+      const statsKey = "alvap_stats_" + cleanBizId;
+      const stats = JSON.parse(localStorage.getItem(statsKey) || '{"views":0,"clicks":{},"visitors":[],"views_by_date":{},"clicks_by_date":{}}');
+      stats.views = Number(stats.views) || 0;
+      stats.clicks = (stats.clicks && typeof stats.clicks === "object") ? stats.clicks : {};
+      stats.visitors = Array.isArray(stats.visitors) ? stats.visitors : [];
+      stats.views_by_date = (stats.views_by_date && typeof stats.views_by_date === "object") ? stats.views_by_date : {};
+      stats.clicks_by_date = (stats.clicks_by_date && typeof stats.clicks_by_date === "object") ? stats.clicks_by_date : {};
+
+      const todayKey = new Date().toISOString().split("T")[0];
       if (type === "view") {
-        stats.views = (stats.views || 0) + 1;
+        stats.views += 1;
         if (!stats.visitors.includes(visitorId)) stats.visitors.push(visitorId);
-      } else if (type === "click") {
-        stats.clicks[buttonId] = (stats.clicks[buttonId] || 0) + 1;
+        stats.views_by_date[todayKey] = (Number(stats.views_by_date[todayKey]) || 0) + 1;
+      } else if (type === "click" && cleanBtnId) {
+        stats.clicks[cleanBtnId] = (Number(stats.clicks[cleanBtnId]) || 0) + 1;
+        stats.clicks_by_date[todayKey] = (Number(stats.clicks_by_date[todayKey]) || 0) + 1;
       }
       localStorage.setItem(statsKey, JSON.stringify(stats));
     } catch (e) {}
 
-    // 2. Transmitir a Google Apps Script si está configurado
-    const gasUrl = (typeof CONFIG !== "undefined" && CONFIG.googleAppsScriptUrl) 
-      ? CONFIG.googleAppsScriptUrl 
+    // 2. Transmitir a Google Apps Script vía GET (?action=track) para evitar bloqueo OPTIONS preflight en Chrome/Safari
+    const gasUrl = (typeof CONFIG !== "undefined" && CONFIG.googleAppsScriptUrl)
+      ? CONFIG.googleAppsScriptUrl
       : localStorage.getItem("alvap_gas_url");
 
     if (gasUrl) {
       try {
-        // Enviar con navigator.sendBeacon o fetch asíncrono
-        const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon(gasUrl, blob);
-        } else {
-          fetch(gasUrl, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          }).catch(() => {});
-        }
+        const trackParams = new URLSearchParams({
+          action: "track",
+          id: cleanBizId,
+          type: type || "view",
+          button: cleanBtnId,
+          visitor: visitorId || "anon",
+          ua: (navigator.userAgent || "").substring(0, 160),
+          ref: document.referrer || "direct",
+          _t: String(Date.now())
+        });
+        const trackUrl = `${gasUrl}${gasUrl.includes("?") ? "&" : "?"}${trackParams.toString()}`;
+        fetch(trackUrl, {
+          method: "GET",
+          mode: "no-cors",
+          keepalive: true,
+          cache: "no-store"
+        }).catch(() => {
+          try {
+            const img = new Image();
+            img.src = trackUrl;
+          } catch (e) {}
+        });
       } catch (err) {
         console.warn("Fallo telemetría GAS:", err);
       }

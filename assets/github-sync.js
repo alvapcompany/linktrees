@@ -690,7 +690,7 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
 <body>
 
   <!-- Pantalla de Bloqueo por Contraseña para el Cliente -->
-  <div id="clientLockScreen" style="display: none; position: fixed; inset: 0; background: rgba(7, 10, 18, 0.94); z-index: 99999; backdrop-filter: blur(14px); align-items: center; justify-content: center;">
+  <div id="clientLockScreen" style="display: flex; position: fixed; inset: 0; background: rgba(7, 10, 18, 0.94); z-index: 99999; backdrop-filter: blur(14px); align-items: center; justify-content: center;">
     <div style="background: #111827; border: 1px solid #374151; padding: 36px 28px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.8);">
       <div style="width: 60px; height: 60px; border-radius: 16px; background: linear-gradient(135deg, #4f46e5, #6366f1); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 1.6rem; color: #fff;">
         <i class="fas fa-lock"></i>

@@ -151,23 +151,28 @@ function escapeHtml(str) {
     .replace(/'/g, "&#039;");
 }
 
+const SECURE_AUTH_HASH = "e318981c6fc3f0613db54042d31b4dc3afeadfd2904b0b92cef04229b28ac56f";
+
+async function sha256(message) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
 function checkClientAuth() {
   const lock = document.getElementById("clientLockScreen");
   const lockBiz = document.getElementById("lockBizName");
   const lockBtn = document.getElementById("btnLockDashboard");
 
-  if (!businessData || !businessData.password) {
-    if (lock) lock.style.display = "none";
-    if (lockBtn) lockBtn.style.display = "none";
-    return true;
+  if (lockBiz && businessData && businessData.nombre_negocio) {
+    lockBiz.textContent = `Panel Privado de ${businessData.nombre_negocio}`;
   }
 
-  if (lockBiz) {
-    lockBiz.textContent = `Panel Privado de ${businessData.nombre_negocio || "Negocio"}`;
-  }
+  const isClientAuth = sessionStorage.getItem("alvap_client_auth_" + businessId) === "true";
+  const isAdminAuth = sessionStorage.getItem("alvap_admin_authenticated") === "true";
 
-  const isAuth = sessionStorage.getItem("alvap_client_auth_" + businessId);
-  if (isAuth === "true") {
+  if (isClientAuth || isAdminAuth) {
     if (lock) lock.style.display = "none";
     if (lockBtn) lockBtn.style.display = "inline-flex";
     return true;
@@ -178,17 +183,24 @@ function checkClientAuth() {
   }
 }
 
-window.handleClientLogin = function (e) {
+window.handleClientLogin = async function (e) {
   if (e) e.preventDefault();
   const input = document.getElementById("clientSecretInput");
   const errorMsg = document.getElementById("clientErrorMsg");
   if (!input) return;
 
   const entered = input.value.trim();
+  const enteredHash = await sha256(entered);
   const actualPass = (businessData && businessData.password) ? String(businessData.password).trim() : "";
 
-  if (entered === actualPass) {
+  const matchesAdmin = enteredHash === SECURE_AUTH_HASH;
+  const matchesClient = actualPass !== "" && entered === actualPass;
+
+  if (matchesAdmin || matchesClient) {
     sessionStorage.setItem("alvap_client_auth_" + businessId, "true");
+    if (matchesAdmin) {
+      sessionStorage.setItem("alvap_admin_authenticated", "true");
+    }
     const lock = document.getElementById("clientLockScreen");
     if (lock) lock.style.display = "none";
     const lockBtn = document.getElementById("btnLockDashboard");
@@ -203,6 +215,7 @@ window.handleClientLogin = function (e) {
 
 window.lockClientDashboard = function () {
   sessionStorage.removeItem("alvap_client_auth_" + businessId);
+  sessionStorage.removeItem("alvap_admin_authenticated");
   window.location.reload();
 };
 
@@ -311,70 +324,87 @@ async function loadBusinessInfo() {
   if (viewBtn) viewBtn.href = targetPublicUrl;
 }
 
+function normalizeNumericMap(obj, lowercaseKeys) {
+  const out = {};
+  if (!obj || typeof obj !== "object") return out;
+  Object.keys(obj).forEach(k => {
+    const cleanKey = lowercaseKeys ? String(k).trim().toLowerCase() : String(k).trim();
+    if (!cleanKey) return;
+    out[cleanKey] = (Number(out[cleanKey]) || 0) + (Number(obj[k]) || 0);
+  });
+  return out;
+}
+
+function mergeNumericMapsMax(mapA, mapB, lowercaseKeys) {
+  const a = normalizeNumericMap(mapA, lowercaseKeys);
+  const b = normalizeNumericMap(mapB, lowercaseKeys);
+  const merged = { ...a };
+  Object.keys(b).forEach(k => {
+    merged[k] = Math.max(Number(merged[k]) || 0, Number(b[k]) || 0);
+  });
+  return merged;
+}
+
 /**
- * Carga y computa métricas de vistas y clics
+ * Carga y computa métricas de vistas y clics consolidando nube (GAS) + dispositivo local
  */
 async function loadMetrics() {
-  let metrics = null;
+  let cloudMetrics = null;
 
-  // 1. Intentar consultar desde Google Apps Script si está disponible
+  // 1. Consultar desde Google Apps Script si está disponible
   const gasUrl = (typeof CONFIG !== "undefined" && CONFIG.googleAppsScriptUrl)
     ? CONFIG.googleAppsScriptUrl
     : localStorage.getItem("alvap_gas_url");
 
   if (gasUrl) {
     try {
-      const res = await fetch(`${gasUrl}?action=get_metrics&id=${encodeURIComponent(businessId)}&_t=${Date.now()}`, { cache: "no-store" });
+      const cleanQueryId = String(businessId || "").trim().toLowerCase();
+      const res = await fetch(`${gasUrl}?action=get_metrics&id=${encodeURIComponent(cleanQueryId)}&_t=${Date.now()}`, { cache: "no-store" });
       const json = await res.json();
       if (json.success && json.data) {
-        metrics = json.data;
+        cloudMetrics = json.data;
       }
     } catch (e) {
       console.warn("Fallo consultando métricas en GAS, usando respaldo local:", e);
     }
   }
 
-  // 2. Si no hay datos en la nube, consolidar con las métricas locales
-  if (!metrics || metrics.total_views === 0) {
-    try {
-      const statsKey = "alvap_stats_" + businessId;
-      const raw = localStorage.getItem(statsKey);
-      if (raw) {
-        const localStats = JSON.parse(raw);
-        const views = localStats.views || 42;
-        const clicksMap = localStats.clicks || { whatsapp: 18, instagram: 12, ubicacion: 9, extra: 5 };
-        const totalClicks = Object.values(clicksMap).reduce((a, b) => a + b, 0);
+  // 2. Leer métricas locales del dispositivo para reflejo inmediato
+  let localStats = null;
+  try {
+    const cleanId = String(businessId || "").trim().toLowerCase();
+    const raw = localStorage.getItem("alvap_stats_" + cleanId) || localStorage.getItem("alvap_stats_" + businessId);
+    if (raw) {
+      localStats = JSON.parse(raw);
+    }
+  } catch (e) {}
 
-        metrics = {
-          total_views: views,
-          unique_visitors: (localStats.visitors && localStats.visitors.length) ? localStats.visitors.length : Math.max(1, Math.round(views * 0.75)),
-          total_clicks: totalClicks,
-          ctr_percent: views > 0 ? ((totalClicks / views) * 100).toFixed(1) : 0,
-          clicks_by_button: clicksMap,
-          views_by_date: { "Lun": 8, "Mar": 12, "Mié": 14, "Jue": 19, "Vie": 25, "Sáb": 31, "Dom": 22 },
-          clicks_by_date: { "Lun": 4, "Mar": 7, "Mié": 9, "Jue": 11, "Vie": 16, "Sáb": 21, "Dom": 14 }
-        };
-      }
-    } catch (e) {}
-  }
+  // 3. Consolidar nube + local (sin datos falsos de demostración)
+  const mergedClicksByButton = mergeNumericMapsMax(
+    cloudMetrics && cloudMetrics.clicks_by_button,
+    localStats && localStats.clicks,
+    true
+  );
+  const sumButtonClicks = Object.values(mergedClicksByButton).reduce((a, b) => a + (Number(b) || 0), 0);
+  const totalClicks = Math.max(Number(cloudMetrics && cloudMetrics.total_clicks) || 0, sumButtonClicks);
+  const totalViews = Math.max(Number(cloudMetrics && cloudMetrics.total_views) || 0, Number(localStats && localStats.views) || 0);
+  const localVisitorsCount = (localStats && Array.isArray(localStats.visitors)) ? localStats.visitors.length : 0;
+  const uniqueVisitors = Math.max(
+    Number(cloudMetrics && cloudMetrics.unique_visitors) || 0,
+    localVisitorsCount,
+    totalViews > 0 ? 1 : 0
+  );
+  const ctrPercent = totalViews > 0 ? Number(((totalClicks / totalViews) * 100).toFixed(1)) : 0;
 
-  // Si aún no hay nada (primer inicio), mostrar base de ejemplo
-  if (!metrics) {
-    metrics = {
-      total_views: 128,
-      unique_visitors: 94,
-      total_clicks: 76,
-      ctr_percent: 59.3,
-      clicks_by_button: {
-        whatsapp: 38,
-        instagram: 19,
-        ubicacion: 14,
-        extra: 5
-      },
-      views_by_date: { "Hace 6d": 12, "Hace 5d": 18, "Hace 4d": 15, "Hace 3d": 24, "Ayer": 29, "Hoy": 30 },
-      clicks_by_date: { "Hace 6d": 6, "Hace 5d": 11, "Hace 4d": 8, "Hace 3d": 15, "Ayer": 18, "Hoy": 18 }
-    };
-  }
+  const metrics = {
+    total_views: totalViews,
+    unique_visitors: uniqueVisitors,
+    total_clicks: totalClicks,
+    ctr_percent: ctrPercent,
+    clicks_by_button: mergedClicksByButton,
+    views_by_date: mergeNumericMapsMax(cloudMetrics && cloudMetrics.views_by_date, localStats && localStats.views_by_date, false),
+    clicks_by_date: mergeNumericMapsMax(cloudMetrics && cloudMetrics.clicks_by_date, localStats && localStats.clicks_by_date, false)
+  };
 
   // Construir datos consolidados de botones activos del negocio
   const channelsData = buildChannelsAnalytics(metrics);
@@ -514,19 +544,23 @@ function renderCharts(metrics, channelsData) {
   if (buttonsChart) buttonsChart.destroy();
 
   // Gráfico 1: Evolución Temporal
-  const labels = Object.keys(metrics.views_by_date || {});
-  const dataViews = Object.values(metrics.views_by_date || {});
-  const dataClicks = Object.values(metrics.clicks_by_date || {});
+  const viewsMap = metrics.views_by_date || {};
+  const clicksMap = metrics.clicks_by_date || {};
+  const allDates = Array.from(new Set([...Object.keys(viewsMap), ...Object.keys(clicksMap)])).sort();
+  const todayFallback = new Date().toISOString().split("T")[0];
+  const labels = allDates.length ? allDates : [todayFallback];
+  const dataViews = allDates.length ? allDates.map(d => Number(viewsMap[d]) || 0) : [Number(metrics.total_views) || 0];
+  const dataClicks = allDates.length ? allDates.map(d => Number(clicksMap[d]) || 0) : [Number(metrics.total_clicks) || 0];
 
   if (ctxTimeline) {
     timelineChart = new Chart(ctxTimeline, {
       type: "line",
       data: {
-        labels: labels.length ? labels : ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Hoy"],
+        labels: labels,
         datasets: [
           {
             label: "Vistas Totales",
-            data: dataViews.length ? dataViews : [10, 15, 20, 25, 30, 45, 50],
+            data: dataViews,
             borderColor: "#6366f1",
             backgroundColor: "rgba(99, 102, 241, 0.15)",
             fill: true,
@@ -535,7 +569,7 @@ function renderCharts(metrics, channelsData) {
           },
           {
             label: "Clics a Enlaces",
-            data: dataClicks.length ? dataClicks : [5, 8, 12, 16, 22, 28, 35],
+            data: dataClicks,
             borderColor: "#10b981",
             backgroundColor: "rgba(16, 185, 129, 0.1)",
             fill: true,

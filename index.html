@@ -261,7 +261,30 @@
   </style>
 </head>
 <body>
-  <div class="hero">
+  <!-- Pantalla de Bloqueo Administrativo del Portal Central -->
+  <div id="authLockScreen" style="position: fixed; inset: 0; background: #070a12; z-index: 99999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(20px);">
+    <div style="background: #111827; border: 1px solid #374151; padding: 36px 32px; border-radius: 24px; width: 90%; max-width: 420px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.85);">
+      <div style="width: 64px; height: 64px; border-radius: 18px; background: linear-gradient(135deg, #6366f1, #a855f7); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-size: 1.8rem; color: #fff;">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+      <h2 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 8px;">Portal Privado Alvap</h2>
+      <p style="font-size: 0.85rem; color: #9ca3af; margin-bottom: 24px;">Ingresa la contraseña de administrador para acceder a los paneles y dashboards de clientes.</p>
+
+      <form id="authLoginForm" onsubmit="handleHubAdminLogin(event)">
+        <div style="margin-bottom: 16px; text-align: left;">
+          <input type="password" id="adminSecretInput" placeholder="Contraseña de Administrador" required autofocus style="width: 100%; padding: 12px 16px; font-size: 1rem; border-radius: 12px; background: #1f293d; color: #fff; border: 1px solid #4b5563; outline: none;">
+        </div>
+        <div id="authErrorMsg" style="display: none; color: #ef4444; font-size: 0.85rem; margin-bottom: 16px; font-weight: 600;">
+          <i class="fas fa-exclamation-triangle"></i> Contraseña de acceso incorrecta.
+        </div>
+        <button type="submit" style="width: 100%; justify-content: center; padding: 14px; font-size: 1rem; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; border: none; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+          <i class="fas fa-lock-open"></i> Desbloquear Panel Central
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="hubProtectedContent" class="hero" style="display: none;">
     <div class="badge">
       <i class="fas fa-bolt"></i> Sistema Linktrees NFC • Multi-Repositorio
     </div>
@@ -295,7 +318,12 @@
           <h2>🌐 Repositorios de Clientes Enlazados (Linktrees & Dashboards)</h2>
           <p>Acceso directo al Linktree web, al Dashboard de clics, al repositorio de GitHub y al editor de cada negocio.</p>
         </div>
-        <span id="linkedReposCount" class="repos-count-pill">Cargando...</span>
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <span id="linkedReposCount" class="repos-count-pill">Cargando...</span>
+          <button type="button" onclick="logoutHubAdmin()" class="repo-btn" style="cursor: pointer; border-color: rgba(239, 68, 68, 0.45); color: #fca5a5; background: rgba(239, 68, 68, 0.1);">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+          </button>
+        </div>
       </div>
       <div id="linkedReposHubGrid" class="repos-grid">
         <p style="color: #94a3b8; font-size: 0.88rem;">Cargando repositorios enlazados...</p>
@@ -308,11 +336,62 @@
   </div>
 
   <script>
-    // Si la URL contiene un ID directamente (?id=ejemplo), redirigir al visor
+    // Si la URL contiene un ID directamente (?id=ejemplo), redirigir de inmediato al visor NFC público
     const params = new URLSearchParams(window.location.search);
     if (params.has("id")) {
       window.location.href = "p/?id=" + encodeURIComponent(params.get("id"));
     }
+
+    const SECURE_AUTH_HASH = "e318981c6fc3f0613db54042d31b4dc3afeadfd2904b0b92cef04229b28ac56f";
+    let hubLoadedOnce = false;
+
+    async function sha256(message) {
+      const msgBuffer = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    function checkHubAdminAuth() {
+      const isAuth = sessionStorage.getItem("alvap_admin_authenticated") === "true";
+      const lock = document.getElementById("authLockScreen");
+      const content = document.getElementById("hubProtectedContent");
+
+      if (isAuth) {
+        if (lock) lock.style.display = "none";
+        if (content) content.style.display = "block";
+        if (!hubLoadedOnce) {
+          hubLoadedOnce = true;
+          loadLinkedReposHub();
+        }
+      } else {
+        if (lock) lock.style.display = "flex";
+        if (content) content.style.display = "none";
+      }
+    }
+
+    window.handleHubAdminLogin = async function (e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById("adminSecretInput");
+      const errorMsg = document.getElementById("authErrorMsg");
+      if (!input) return;
+
+      const enteredHash = await sha256(input.value.trim());
+      if (enteredHash === SECURE_AUTH_HASH) {
+        if (errorMsg) errorMsg.style.display = "none";
+        sessionStorage.setItem("alvap_admin_authenticated", "true");
+        checkHubAdminAuth();
+      } else {
+        if (errorMsg) errorMsg.style.display = "block";
+        input.value = "";
+        input.focus();
+      }
+    };
+
+    window.logoutHubAdmin = function () {
+      sessionStorage.removeItem("alvap_admin_authenticated");
+      window.location.reload();
+    };
 
     function escapeHtml(str) {
       if (!str) return "";
@@ -385,7 +464,7 @@
       }
     }
 
-    document.addEventListener("DOMContentLoaded", loadLinkedReposHub);
+    document.addEventListener("DOMContentLoaded", checkHubAdminAuth);
   </script>
 </body>
 </html>
