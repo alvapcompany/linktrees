@@ -1194,6 +1194,340 @@ function escapeHtml(str) {
     .replace(/'/g, "&#039;");
 }
 
+// ============================================================================
+// GESTOR DEL REPOSITORIO DEDICADO DE IMÁGENES (alvapcompany/imagenes)
+// ============================================================================
+
+const IMAGES_REPO_NAME = "imagenes";
+const IMAGE_PRESETS = {
+  logo: { maxW: 400, maxH: 400, folder: "logos", quality: 0.85 },
+  portada: { maxW: 800, maxH: 400, folder: "portadas", quality: 0.84 },
+  original: { maxW: Infinity, maxH: Infinity, folder: "otros", quality: 0.86 }
+};
+let pendingImageUpload = null;
+
+function getAdminGitHubConfig() {
+  return {
+    token: ((document.getElementById("cfgGithubToken") && document.getElementById("cfgGithubToken").value) || "").trim(),
+    owner: ((document.getElementById("cfgGithubOwner") && document.getElementById("cfgGithubOwner").value) || "alvapcompany").trim()
+  };
+}
+
+function setImagesRepoStatus(message, level = "info") {
+  const el = document.getElementById("imgRepoStatusMsg");
+  if (!el) return;
+  if (!message) {
+    el.style.display = "none";
+    el.textContent = "";
+    return;
+  }
+  const palette = {
+    info: { bg: "rgba(56, 189, 248, 0.12)", border: "#0284c7", color: "#bae6fd" },
+    success: { bg: "rgba(16, 185, 129, 0.12)", border: "#10b981", color: "#a7f3d0" },
+    error: { bg: "rgba(239, 68, 68, 0.12)", border: "#ef4444", color: "#fecaca" }
+  }[level] || { bg: "rgba(56, 189, 248, 0.12)", border: "#0284c7", color: "#bae6fd" };
+
+  el.style.display = "block";
+  el.style.background = palette.bg;
+  el.style.border = `1px solid ${palette.border}`;
+  el.style.color = palette.color;
+  el.textContent = message;
+}
+
+window.openImagesRepoModal = function (targetType) {
+  const modal = document.getElementById("imagesRepoModal");
+  if (!modal) return;
+
+  const { owner } = getAdminGitHubConfig();
+  const badge = document.getElementById("imgRepoNameBadge");
+  if (badge) badge.textContent = `${owner}/${IMAGES_REPO_NAME}`;
+
+  const targetSel = document.getElementById("imgRepoAssignTarget");
+  const presetSel = document.getElementById("imgRepoPreset");
+  if (targetType === "avatar" || targetType === "portada") {
+    if (targetSel) targetSel.value = targetType;
+    if (presetSel) presetSel.value = targetType === "portada" ? "portada" : "logo";
+  }
+
+  const fileNameInput = document.getElementById("imgRepoFileName");
+  const activeBizId = (document.getElementById("businessId") && document.getElementById("businessId").value) || currentId || "negocio";
+  if (fileNameInput && !pendingImageUpload) {
+    fileNameInput.value = activeBizId;
+  }
+
+  setImagesRepoStatus("");
+  const resBox = document.getElementById("imgRepoResultBox");
+  if (resBox) resBox.style.display = "none";
+
+  modal.classList.add("active");
+
+  if (pendingImageUpload && pendingImageUpload.originalFile) {
+    reprocessSelectedImageForRepo();
+  }
+  const detailsEl = document.getElementById("imgRepoGalleryDetails");
+  if (detailsEl && detailsEl.open) {
+    loadImagesRepoCatalog();
+  }
+};
+
+window.closeImagesRepoModal = function () {
+  const modal = document.getElementById("imagesRepoModal");
+  if (modal) modal.classList.remove("active");
+};
+
+function optimizeImageInBrowser(file, presetKey) {
+  const cfg = IMAGE_PRESETS[presetKey] || IMAGE_PRESETS.logo;
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("No se pudo leer el archivo de imagen."));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("El archivo seleccionado no es una imagen válida."));
+      img.onload = () => {
+        let targetW = img.naturalWidth || img.width;
+        let targetH = img.naturalHeight || img.height;
+
+        if (Number.isFinite(cfg.maxW) && Number.isFinite(cfg.maxH)) {
+          const ratio = Math.min(cfg.maxW / targetW, cfg.maxH / targetH, 1);
+          targetW = Math.max(1, Math.round(targetW * ratio));
+          targetH = Math.max(1, Math.round(targetH * ratio));
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = targetW;
+        canvas.height = targetH;
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, targetW, targetH);
+        ctx.drawImage(img, 0, 0, targetW, targetH);
+
+        let dataUrl = canvas.toDataURL("image/webp", cfg.quality);
+        let ext = "webp";
+        if (!dataUrl.startsWith("data:image/webp")) {
+          dataUrl = canvas.toDataURL("image/jpeg", cfg.quality);
+          ext = "jpg";
+        }
+
+        const base64 = dataUrl.split(",")[1] || "";
+        const bytes = Math.round((base64.length * 3) / 4);
+        resolve({
+          originalFile: file,
+          originalBytes: file.size,
+          dataUrl,
+          base64,
+          ext,
+          width: targetW,
+          height: targetH,
+          bytes,
+          folder: cfg.folder
+        });
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderPendingImagePreview(info) {
+  const box = document.getElementById("imgRepoPreviewBox");
+  const imgEl = document.getElementById("imgRepoPreviewImg");
+  const statsEl = document.getElementById("imgRepoStatsText");
+  if (!box || !imgEl || !statsEl) return;
+
+  const origKb = (info.originalBytes / 1024).toFixed(1);
+  const optKb = (info.bytes / 1024).toFixed(1);
+  const savedPct = info.originalBytes > 0
+    ? Math.max(0, Math.round((1 - info.bytes / info.originalBytes) * 100))
+    : 0;
+
+  imgEl.src = info.dataUrl;
+  statsEl.innerHTML = `
+    <div>Formato: <strong>.${info.ext.toUpperCase()}</strong> • Resolución: <strong>${info.width}×${info.height} px</strong></div>
+    <div>Peso: <strong>${origKb} KB</strong> → <strong style="color:#34d399;">${optKb} KB</strong> (${savedPct}% más ligera) • Carpeta: <code>${escapeHtml(info.folder)}/</code></div>
+  `;
+  box.style.display = "flex";
+}
+
+window.handleImageRepoFileSelect = async function (event) {
+  const file = event && event.target && event.target.files && event.target.files[0];
+  if (!file) return;
+
+  setImagesRepoStatus("");
+  const resBox = document.getElementById("imgRepoResultBox");
+  if (resBox) resBox.style.display = "none";
+
+  const preset = (document.getElementById("imgRepoPreset") && document.getElementById("imgRepoPreset").value) || "logo";
+  const nameInput = document.getElementById("imgRepoFileName");
+  const activeBizId = (document.getElementById("businessId") && document.getElementById("businessId").value) || currentId || "";
+  if (nameInput && !nameInput.value.trim()) {
+    const cleanBase = file.name.replace(/\.[^.]+$/, "").toLowerCase().replace(/[^a-z0-9_-]/g, "-");
+    nameInput.value = activeBizId || cleanBase || "imagen";
+  }
+
+  try {
+    pendingImageUpload = await optimizeImageInBrowser(file, preset);
+    renderPendingImagePreview(pendingImageUpload);
+  } catch (err) {
+    pendingImageUpload = null;
+    setImagesRepoStatus(err.message || "No se pudo procesar la imagen.", "error");
+  }
+};
+
+window.reprocessSelectedImageForRepo = async function () {
+  if (!pendingImageUpload || !pendingImageUpload.originalFile) return;
+  const preset = (document.getElementById("imgRepoPreset") && document.getElementById("imgRepoPreset").value) || "logo";
+  try {
+    pendingImageUpload = await optimizeImageInBrowser(pendingImageUpload.originalFile, preset);
+    renderPendingImagePreview(pendingImageUpload);
+  } catch (err) {
+    setImagesRepoStatus(err.message || "Error optimizando la imagen.", "error");
+  }
+};
+
+function applyUploadedImageUrlToEditor(cdnUrl, assignTarget) {
+  if (assignTarget === "avatar") {
+    const avatarInput = document.getElementById("avatarUrl");
+    if (avatarInput) avatarInput.value = cdnUrl;
+    updateLivePreview();
+    return "Aplicado automáticamente al campo Foto de Perfil. Haz clic en Auto-Commit a GitHub para publicarlo en el Linktree.";
+  }
+  if (assignTarget === "portada") {
+    const coverInput = document.getElementById("portadaUrl");
+    if (coverInput) coverInput.value = cdnUrl;
+    updateLivePreview();
+    return "Aplicado automáticamente al campo Portada / Banner. Haz clic en Auto-Commit a GitHub para publicarlo en el Linktree.";
+  }
+  return "Link listo para pegar donde lo necesites.";
+}
+
+window.uploadSelectedImageToRepo = async function () {
+  if (!pendingImageUpload) {
+    setImagesRepoStatus("Primero selecciona una imagen desde tu dispositivo.", "error");
+    return;
+  }
+
+  const { token, owner } = getAdminGitHubConfig();
+  if (!token) {
+    setImagesRepoStatus("Falta el Token de GitHub en la pestaña 'Conexiones (GitHub / Sheets)'.", "error");
+    return;
+  }
+
+  const rawSlug = ((document.getElementById("imgRepoFileName") && document.getElementById("imgRepoFileName").value) || currentId || "imagen")
+    .trim()
+    .toLowerCase()
+    .replace(/\.(webp|jpg|jpeg|png|gif)$/i, "")
+    .replace(/[^a-z0-9._-]/g, "-")
+    .replace(/^-+|-+$/g, "");
+  const finalName = rawSlug || `img-${Date.now()}`;
+  const filePath = `${pendingImageUpload.folder}/${finalName}.${pendingImageUpload.ext}`;
+  const assignTarget = (document.getElementById("imgRepoAssignTarget") && document.getElementById("imgRepoAssignTarget").value) || "none";
+
+  const btn = document.getElementById("btnUploadImgRepo");
+  const prevBtnHtml = btn ? btn.innerHTML : "";
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo a GitHub...';
+  }
+  setImagesRepoStatus(`Subiendo ${filePath} al repositorio ${owner}/${IMAGES_REPO_NAME}...`, "info");
+
+  try {
+    const res = await GitHubSync.uploadImageToImagesRepo(
+      owner,
+      filePath,
+      pendingImageUpload.base64,
+      token,
+      IMAGES_REPO_NAME
+    );
+
+    const cdnInput = document.getElementById("imgRepoCdnUrl");
+    const pagesInput = document.getElementById("imgRepoPagesUrl");
+    const resBox = document.getElementById("imgRepoResultBox");
+    const noteEl = document.getElementById("imgRepoAppliedNote");
+
+    if (cdnInput) cdnInput.value = res.cdnUrl;
+    if (pagesInput) pagesInput.value = res.pagesUrl;
+    if (noteEl) noteEl.textContent = applyUploadedImageUrlToEditor(res.cdnUrl, assignTarget);
+    if (resBox) resBox.style.display = "block";
+
+    setImagesRepoStatus(`✅ Imagen subida con éxito (${res.path}).`, "success");
+
+    const detailsEl = document.getElementById("imgRepoGalleryDetails");
+    if (detailsEl && detailsEl.open) {
+      loadImagesRepoCatalog();
+    }
+  } catch (err) {
+    setImagesRepoStatus(`❌ Error al subir: ${err.message}`, "error");
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = prevBtnHtml;
+    }
+  }
+};
+
+window.copyImagesRepoLink = function (inputId) {
+  const input = document.getElementById(inputId);
+  if (!input || !input.value) return;
+  navigator.clipboard.writeText(input.value).then(() => {
+    setImagesRepoStatus("📋 Enlace copiado al portapapeles.", "success");
+  }).catch(() => {
+    input.select();
+    document.execCommand("copy");
+    setImagesRepoStatus("📋 Enlace copiado al portapapeles.", "success");
+  });
+};
+
+window.useCatalogImage = function (url, target) {
+  if (!url) return;
+  if (target === "copy") {
+    navigator.clipboard.writeText(url).then(() => {
+      setImagesRepoStatus("📋 Link CDN copiado al portapapeles.", "success");
+    }).catch(() => {});
+    return;
+  }
+  const msg = applyUploadedImageUrlToEditor(url, target);
+  setImagesRepoStatus(`✅ ${msg}`, "success");
+};
+
+window.loadImagesRepoCatalog = async function () {
+  const listEl = document.getElementById("imgRepoCatalogList");
+  const countEl = document.getElementById("imgRepoCatalogCount");
+  if (!listEl) return;
+
+  const { token, owner } = getAdminGitHubConfig();
+  listEl.innerHTML = '<div style="font-size: 0.78rem; color: #9ca3af;"><i class="fas fa-spinner fa-spin"></i> Consultando galería...</div>';
+
+  try {
+    const res = await GitHubSync.listRepoImages(owner, token, IMAGES_REPO_NAME);
+    if (countEl) countEl.textContent = res.images.length ? `(${res.images.length})` : "";
+
+    if (!res.exists || res.images.length === 0) {
+      listEl.innerHTML = '<div style="font-size: 0.78rem; color: #9ca3af; grid-column: 1 / -1;">Aún no hay imágenes en este repositorio. Sube la primera arriba.</div>';
+      return;
+    }
+
+    listEl.innerHTML = res.images.map(img => `
+      <div style="background: #1f2937; border: 1px solid #374151; border-radius: 10px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+        <img src="${escapeHtml(img.cdnUrl)}" alt="${escapeHtml(img.name)}" loading="lazy" style="width: 100%; height: 84px; object-fit: cover; border-radius: 6px; background: #0f172a;">
+        <div style="font-size: 0.72rem; font-weight: 700; color: #f3f4f6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(img.path)}">${escapeHtml(img.name)}</div>
+        <div style="font-size: 0.66rem; color: #9ca3af;">${escapeHtml(img.folder)} • ${(img.size / 1024).toFixed(1)} KB</div>
+        <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+          <button type="button" class="btn btn-secondary btn-sm img-cat-action" data-action="avatar" data-url="${escapeHtml(img.cdnUrl)}" style="padding: 3px 6px; font-size: 0.68rem; flex: 1;">Perfil</button>
+          <button type="button" class="btn btn-secondary btn-sm img-cat-action" data-action="portada" data-url="${escapeHtml(img.cdnUrl)}" style="padding: 3px 6px; font-size: 0.68rem; flex: 1;">Portada</button>
+          <button type="button" class="btn btn-secondary btn-sm img-cat-action" data-action="copy" data-url="${escapeHtml(img.cdnUrl)}" style="padding: 3px 6px; font-size: 0.68rem;" title="Copiar link CDN"><i class="fas fa-copy"></i></button>
+        </div>
+      </div>
+    `).join("");
+
+    listEl.onclick = function (e) {
+      const btn = e.target.closest(".img-cat-action");
+      if (!btn) return;
+      useCatalogImage(btn.getAttribute("data-url"), btn.getAttribute("data-action"));
+    };
+  } catch (err) {
+    listEl.innerHTML = `<div style="font-size: 0.78rem; color: #fca5a5; grid-column: 1 / -1;">No se pudo cargar la galería: ${escapeHtml(err.message)}</div>`;
+  }
+};
+
 
 
 

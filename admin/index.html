@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Panel Administrativo de Linktrees | Alvap Company</title>
-  <link rel="stylesheet" href="admin.css?v=12.0">
+  <link rel="stylesheet" href="admin.css?v=13.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,6 +53,9 @@
       <span id="gasStatusBadge" class="brand-badge" style="background: #374151;">
         <i class="fas fa-spinner fa-spin"></i> Sheets
       </span>
+      <button class="btn btn-secondary" onclick="openImagesRepoModal()" style="border-color: #ec4899; color: #f472b6; background: rgba(236, 72, 153, 0.12);" title="Subir y optimizar imágenes al repositorio imagenes">
+        <i class="fas fa-images"></i> Subir a Repo Imágenes
+      </button>
       <button class="btn btn-secondary" onclick="previewInNewTab()">
         <i class="fas fa-external-link-alt"></i> Ver Perfil
       </button>
@@ -138,11 +141,21 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label>URL Foto de Perfil / Logo (Cuadrado)</label>
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <label style="margin: 0;">URL Foto de Perfil / Logo (Cuadrado)</label>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="openImagesRepoModal('avatar')" style="padding: 4px 8px; font-size: 0.72rem; border-color: #ec4899; color: #f472b6;">
+                  <i class="fas fa-cloud-upload-alt"></i> Subir a Repo Imágenes
+                </button>
+              </div>
               <input type="url" id="avatarUrl" class="form-control" placeholder="https://ejemplo.com/logo.jpg">
             </div>
             <div class="form-group">
-              <label>URL Portada / Banner (Opcional)</label>
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <label style="margin: 0;">URL Portada / Banner (Opcional)</label>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="openImagesRepoModal('portada')" style="padding: 4px 8px; font-size: 0.72rem; border-color: #ec4899; color: #f472b6;">
+                  <i class="fas fa-cloud-upload-alt"></i> Subir a Repo Imágenes
+                </button>
+              </div>
               <input type="url" id="portadaUrl" class="form-control" placeholder="https://ejemplo.com/portada.jpg">
             </div>
           </div>
@@ -467,8 +480,105 @@
     </div>
   </div>
 
-  <script src="../config.js?v=12.0"></script>
-  <script src="../assets/github-sync.js?v=12.0"></script>
-  <script src="admin.js?v=12.0"></script>
+  <!-- Modal Gestor del Repositorio de Imágenes -->
+  <div id="imagesRepoModal" class="modal">
+    <div class="modal-content" style="max-width: 680px; max-height: 90vh; overflow-y: auto;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-images" style="color: #ec4899;"></i> Subir a Repositorio <span id="imgRepoNameBadge" style="color: #f472b6;">imagenes</span>
+        </h3>
+        <button class="modal-close" onclick="closeImagesRepoModal()">&times;</button>
+      </div>
+
+      <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 10px 14px; font-size: 0.78rem; color: #a7f3d0; margin-bottom: 16px;">
+        <i class="fas fa-bolt"></i> <strong>Máximo rendimiento gratis:</strong> Cada foto se convierte automáticamente a <strong>.webp ultraligero</strong> y se entrega vía CDN global (<code>cdn.jsdelivr.net</code>) sin caducar y consumiendo <strong>0 KB</strong> de tus 100 GB mensuales de GitHub Pages.
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tipo de Optimización</label>
+          <select id="imgRepoPreset" class="form-control" onchange="reprocessSelectedImageForRepo()">
+            <option value="logo">Logo / Avatar (400×400 px WebP)</option>
+            <option value="portada">Portada / Banner (800×400 px WebP)</option>
+            <option value="original">Tamaño Original (WebP optimizado)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Aplicar Automáticamente a</label>
+          <select id="imgRepoAssignTarget" class="form-control">
+            <option value="avatar">Foto de Perfil (avatar_url)</option>
+            <option value="portada">Portada / Banner (portada_url)</option>
+            <option value="none">Solo subir y copiar link</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre del archivo (sin extensión)</label>
+          <input type="text" id="imgRepoFileName" class="form-control" placeholder="ej. vainilla-saltillo">
+        </div>
+        <div class="form-group">
+          <label>Seleccionar Imagen (JPG, PNG, WebP)</label>
+          <input type="file" id="imgRepoFileInput" class="form-control" accept="image/*" onchange="handleImageRepoFileSelect(event)" style="padding: 8px;">
+        </div>
+      </div>
+
+      <div id="imgRepoPreviewBox" style="display: none; background: #111827; border: 1px solid #374151; border-radius: 12px; padding: 12px; margin-bottom: 14px; align-items: center; gap: 14px; flex-wrap: wrap;">
+        <img id="imgRepoPreviewImg" src="" alt="Vista previa optimizada" style="width: 78px; height: 78px; object-fit: cover; border-radius: 10px; border: 1px solid #4b5563; background: #0f172a;">
+        <div style="flex: 1; min-width: 200px;">
+          <div style="font-weight: 700; font-size: 0.85rem; color: #f9fafb; margin-bottom: 4px;">Lista para subir optimizada</div>
+          <div id="imgRepoStatsText" style="font-size: 0.78rem; color: #9ca3af;"></div>
+        </div>
+      </div>
+
+      <div id="imgRepoStatusMsg" style="display: none; font-size: 0.82rem; margin-bottom: 12px; padding: 8px 12px; border-radius: 8px;"></div>
+
+      <button type="button" id="btnUploadImgRepo" class="btn btn-primary" onclick="uploadSelectedImageToRepo()" style="width: 100%; justify-content: center; background: linear-gradient(135deg, #ec4899, #8b5cf6);">
+        <i class="fas fa-cloud-upload-alt"></i> Subir a Repositorio imagenes y Generar Link
+      </button>
+
+      <div id="imgRepoResultBox" style="display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 14px; border-radius: 12px; margin-top: 14px;">
+        <div style="font-weight: 700; color: #34d399; font-size: 0.86rem; margin-bottom: 8px;">
+          <i class="fas fa-check-circle"></i> ¡Imagen alojada permanentemente en GitHub!
+        </div>
+        <div style="font-size: 0.76rem; color: #9ca3af; margin-bottom: 4px;">Link CDN Recomendado (0 KB de GitHub Pages):</div>
+        <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+          <input type="text" id="imgRepoCdnUrl" class="form-control" readonly style="font-size: 0.78rem; padding: 6px 10px;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="copyImagesRepoLink('imgRepoCdnUrl')">
+            <i class="fas fa-copy"></i> Copiar
+          </button>
+        </div>
+        <div style="font-size: 0.76rem; color: #9ca3af; margin-bottom: 4px;">Link Directo GitHub Pages (Respaldo):</div>
+        <div style="display: flex; gap: 6px;">
+          <input type="text" id="imgRepoPagesUrl" class="form-control" readonly style="font-size: 0.78rem; padding: 6px 10px;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="copyImagesRepoLink('imgRepoPagesUrl')">
+            <i class="fas fa-copy"></i> Copiar
+          </button>
+        </div>
+        <div id="imgRepoAppliedNote" style="font-size: 0.76rem; color: #a7f3d0; margin-top: 8px;"></div>
+      </div>
+
+      <details id="imgRepoGalleryDetails" ontoggle="if (this.open) loadImagesRepoCatalog()" style="margin-top: 18px; background: #111827; border: 1px solid #374151; border-radius: 12px; padding: 12px;">
+        <summary style="cursor: pointer; font-weight: 700; font-size: 0.85rem; color: #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+          <span><i class="fas fa-folder-open" style="color: #f472b6;"></i> Galería del Repositorio <span id="imgRepoCatalogCount"></span></span>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="event.preventDefault(); event.stopPropagation(); loadImagesRepoCatalog();" style="padding: 3px 8px; font-size: 0.72rem;">
+            <i class="fas fa-sync-alt"></i> Actualizar
+          </button>
+        </summary>
+        <div id="imgRepoCatalogList" style="margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; max-height: 240px; overflow-y: auto;">
+          <div style="font-size: 0.78rem; color: #9ca3af;">Haz clic en Actualizar para ver las imágenes alojadas.</div>
+        </div>
+      </details>
+
+      <div style="text-align: right; margin-top: 16px;">
+        <button type="button" class="btn btn-secondary" onclick="closeImagesRepoModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../config.js?v=13.0"></script>
+  <script src="../assets/github-sync.js?v=13.0"></script>
+  <script src="admin.js?v=13.0"></script>
 </body>
 </html>

@@ -255,15 +255,14 @@ const GitHubSync = {
   },
 
   /**
-   * Hace un commit de un archivo al repositorio con reintentos ante conflictos/inicialización
+   * Helper interno para hacer commit de contenido ya codificado en Base64
    */
-  async commitFile(owner, repo, path, contentString, message, token) {
+  async _putRepoContentBase64(owner, repo, path, base64Content, message, token) {
     const maxAttempts = 3;
     let lastError = null;
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       const sha = await this.getFileSha(owner, repo, path, token);
-      const base64Content = this.encodeBase64Utf8(contentString);
 
       const bodyPayload = {
         message: message,
@@ -296,6 +295,108 @@ const GitHubSync = {
     }
 
     throw lastError || new Error(`Error en commit de ${path}`);
+  },
+
+  /**
+   * Hace un commit de un archivo de texto UTF-8 al repositorio con reintentos
+   */
+  async commitFile(owner, repo, path, contentString, message, token) {
+    const base64Content = this.encodeBase64Utf8(contentString);
+    return await this._putRepoContentBase64(owner, repo, path, base64Content, message, token);
+  },
+
+  /**
+   * Hace un commit de un archivo binario ya codificado en Base64 (imágenes .webp/.jpg/.png)
+   */
+  async commitBinaryBase64File(owner, repo, path, rawBase64, message, token) {
+    const cleanBase64 = String(rawBase64 || "")
+      .replace(/^data:[^;]+;base64,/i, "")
+      .replace(/\s+/g, "");
+    if (!cleanBase64) {
+      throw new Error(`Contenido binario Base64 vacío para ${path}`);
+    }
+    return await this._putRepoContentBase64(owner, repo, path, cleanBase64, message, token);
+  },
+
+  /**
+   * Sube una imagen optimizada al repositorio dedicado de imágenes y devuelve sus URLs CDN y Pages
+   */
+  async uploadImageToImagesRepo(owner, filePath, rawBase64, token, customRepoName = "imagenes") {
+    const repoName = (customRepoName || "imagenes").trim();
+    const cleanPath = String(filePath || "").replace(/^\/+/, "");
+    if (!cleanPath) throw new Error("Ruta de archivo inválida para el repositorio de imágenes.");
+
+    await this.ensureRepository(owner, repoName, token);
+    const commitRes = await this.commitBinaryBase64File(
+      owner,
+      repoName,
+      cleanPath,
+      rawBase64,
+      `feat(images): subir imagen [${cleanPath}]`,
+      token
+    );
+    await this.ensurePagesEnabled(owner, repoName, token);
+
+    const encodedPath = cleanPath.split("/").map(seg => encodeURIComponent(seg)).join("/");
+    return {
+      owner,
+      repo: repoName,
+      path: cleanPath,
+      cdnUrl: `https://cdn.jsdelivr.net/gh/${owner}/${repoName}@main/${encodedPath}`,
+      pagesUrl: `https://${owner.toLowerCase()}.github.io/${repoName}/${encodedPath}`,
+      rawUrl: `https://raw.githubusercontent.com/${owner}/${repoName}/main/${encodedPath}`,
+      repoUrl: `https://github.com/${owner}/${repoName}`,
+      commitSha: commitRes.commit ? commitRes.commit.sha : "OK"
+    };
+  },
+
+  /**
+   * Lista todas las imágenes alojadas en el repositorio dedicado de imágenes
+   */
+  async listRepoImages(owner, token, customRepoName = "imagenes") {
+    const repoName = (customRepoName || "imagenes").trim();
+    const headers = token ? this.getHeaders(token) : { "Accept": "application/vnd.github.v3+json" };
+    const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoName)}/git/trees/main?recursive=1&_t=${Date.now()}`;
+
+    try {
+      let res = await fetch(url, { headers, cache: "no-store" });
+      if (res.status === 401 && headers["Authorization"]) {
+        delete headers["Authorization"];
+        res = await fetch(url, { headers, cache: "no-store" });
+      }
+      if (res.status === 404 || res.status === 409) {
+        return { exists: false, repoUrl: `https://github.com/${owner}/${repoName}`, images: [] };
+      }
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `Error listando imágenes (HTTP ${res.status})`);
+      }
+
+      const data = await res.json();
+      const tree = Array.isArray(data.tree) ? data.tree : [];
+      const images = tree
+        .filter(item => item.type === "blob" && /\.(webp|jpg|jpeg|png|gif|svg)$/i.test(item.path))
+        .map(item => {
+          const encodedPath = item.path.split("/").map(seg => encodeURIComponent(seg)).join("/");
+          return {
+            path: item.path,
+            name: item.path.split("/").pop(),
+            folder: item.path.includes("/") ? item.path.split("/")[0] : "raiz",
+            size: item.size || 0,
+            cdnUrl: `https://cdn.jsdelivr.net/gh/${owner}/${repoName}@main/${encodedPath}`,
+            pagesUrl: `https://${owner.toLowerCase()}.github.io/${repoName}/${encodedPath}`
+          };
+        })
+        .sort((a, b) => a.path.localeCompare(b.path));
+
+      return {
+        exists: true,
+        repoUrl: `https://github.com/${owner}/${repoName}`,
+        images
+      };
+    } catch (e) {
+      throw e;
+    }
   },
 
   /**
