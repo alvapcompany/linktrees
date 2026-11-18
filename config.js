@@ -331,3 +331,80 @@ const CONFIG = {
     }
   ]
 };
+
+// Expandir cada subdivisión a 60 diseños (300 diseños en total)
+(function expandThemesTo300() {
+  if (!CONFIG || !Array.isArray(CONFIG.themes)) return;
+
+  const categorySpecs = {
+    dark: {
+      prefix: "🌙",
+      label: "Cyber",
+      lightText: true,
+      hues: [220, 245, 265, 195, 170, 285, 210, 255, 185, 235],
+      bgSat: [35, 55],
+      bgLight: [8, 16]
+    },
+    light: {
+      prefix: "☀️",
+      label: "Claro",
+      lightText: false,
+      hues: [195, 160, 215, 140, 35, 250, 180, 205, 125, 20],
+      bgSat: [45, 75],
+      bgLight: [90, 96]
+    },
+    luxury: {
+      prefix: "👑",
+      label: "Lujo",
+      lightText: true,
+      hues: [42, 35, 48, 28, 345, 275, 155, 215, 15, 52],
+      bgSat: [20, 40],
+      bgLight: [6, 13]
+    },
+    gastro: {
+      prefix: "🍽️",
+      label: "Gastro",
+      lightText: true,
+      hues: [18, 28, 8, 38, 135, 350, 24, 45, 150, 12],
+      bgSat: [45, 70],
+      bgLight: [12, 22]
+    },
+    creative: {
+      prefix: "🎨",
+      label: "Neón",
+      lightText: true,
+      hues: [315, 280, 185, 340, 155, 25, 260, 195, 295, 170],
+      bgSat: [65, 85],
+      bgLight: [12, 22]
+    }
+  };
+
+  Object.keys(categorySpecs).forEach((cat) => {
+    const spec = categorySpecs[cat];
+    const existingCount = CONFIG.themes.filter((t) => t.category === cat).length;
+    const needed = Math.max(0, 60 - existingCount);
+
+    for (let i = 1; i <= needed; i++) {
+      const idx = existingCount + i;
+      const hue = spec.hues[(i - 1) % spec.hues.length];
+      const hue2 = (hue + 28 + ((i * 7) % 35)) % 360;
+      const sat = spec.bgSat[0] + ((i * 5) % (spec.bgSat[1] - spec.bgSat[0] + 1));
+      const light1 = spec.bgLight[0] + (i % (spec.bgLight[1] - spec.bgLight[0] + 1));
+      const light2 = spec.lightText ? Math.max(4, light1 - 5) : Math.min(98, light1 + 3);
+      const angle = 120 + ((i * 15) % 120);
+      const accentHue = (hue + 18) % 360;
+      const accent = `hsl(${accentHue}, ${spec.lightText ? 82 : 72}%, ${spec.lightText ? 58 : 44}%)`;
+
+      CONFIG.themes.push({
+        id: `${cat}-style-${idx}`,
+        name: `${spec.prefix} ${spec.label} #${idx}`,
+        category: cat,
+        bg: `linear-gradient(${angle}deg, hsl(${hue}, ${sat}%, ${light1}%) 0%, hsl(${hue2}, ${sat}%, ${light2}%) 100%)`,
+        textColor: spec.lightText ? "#f9fafb" : "#111827",
+        cardBg: spec.lightText ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0.85)",
+        cardBorder: spec.lightText ? "rgba(255, 255, 255, 0.16)" : "rgba(17, 24, 39, 0.12)",
+        accentColor: accent
+      });
+    }
+  });
+})();
