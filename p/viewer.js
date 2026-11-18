@@ -90,17 +90,19 @@
     const token = (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.token) ? CONFIG.github.token.trim() : "";
 
     try {
-      const standaloneSlug = resolveStandaloneRepoSlug();
-      if (standaloneSlug) {
-        const standaloneBiz = await fetchGitHubContentsJson(owner, standaloneSlug, "business.json", token);
-        if (standaloneBiz && (standaloneBiz.id || standaloneBiz.nombre_negocio)) {
-          return standaloneBiz;
-        }
-      }
-      const dict = await fetchGitHubContentsJson(owner, mainRepo, "data/businesses.json", token);
-      if (dict && dict[id]) {
-        return dict[id];
-      }
+      const fallbackRepo = (window.INITIAL_BUSINESS && window.INITIAL_BUSINESS.github_repo)
+        ? String(window.INITIAL_BUSINESS.github_repo).split("/").pop()
+        : id;
+      const standaloneSlug = resolveStandaloneRepoSlug() || (window.STANDALONE_REPO ? fallbackRepo : null);
+
+      const [standaloneBiz, dict] = await Promise.all([
+        standaloneSlug ? fetchGitHubContentsJson(owner, standaloneSlug, "business.json", token) : Promise.resolve(null),
+        fetchGitHubContentsJson(owner, mainRepo, "data/businesses.json", token)
+      ]);
+
+      const validStandalone = (standaloneBiz && (standaloneBiz.id || standaloneBiz.nombre_negocio)) ? standaloneBiz : null;
+      const mainBiz = (dict && dict[id]) ? dict[id] : null;
+      return pickNewestBusiness(validStandalone, mainBiz);
     } catch (e) {
       console.warn("GitHub API live fetch omitido:", e);
     }
@@ -246,7 +248,7 @@
     document.title = `${b.nombre_negocio} | Enlaces Oficiales`;
 
     // Aplicar tema
-    applyTheme(b.tema, b.color_primario, b.color_acento);
+    applyTheme(b.tema, b.color_primario, b.color_acento, b.custom_colors_active);
 
     const app = document.getElementById("app");
     if (!app) return;
@@ -374,6 +376,8 @@
             iconStyle = `background: rgba(0, 0, 0, 0.25); color: #ffffff;`;
           } else if (estilo === "border_glow") {
             cardStyle = `border: 1.5px solid ${btn.customColor}; box-shadow: 0 0 15px ${btn.customColor}40;`;
+          } else if (btn.customColor) {
+            cardStyle = `border-color: ${btn.customColor}55;`;
           }
           return `
             <a href="${btn.url}" 
@@ -420,7 +424,7 @@
     `;
   }
 
-  function applyTheme(themeId, primary, accent) {
+  function applyTheme(themeId, primary, accent, customColorsActive) {
     if (typeof CONFIG !== "undefined" && CONFIG.themes) {
       const theme = CONFIG.themes.find(t => t.id === themeId);
       if (theme) {
@@ -432,6 +436,13 @@
     }
     if (primary) document.documentElement.style.setProperty("--primary-color", primary);
     if (accent) document.documentElement.style.setProperty("--accent-color", accent);
+    if (customColorsActive && primary && accent) {
+      document.documentElement.style.setProperty(
+        "--bg-gradient",
+        `radial-gradient(circle at 18% 15%, ${primary}66 0%, transparent 55%), radial-gradient(circle at 82% 85%, ${accent}66 0%, transparent 55%), linear-gradient(135deg, ${primary}38 0%, ${accent}38 100%), #090d16`
+      );
+      document.documentElement.style.setProperty("--card-border", `${primary}55`);
+    }
   }
 
   /**

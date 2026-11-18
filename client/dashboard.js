@@ -1226,8 +1226,10 @@ window.saveClientDesign = async function () {
   });
 
   if (businessData) {
+    businessData.id = businessData.id || businessId;
     businessData.color_primario = primaryColor;
     businessData.color_acento = accentColor;
+    businessData.custom_colors_active = true;
     businessData.orden_botones = buttonOrder;
     if (buttonColors.whatsapp) businessData.color_btn_whatsapp = buttonColors.whatsapp;
     if (buttonColors.instagram) businessData.color_btn_instagram = buttonColors.instagram;
@@ -1276,51 +1278,63 @@ window.saveClientDesign = async function () {
 
   try {
     if (ghToken && businessData) {
-      const applyDesignMutation = (target) => {
-        const next = {
-          ...(target || {}),
-          color_primario: primaryColor,
-          color_acento: accentColor,
-          orden_botones: buttonOrder,
-          fecha_actualizacion: businessData.fecha_actualizacion
-        };
-        if (buttonColors.whatsapp) next.color_btn_whatsapp = buttonColors.whatsapp;
-        if (buttonColors.instagram) next.color_btn_instagram = buttonColors.instagram;
-        if (buttonColors.facebook) next.color_btn_facebook = buttonColors.facebook;
-        if (buttonColors.ubicacion) next.color_btn_ubicacion = buttonColors.ubicacion;
-        if (buttonColors.extra) next.color_btn_extra = buttonColors.extra;
-        if (Array.isArray(next.botones_adicionales)) {
-          next.botones_adicionales = next.botones_adicionales.map((extraBtn, idx) => {
-            const key = extraBtn.id || ("extra_" + idx);
-            return buttonColors[key] ? { ...extraBtn, color: buttonColors[key] } : extraBtn;
-          });
-        }
-        return next;
-      };
-
-      const promises = [];
-      if (businessData.deploy_individual_repo !== false) {
-        const rawRepo = String(businessData.github_repo || businessId).trim();
-        const parts = rawRepo.includes("/") ? rawRepo.split("/") : [ghOwner, rawRepo];
-        promises.push(
-          putGitHubJsonFile(parts[0], parts[1], "business.json", applyDesignMutation, `feat(design): actualizar colores y orden [${businessId}]`, ghToken)
-        );
-      }
-      promises.push(
-        putGitHubJsonFile(
+      if (typeof GitHubSync !== "undefined" && typeof GitHubSync.autoCommitBusiness === "function") {
+        await GitHubSync.autoCommitBusiness(
           ghOwner,
           ghMainRepo,
-          "data/businesses.json",
-          (dict) => ({
-            ...(dict || {}),
-            [businessId]: applyDesignMutation((dict && dict[businessId]) || businessData)
-          }),
-          `feat(design): actualizar colores y orden [${businessId}]`,
+          businessData,
+          { [businessId]: businessData },
           ghToken
-        )
-      );
-      await Promise.all(promises);
-      syncedGithub = true;
+        );
+        syncedGithub = true;
+      } else {
+        const applyDesignMutation = (target) => {
+          const next = {
+            ...(target || {}),
+            color_primario: primaryColor,
+            color_acento: accentColor,
+            custom_colors_active: true,
+            orden_botones: buttonOrder,
+            fecha_actualizacion: businessData.fecha_actualizacion
+          };
+          if (buttonColors.whatsapp) next.color_btn_whatsapp = buttonColors.whatsapp;
+          if (buttonColors.instagram) next.color_btn_instagram = buttonColors.instagram;
+          if (buttonColors.facebook) next.color_btn_facebook = buttonColors.facebook;
+          if (buttonColors.ubicacion) next.color_btn_ubicacion = buttonColors.ubicacion;
+          if (buttonColors.extra) next.color_btn_extra = buttonColors.extra;
+          if (Array.isArray(next.botones_adicionales)) {
+            next.botones_adicionales = next.botones_adicionales.map((extraBtn, idx) => {
+              const key = extraBtn.id || ("extra_" + idx);
+              return buttonColors[key] ? { ...extraBtn, color: buttonColors[key] } : extraBtn;
+            });
+          }
+          return next;
+        };
+
+        const promises = [];
+        if (businessData.deploy_individual_repo !== false) {
+          const rawRepo = String(businessData.github_repo || businessId).trim();
+          const parts = rawRepo.includes("/") ? rawRepo.split("/") : [ghOwner, rawRepo];
+          promises.push(
+            putGitHubJsonFile(parts[0], parts[1], "business.json", applyDesignMutation, `feat(design): actualizar colores y orden [${businessId}]`, ghToken)
+          );
+        }
+        promises.push(
+          putGitHubJsonFile(
+            ghOwner,
+            ghMainRepo,
+            "data/businesses.json",
+            (dict) => ({
+              ...(dict || {}),
+              [businessId]: applyDesignMutation((dict && dict[businessId]) || businessData)
+            }),
+            `feat(design): actualizar colores y orden [${businessId}]`,
+            ghToken
+          )
+        );
+        await Promise.all(promises);
+        syncedGithub = true;
+      }
     }
   } catch (ghErr) {
     console.warn("No se pudo sincronizar diseño con GitHub:", ghErr);

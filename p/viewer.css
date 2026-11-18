@@ -72,7 +72,7 @@ body {
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid rgba(255, 255, 255, 0.2);
+  border: 4px solid var(--primary-color);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
   background: #1e293b;
 }
@@ -81,7 +81,7 @@ body {
   position: absolute;
   bottom: 4px;
   right: 4px;
-  background: #3b82f6;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
   color: #fff;
   border-radius: 50%;
   width: 24px;
@@ -178,7 +178,7 @@ body {
 .link-btn:hover {
   transform: translateY(-3px) scale(1.01);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-  border-color: rgba(255, 255, 255, 0.4);
+  border-color: var(--accent-color);
 }
 
 .link-btn:active {

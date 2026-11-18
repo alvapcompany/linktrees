@@ -1044,6 +1044,7 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
     window.INITIAL_BUSINESS = ${safeJson};
   </script>
   <script src="${coreBase}/config.js?v=${v}"></script>
+  <script src="${coreBase}/assets/github-sync.js?v=${v}"></script>
   <script src="${coreBase}/client/dashboard.js?v=${v}"></script>
 </body>
 </html>`;

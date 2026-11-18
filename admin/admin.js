@@ -559,6 +559,7 @@ function getFormData() {
     password: document.getElementById("businessPassword") ? document.getElementById("businessPassword").value.trim() : "",
     botones_adicionales: extraBtns,
     orden_botones: (businesses[id] && Array.isArray(businesses[id].orden_botones)) ? businesses[id].orden_botones : undefined,
+    custom_colors_active: (businesses[id] && businesses[id].custom_colors_active) || false,
     fecha_actualizacion: new Date().toISOString()
   };
 }
@@ -588,23 +589,34 @@ function updateLivePreview() {
   const estilo = data.estilo_botones || "icon_only";
 
   if (data.boton_whatsapp) {
-    buttons.push({ label: "WhatsApp", sub: "Respuesta rápida", icon: "fab fa-whatsapp", color: data.color_btn_whatsapp || "#25D366" });
+    buttons.push({ id: "whatsapp", label: "WhatsApp", sub: "Respuesta rápida", icon: "fab fa-whatsapp", color: data.color_btn_whatsapp || "#25D366" });
   }
   if (data.boton_instagram) {
-    buttons.push({ label: "Instagram", sub: "Galería de fotos", icon: "fab fa-instagram", color: data.color_btn_instagram || "#E1306C" });
+    buttons.push({ id: "instagram", label: "Instagram", sub: "Galería de fotos", icon: "fab fa-instagram", color: data.color_btn_instagram || "#E1306C" });
   }
   if (data.boton_facebook) {
-    buttons.push({ label: "Facebook", sub: "Comunidad oficial", icon: "fab fa-facebook-f", color: data.color_btn_facebook || "#1877F2" });
+    buttons.push({ id: "facebook", label: "Facebook", sub: "Comunidad oficial", icon: "fab fa-facebook-f", color: data.color_btn_facebook || "#1877F2" });
   }
   if (data.boton_ubicacion) {
-    buttons.push({ label: "Google Maps", sub: "Ver ubicación en GPS", icon: "fas fa-map-marker-alt", color: data.color_btn_ubicacion || "#EA4335" });
+    buttons.push({ id: "ubicacion", label: "Google Maps", sub: "Ver ubicación en GPS", icon: "fas fa-map-marker-alt", color: data.color_btn_ubicacion || "#EA4335" });
   }
   if (data.boton_extra_label && data.boton_extra_url) {
-    buttons.push({ label: data.boton_extra_label, sub: "Enlace destacado", icon: "fas fa-external-link-alt", color: data.color_btn_extra || data.color_primario || "#eab308" });
+    buttons.push({ id: "extra", label: data.boton_extra_label, sub: "Enlace destacado", icon: "fas fa-external-link-alt", color: data.color_btn_extra || data.color_primario || "#eab308" });
   }
-  (data.botones_adicionales || []).forEach(b => {
-    buttons.push({ label: b.label, sub: "Directo", icon: "fas fa-link", color: b.color || data.color_primario });
+  (data.botones_adicionales || []).forEach((b, idx) => {
+    buttons.push({ id: b.id || ("extra_" + idx), label: b.label, sub: "Directo", icon: "fas fa-link", color: b.color || data.color_primario });
   });
+
+  if (Array.isArray(data.orden_botones) && data.orden_botones.length > 0) {
+    buttons.sort((a, b) => {
+      const idxA = data.orden_botones.indexOf(a.id);
+      const idxB = data.orden_botones.indexOf(b.id);
+      if (idxA === -1 && idxB === -1) return 0;
+      if (idxA === -1) return 1;
+      if (idxB === -1) return -1;
+      return idxA - idxB;
+    });
+  }
 
   doc.open();
   doc.write(`
