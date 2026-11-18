@@ -558,6 +558,7 @@ function getFormData() {
     link_google_negocio: document.getElementById("linkGoogle").value || "",
     password: document.getElementById("businessPassword") ? document.getElementById("businessPassword").value.trim() : "",
     botones_adicionales: extraBtns,
+    orden_botones: (businesses[id] && Array.isArray(businesses[id].orden_botones)) ? businesses[id].orden_botones : undefined,
     fecha_actualizacion: new Date().toISOString()
   };
 }

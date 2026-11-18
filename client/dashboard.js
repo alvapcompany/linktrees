@@ -1085,6 +1085,56 @@ function renderButtonsBreakdown(metrics, channelsData) {
 
 let clientButtonOrder = [];
 
+function normalizeHexColor(c, fallback = "#6366f1") {
+  if (!c) return fallback;
+  const trimmed = String(c).trim();
+  if (/^#[0-9a-f]{6}$/i.test(trimmed)) return trimmed;
+  return fallback;
+}
+
+function encodeGitHubBase64Utf8(str) {
+  const bytes = new TextEncoder().encode(str);
+  let binary = "";
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+async function putGitHubJsonFile(repoOwner, repoName, filePath, mutateFn, commitMsg, token) {
+  const headers = {
+    "Authorization": `Bearer ${token.trim()}`,
+    "Accept": "application/vnd.github.v3+json",
+    "Content-Type": "application/json"
+  };
+
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const getRes = await fetch(`https://api.github.com/repos/${encodeURIComponent(repoOwner)}/${encodeURIComponent(repoName)}/contents/${filePath}?_t=${Date.now()}`, {
+      headers,
+      cache: "no-store"
+    });
+    if (!getRes.ok) {
+      throw new Error(`No se pudo leer ${repoOwner}/${repoName}/${filePath} (HTTP ${getRes.status})`);
+    }
+    const fileData = await getRes.json();
+    const parsed = JSON.parse(decodeGitHubBase64Utf8(fileData.content || ""));
+    const updated = mutateFn(parsed);
+    const putRes = await fetch(`https://api.github.com/repos/${encodeURIComponent(repoOwner)}/${encodeURIComponent(repoName)}/contents/${filePath}`, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify({
+        message: commitMsg,
+        content: encodeGitHubBase64Utf8(JSON.stringify(updated, null, 2)),
+        sha: fileData.sha,
+        branch: "main"
+      })
+    });
+    if (putRes.ok) return await putRes.json();
+    if (putRes.status === 409 && attempt < 2) continue;
+    throw new Error(`Error guardando ${filePath} (HTTP ${putRes.status})`);
+  }
+}
+
 function initClientDesignEditor(channelsData) {
   const listEl = document.getElementById("clientButtonOrderList");
   const primaryInput = document.getElementById("clientColorPrimary");
@@ -1103,7 +1153,22 @@ function initClientDesignEditor(channelsData) {
   accentInput.oninput = () => document.documentElement.style.setProperty("--accent", accentInput.value);
 
   if (!clientButtonOrder.length && Array.isArray(channelsData)) {
-    clientButtonOrder = channelsData.map(ch => ({ key: ch.key, label: ch.label, color: ch.color }));
+    const reorderable = channelsData
+      .filter(ch => ch.id !== "google_reviews")
+      .map(ch => ({ id: ch.id, label: ch.label, color: normalizeHexColor(ch.color) }));
+
+    const savedOrder = businessData && Array.isArray(businessData.orden_botones) ? businessData.orden_botones : [];
+    if (savedOrder.length > 0) {
+      reorderable.sort((a, b) => {
+        const ia = savedOrder.indexOf(a.id);
+        const ib = savedOrder.indexOf(b.id);
+        if (ia === -1 && ib === -1) return 0;
+        if (ia === -1) return 1;
+        if (ib === -1) return -1;
+        return ia - ib;
+      });
+    }
+    clientButtonOrder = reorderable;
   }
 
   renderClientButtonOrderList();
@@ -1120,17 +1185,22 @@ function renderClientButtonOrderList() {
 
   listEl.innerHTML = clientButtonOrder.map((btn, idx) => `
     <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #0b1120; border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 14px;">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <span style="width: 14px; height: 14px; border-radius: 4px; background: ${escapeHtml(btn.color || "#6366f1")}; display: inline-block;"></span>
-        <span style="font-size: 0.9rem; font-weight: 600;">${escapeHtml(btn.label)}</span>
+      <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+        <input type="color" value="${escapeHtml(normalizeHexColor(btn.color))}" title="Color del botón" onchange="updateClientButtonColor(${idx}, this.value)" style="width: 32px; height: 28px; border: none; border-radius: 6px; background: transparent; cursor: pointer; flex-shrink: 0;">
+        <span style="font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(btn.label)}</span>
       </div>
-      <div style="display: flex; gap: 6px;">
-        <button type="button" class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.8rem;" onclick="moveClientButton(${idx}, -1)" ${idx === 0 ? "disabled" : ""}>↑</button>
-        <button type="button" class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.8rem;" onclick="moveClientButton(${idx}, 1)" ${idx === clientButtonOrder.length - 1 ? "disabled" : ""}>↓</button>
+      <div style="display: flex; gap: 6px; flex-shrink: 0;">
+        <button type="button" class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.8rem;" onclick="moveClientButton(${idx}, -1)" ${idx === 0 ? "disabled" : ""} title="Subir">↑</button>
+        <button type="button" class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.8rem;" onclick="moveClientButton(${idx}, 1)" ${idx === clientButtonOrder.length - 1 ? "disabled" : ""} title="Bajar">↓</button>
       </div>
     </div>
   `).join("");
 }
+
+window.updateClientButtonColor = function (index, newColor) {
+  if (!clientButtonOrder[index]) return;
+  clientButtonOrder[index].color = newColor;
+};
 
 window.moveClientButton = function (index, direction) {
   const target = index + direction;
@@ -1147,13 +1217,47 @@ window.saveClientDesign = async function () {
   const statusEl = document.getElementById("clientDesignStatus");
   const btn = document.getElementById("btnSaveClientDesign");
 
-  const design = {
-    color_primario: primaryInput ? primaryInput.value : "",
-    color_acento: accentInput ? accentInput.value : "",
-    button_order: clientButtonOrder.map(b => b.key)
-  };
+  const primaryColor = primaryInput ? primaryInput.value : (businessData && businessData.color_primario) || "#6366f1";
+  const accentColor = accentInput ? accentInput.value : (businessData && businessData.color_acento) || "#a855f7";
+  const buttonOrder = clientButtonOrder.map(b => b.id);
+  const buttonColors = {};
+  clientButtonOrder.forEach(b => {
+    buttonColors[b.id] = b.color;
+  });
 
+  if (businessData) {
+    businessData.color_primario = primaryColor;
+    businessData.color_acento = accentColor;
+    businessData.orden_botones = buttonOrder;
+    if (buttonColors.whatsapp) businessData.color_btn_whatsapp = buttonColors.whatsapp;
+    if (buttonColors.instagram) businessData.color_btn_instagram = buttonColors.instagram;
+    if (buttonColors.facebook) businessData.color_btn_facebook = buttonColors.facebook;
+    if (buttonColors.ubicacion) businessData.color_btn_ubicacion = buttonColors.ubicacion;
+    if (buttonColors.extra) businessData.color_btn_extra = buttonColors.extra;
+    if (Array.isArray(businessData.botones_adicionales)) {
+      businessData.botones_adicionales = businessData.botones_adicionales.map((extraBtn, idx) => {
+        const key = extraBtn.id || ("extra_" + idx);
+        return buttonColors[key] ? { ...extraBtn, color: buttonColors[key] } : extraBtn;
+      });
+    }
+    businessData.fecha_actualizacion = new Date().toISOString();
+    localStorage.setItem("alvap_biz_" + businessId, JSON.stringify(businessData));
+  }
+
+  const design = {
+    color_primario: primaryColor,
+    color_acento: accentColor,
+    button_order: buttonOrder,
+    button_colors: buttonColors
+  };
   localStorage.setItem(`alvap_design_${businessId}`, JSON.stringify(design));
+
+  if (btn) btn.disabled = true;
+  if (statusEl) {
+    statusEl.style.display = "block";
+    statusEl.style.color = "#9ca3af";
+    statusEl.textContent = "⏳ Guardando cambios en tu tarjeta...";
+  }
 
   const gasUrl = (businessData && businessData.gas_url)
     ? businessData.gas_url
@@ -1161,7 +1265,67 @@ window.saveClientDesign = async function () {
       ? CONFIG.googleAppsScriptUrl
       : localStorage.getItem("alvap_gas_url"));
 
-  if (btn) btn.disabled = true;
+  const ghOwner = (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.owner) ? CONFIG.github.owner : "alvapcompany";
+  const ghMainRepo = (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.repo) ? CONFIG.github.repo : "linktrees";
+  const ghToken = (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.token)
+    ? CONFIG.github.token.trim()
+    : (localStorage.getItem("alvap_github_token") || "").trim();
+
+  let syncedGithub = false;
+  let syncedSheets = false;
+
+  try {
+    if (ghToken && businessData) {
+      const applyDesignMutation = (target) => {
+        const next = {
+          ...(target || {}),
+          color_primario: primaryColor,
+          color_acento: accentColor,
+          orden_botones: buttonOrder,
+          fecha_actualizacion: businessData.fecha_actualizacion
+        };
+        if (buttonColors.whatsapp) next.color_btn_whatsapp = buttonColors.whatsapp;
+        if (buttonColors.instagram) next.color_btn_instagram = buttonColors.instagram;
+        if (buttonColors.facebook) next.color_btn_facebook = buttonColors.facebook;
+        if (buttonColors.ubicacion) next.color_btn_ubicacion = buttonColors.ubicacion;
+        if (buttonColors.extra) next.color_btn_extra = buttonColors.extra;
+        if (Array.isArray(next.botones_adicionales)) {
+          next.botones_adicionales = next.botones_adicionales.map((extraBtn, idx) => {
+            const key = extraBtn.id || ("extra_" + idx);
+            return buttonColors[key] ? { ...extraBtn, color: buttonColors[key] } : extraBtn;
+          });
+        }
+        return next;
+      };
+
+      const promises = [];
+      if (businessData.deploy_individual_repo !== false) {
+        const rawRepo = String(businessData.github_repo || businessId).trim();
+        const parts = rawRepo.includes("/") ? rawRepo.split("/") : [ghOwner, rawRepo];
+        promises.push(
+          putGitHubJsonFile(parts[0], parts[1], "business.json", applyDesignMutation, `feat(design): actualizar colores y orden [${businessId}]`, ghToken)
+        );
+      }
+      promises.push(
+        putGitHubJsonFile(
+          ghOwner,
+          ghMainRepo,
+          "data/businesses.json",
+          (dict) => ({
+            ...(dict || {}),
+            [businessId]: applyDesignMutation((dict && dict[businessId]) || businessData)
+          }),
+          `feat(design): actualizar colores y orden [${businessId}]`,
+          ghToken
+        )
+      );
+      await Promise.all(promises);
+      syncedGithub = true;
+    }
+  } catch (ghErr) {
+    console.warn("No se pudo sincronizar diseño con GitHub:", ghErr);
+  }
+
   try {
     if (gasUrl) {
       await fetch(gasUrl, {
@@ -1174,19 +1338,26 @@ window.saveClientDesign = async function () {
           design
         })
       });
+      syncedSheets = true;
     }
-    if (statusEl) {
-      statusEl.style.display = "block";
-      statusEl.style.color = "#34d399";
-      statusEl.textContent = "✅ Diseño guardado correctamente.";
-    }
-  } catch (err) {
-    if (statusEl) {
-      statusEl.style.display = "block";
-      statusEl.style.color = "#f59e0b";
-      statusEl.textContent = "⚠️ Guardado localmente (sin conexión al Sheet).";
-    }
-  } finally {
-    if (btn) btn.disabled = false;
+  } catch (gasErr) {
+    console.warn("No se pudo enviar diseño a Google Sheets:", gasErr);
   }
+
+  applyDashboardView();
+
+  if (statusEl) {
+    statusEl.style.display = "block";
+    if (syncedGithub) {
+      statusEl.style.color = "#34d399";
+      statusEl.textContent = "✅ ¡Diseño guardado! Los colores y el orden ya se aplicaron en tu tarjeta.";
+    } else if (syncedSheets) {
+      statusEl.style.color = "#34d399";
+      statusEl.textContent = "✅ Diseño guardado en el registro.";
+    } else {
+      statusEl.style.color = "#f59e0b";
+      statusEl.textContent = "⚠️ Guardado localmente (sin conexión).";
+    }
+  }
+  if (btn) btn.disabled = false;
 };

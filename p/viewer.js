@@ -8,6 +8,7 @@
   const businessId = urlParams.get("id") || (window.INITIAL_BUSINESS ? window.INITIAL_BUSINESS.id : "alvap-studio");
   let lastRenderedSignature = "";
   let hasTrackedInitialView = false;
+  let currentBusinessData = null;
 
   // Limpiar Cache Storage y Service Workers obsoletos en móviles (iOS/Android)
   function purgeBrowserCaches() {
@@ -227,6 +228,8 @@
       };
     }
 
+    currentBusinessData = data;
+
     const signature = JSON.stringify(data);
     if (!isSilentRefresh || signature !== lastRenderedSignature) {
       lastRenderedSignature = signature;
@@ -325,6 +328,18 @@
             customColor: btn.color || b.color_primario
           });
         }
+      });
+    }
+
+    // Aplicar orden personalizado definido por el cliente o admin
+    if (Array.isArray(b.orden_botones) && b.orden_botones.length > 0) {
+      buttons.sort((a, btnB) => {
+        const idxA = b.orden_botones.indexOf(a.id);
+        const idxB = b.orden_botones.indexOf(btnB.id);
+        if (idxA === -1 && idxB === -1) return 0;
+        if (idxA === -1) return 1;
+        if (idxB === -1) return -1;
+        return idxA - idxB;
       });
     }
 
@@ -467,9 +482,11 @@
     } catch (e) {}
 
     // 2. Transmitir a Google Apps Script vía GET (?action=track) para evitar bloqueo OPTIONS preflight en Chrome/Safari
-    const gasUrl = (typeof CONFIG !== "undefined" && CONFIG.googleAppsScriptUrl)
-      ? CONFIG.googleAppsScriptUrl
-      : localStorage.getItem("alvap_gas_url");
+    const gasUrl = (currentBusinessData && currentBusinessData.gas_url)
+      || (window.INITIAL_BUSINESS && window.INITIAL_BUSINESS.gas_url)
+      || ((typeof CONFIG !== "undefined" && CONFIG.googleAppsScriptUrl)
+        ? CONFIG.googleAppsScriptUrl
+        : localStorage.getItem("alvap_gas_url"));
 
     if (gasUrl) {
       try {

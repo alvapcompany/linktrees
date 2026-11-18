@@ -896,7 +896,7 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
 
       <div class="kpi-card">
         <div class="kpi-header">
-          <span>Tasa de Interacción (CTR)</span>
+          <span>% de personas que dan clic</span>
           <div class="kpi-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
             <i class="fas fa-bolt"></i>
           </div>
@@ -966,15 +966,15 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
       <div class="breakdown-header">
         <div>
           <h2 style="font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-table" style="color: #6366f1;"></i> 📋 Registro por Filas (Fecha / Semana / Mes) y Columnas por Botón
+            <i class="fas fa-table" style="color: #6366f1;"></i> 📋 Historial diario de visitas y clics
           </h2>
           <p style="font-size: 0.84rem; color: #9ca3af; margin-top: 4px;">
-            Acomodo estructurado por fila diaria y columnas individuales de cada botón (compatible con filtros de Google Sheets y Excel).
+            Mira cuántas personas visitaron tu tarjeta cada día y qué botones tocaron. Puedes descargarlo para abrirlo en Excel.
           </p>
         </div>
         <div>
           <button type="button" onclick="exportDailyTableCsv()" class="btn btn-secondary" style="font-size: 0.82rem; padding: 9px 14px;">
-            <i class="fas fa-file-csv" style="color: #10b981;"></i> Descargar CSV (Sheets / Excel)
+            <i class="fas fa-file-csv" style="color: #10b981;"></i> Descargar para Excel
           </button>
         </div>
       </div>
@@ -982,18 +982,18 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
         <table class="daily-metrics-table">
           <thead>
             <tr>
-              <th>Fecha (Día)</th>
+              <th>Fecha</th>
               <th>Semana</th>
               <th>Mes</th>
-              <th>Vistas</th>
-              <th>Clics Totales</th>
-              <th>CTR</th>
+              <th>Visitas</th>
+              <th>Total de clics</th>
+              <th>% de clics</th>
               <th>WhatsApp</th>
               <th>Instagram</th>
               <th>Facebook</th>
               <th>Google Maps</th>
-              <th>Enlace Extra</th>
-              <th>Insignia Google</th>
+              <th>Otro enlace</th>
+              <th>Reseñas Google</th>
             </tr>
           </thead>
           <tbody id="dailyMetricsTableBody">
@@ -1001,6 +1001,39 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
           </tbody>
         </table>
       </div>
+    </section>
+
+    <!-- Sección 3: Personalizar Colores y Orden de Botones (Sin editar contenido) -->
+    <section class="buttons-breakdown-section" style="margin-top: 24px;">
+      <div class="breakdown-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h2 style="font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-palette" style="color: var(--primary);"></i> 🎨 Personalizar colores y orden
+          </h2>
+          <p style="font-size: 0.84rem; color: #9ca3af; margin-top: 4px;">
+            Cambia los colores de tu tarjeta o mueve tus botones arriba y abajo (sin modificar textos ni enlaces).
+          </p>
+        </div>
+        <button type="button" id="btnSaveClientDesign" onclick="saveClientDesign()" class="btn btn-primary" style="font-size: 0.85rem;">
+          <i class="fas fa-save"></i> Guardar diseño
+        </button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 18px;">
+        <div style="background: #0b1120; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 0.86rem; font-weight: 600;">Color principal</span>
+          <input type="color" id="clientColorPrimary" value="#6366f1" style="width: 42px; height: 32px; border: none; border-radius: 8px; background: transparent; cursor: pointer;">
+        </div>
+        <div style="background: #0b1120; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 0.86rem; font-weight: 600;">Color secundario</span>
+          <input type="color" id="clientColorAccent" value="#a855f7" style="width: 42px; height: 32px; border: none; border-radius: 8px; background: transparent; cursor: pointer;">
+        </div>
+      </div>
+
+      <div id="clientButtonOrderList" style="display: flex; flex-direction: column; gap: 8px;">
+        <p style="font-size: 0.84rem; color: #9ca3af;">Cargando botones...</p>
+      </div>
+      <div id="clientDesignStatus" style="margin-top: 12px; font-size: 0.84rem; color: #34d399; display: none;"></div>
     </section>
 
   </div>
