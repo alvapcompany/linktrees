@@ -575,3 +575,118 @@ body {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.76rem;
 }
+
+/* =========================================================
+   Responsive: Tabletas y Celulares
+   ========================================================= */
+@media (max-width: 900px) {
+  body {
+    padding: 18px 16px;
+  }
+
+  .dash-header {
+    padding: 18px 20px;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .charts-grid {
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .chart-card,
+  .buttons-breakdown-section {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    padding: 14px 12px;
+  }
+
+  .dash-header {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+    border-radius: 16px;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .biz-profile {
+    gap: 12px;
+  }
+
+  .biz-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+  }
+
+  .biz-info h1 {
+    font-size: 1.2rem;
+  }
+
+  .dash-actions {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .dash-actions .btn {
+    flex: 1 1 calc(50% - 5px);
+    justify-content: center;
+    padding: 10px 12px;
+    font-size: 0.84rem;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .kpi-card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .charts-grid {
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .chart-card,
+  .buttons-breakdown-section {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .chart-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .chart-container {
+    height: 240px;
+    min-height: 240px;
+  }
+
+  .filter-date-input {
+    width: 100%;
+    padding: 9px 12px;
+  }
+
+  .daily-metrics-table thead th,
+  .daily-metrics-table tbody td {
+    padding: 10px 12px;
+  }
+}

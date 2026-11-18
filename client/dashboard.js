@@ -313,6 +313,16 @@ async function loadBusinessInfo() {
   document.getElementById("bizCategory").textContent = businessData.categoria || "Portal de Métricas y Clics por Botón";
   document.getElementById("bizAvatar").src = businessData.avatar_url || "https://via.placeholder.com/150";
 
+  // Aplicar colores del Linktree del negocio al dashboard
+  const primaryColor = businessData.color_primario || businessData.color_btn_extra;
+  const accentColor = businessData.color_secundario || businessData.color_acento || primaryColor;
+  if (primaryColor) {
+    document.documentElement.style.setProperty("--primary", primaryColor);
+  }
+  if (accentColor) {
+    document.documentElement.style.setProperty("--accent", accentColor);
+  }
+
   const fallbackPublicUrl = `https://alvapcompany.github.io/linktrees/p/?id=${encodeURIComponent(businessId)}`;
   const owner = (typeof CONFIG !== "undefined" && CONFIG.github && CONFIG.github.owner) ? CONFIG.github.owner.toLowerCase() : "alvapcompany";
   const repoSlug = (businessData.github_repo || businessId).trim();
@@ -1062,7 +1072,7 @@ function renderButtonsBreakdown(metrics, channelsData) {
 
         <div class="btn-stat-footer">
           <span>Participación: <strong>${ch.sharePercent}%</strong> del total</span>
-          <span>CTR vs visitas: <strong>${ch.ctrPercent}%</strong></span>
+          <span>Clics vs visitas: <strong>${ch.ctrPercent}%</strong></span>
         </div>
       </div>
     `;
