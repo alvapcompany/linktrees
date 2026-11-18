@@ -751,9 +751,11 @@ async function loadMetrics() {
   let cloudMetrics = null;
 
   // 1. Consultar desde Google Apps Script si está disponible
-  const gasUrl = (typeof CONFIG !== "undefined" && CONFIG.googleAppsScriptUrl)
-    ? CONFIG.googleAppsScriptUrl
-    : localStorage.getItem("alvap_gas_url");
+  const gasUrl = (businessData && businessData.gas_url)
+    ? businessData.gas_url
+    : ((typeof CONFIG !== "undefined" && CONFIG.googleAppsScriptUrl)
+      ? CONFIG.googleAppsScriptUrl
+      : localStorage.getItem("alvap_gas_url"));
 
   if (gasUrl) {
     try {

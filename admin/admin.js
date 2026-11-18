@@ -234,6 +234,9 @@ function selectBusiness(id) {
   if (document.getElementById("githubRepoName")) {
     document.getElementById("githubRepoName").value = b.github_repo || id;
   }
+  if (document.getElementById("bizGasUrl")) {
+    document.getElementById("bizGasUrl").value = b.gas_url || "";
+  }
   if (document.getElementById("deployIndividualRepo")) {
     document.getElementById("deployIndividualRepo").checked = b.deploy_individual_repo !== false;
   }
@@ -519,6 +522,7 @@ function getFormData() {
   });
 
   const repoInputVal = document.getElementById("githubRepoName") ? document.getElementById("githubRepoName").value.trim() : "";
+  const bizGasUrlVal = document.getElementById("bizGasUrl") ? document.getElementById("bizGasUrl").value.trim() : "";
   const deployIndividual = document.getElementById("deployIndividualRepo") ? document.getElementById("deployIndividualRepo").checked : true;
   const effectiveRepo = repoInputVal || id;
   const repoInfo = getResolvedRepoUrls(effectiveRepo, id);
@@ -526,6 +530,7 @@ function getFormData() {
   return {
     id: id,
     github_repo: effectiveRepo,
+    gas_url: bizGasUrlVal,
     deploy_individual_repo: deployIndividual,
     repo_url: deployIndividual ? repoInfo.repoUrl : ((businesses[id] && businesses[id].repo_url) || ""),
     pages_url: deployIndividual ? repoInfo.pagesUrl : ((businesses[id] && businesses[id].pages_url) || ""),
