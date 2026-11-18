@@ -139,6 +139,13 @@ function doGet(e) {
       return jsonResponse({ success: true, data: reviews });
     }
 
+    if (action === "get_design") {
+      const id = params.id;
+      if (!id) return jsonResponse({ success: false, error: "ID requerido" });
+      const design = getDesignConfig(id);
+      return jsonResponse({ success: true, data: design });
+    }
+
     if (action === "track") {
       // Soporte para tracking rápido vía GET (ej. 1x1 pixel o beacon get)
       recordEvent({
@@ -179,6 +186,11 @@ function doPost(e) {
 
     if (action === "save_business") {
       const result = saveOrUpdateBusiness(payload.data || payload);
+      return jsonResponse({ success: true, data: result });
+    }
+
+    if (action === "save_design") {
+      const result = saveDesignConfig(payload.business_id, payload.design || payload);
       return jsonResponse({ success: true, data: result });
     }
 
@@ -913,4 +925,61 @@ function getGoogleReviews(businessId) {
 function jsonResponse(data) {
   return ContentService.createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * Guarda la personalización visual (colores y orden de botones) de un cliente
+ */
+function saveDesignConfig(businessId, design) {
+  if (!businessId) throw new Error("business_id requerido");
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName("DisenoClientes");
+  if (!sheet) {
+    sheet = ss.insertSheet("DisenoClientes");
+    sheet.appendRow(["business_id", "design_json", "updated_at"]);
+  }
+
+  const cleanId = String(businessId).trim().toLowerCase();
+  const payload = JSON.stringify({
+    color_primario: design.color_primario || "",
+    color_acento: design.color_acento || "",
+    button_order: Array.isArray(design.button_order) ? design.button_order : [],
+    button_colors: design.button_colors || {}
+  });
+  const now = new Date().toISOString();
+
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][0]).trim().toLowerCase() === cleanId) {
+      sheet.getRange(i + 1, 2).setValue(payload);
+      sheet.getRange(i + 1, 3).setValue(now);
+      return JSON.parse(payload);
+    }
+  }
+
+  sheet.appendRow([cleanId, payload, now]);
+  return JSON.parse(payload);
+}
+
+/**
+ * Obtiene la personalización visual guardada de un cliente
+ */
+function getDesignConfig(businessId) {
+  if (!businessId) return null;
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("DisenoClientes");
+  if (!sheet) return null;
+
+  const cleanId = String(businessId).trim().toLowerCase();
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][0]).trim().toLowerCase() === cleanId) {
+      try {
+        return JSON.parse(data[i][1]);
+      } catch (e) {
+        return null;
+      }
+    }
+  }
+  return null;
 }

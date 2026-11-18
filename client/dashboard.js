@@ -1079,4 +1079,114 @@ function renderButtonsBreakdown(metrics, channelsData) {
       </div>
     `;
   }).join("");
+
+  initClientDesignEditor(channelsData);
 }
+
+let clientButtonOrder = [];
+
+function initClientDesignEditor(channelsData) {
+  const listEl = document.getElementById("clientButtonOrderList");
+  const primaryInput = document.getElementById("clientColorPrimary");
+  const accentInput = document.getElementById("clientColorAccent");
+  if (!listEl || !primaryInput || !accentInput) return;
+
+  if (businessData && businessData.color_primario && /^#[0-9a-f]{6}$/i.test(businessData.color_primario)) {
+    primaryInput.value = businessData.color_primario;
+  }
+  const savedAccent = businessData && (businessData.color_secundario || businessData.color_acento);
+  if (savedAccent && /^#[0-9a-f]{6}$/i.test(savedAccent)) {
+    accentInput.value = savedAccent;
+  }
+
+  primaryInput.oninput = () => document.documentElement.style.setProperty("--primary", primaryInput.value);
+  accentInput.oninput = () => document.documentElement.style.setProperty("--accent", accentInput.value);
+
+  if (!clientButtonOrder.length && Array.isArray(channelsData)) {
+    clientButtonOrder = channelsData.map(ch => ({ key: ch.key, label: ch.label, color: ch.color }));
+  }
+
+  renderClientButtonOrderList();
+}
+
+function renderClientButtonOrderList() {
+  const listEl = document.getElementById("clientButtonOrderList");
+  if (!listEl) return;
+
+  if (!clientButtonOrder.length) {
+    listEl.innerHTML = `<p style="font-size: 0.84rem; color: #9ca3af;">No hay botones activos para reordenar.</p>`;
+    return;
+  }
+
+  listEl.innerHTML = clientButtonOrder.map((btn, idx) => `
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #0b1120; border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 14px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="width: 14px; height: 14px; border-radius: 4px; background: ${escapeHtml(btn.color || "#6366f1")}; display: inline-block;"></span>
+        <span style="font-size: 0.9rem; font-weight: 600;">${escapeHtml(btn.label)}</span>
+      </div>
+      <div style="display: flex; gap: 6px;">
+        <button type="button" class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.8rem;" onclick="moveClientButton(${idx}, -1)" ${idx === 0 ? "disabled" : ""}>↑</button>
+        <button type="button" class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.8rem;" onclick="moveClientButton(${idx}, 1)" ${idx === clientButtonOrder.length - 1 ? "disabled" : ""}>↓</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+window.moveClientButton = function (index, direction) {
+  const target = index + direction;
+  if (target < 0 || target >= clientButtonOrder.length) return;
+  const temp = clientButtonOrder[index];
+  clientButtonOrder[index] = clientButtonOrder[target];
+  clientButtonOrder[target] = temp;
+  renderClientButtonOrderList();
+};
+
+window.saveClientDesign = async function () {
+  const primaryInput = document.getElementById("clientColorPrimary");
+  const accentInput = document.getElementById("clientColorAccent");
+  const statusEl = document.getElementById("clientDesignStatus");
+  const btn = document.getElementById("btnSaveClientDesign");
+
+  const design = {
+    color_primario: primaryInput ? primaryInput.value : "",
+    color_acento: accentInput ? accentInput.value : "",
+    button_order: clientButtonOrder.map(b => b.key)
+  };
+
+  localStorage.setItem(`alvap_design_${businessId}`, JSON.stringify(design));
+
+  const gasUrl = (businessData && businessData.gas_url)
+    ? businessData.gas_url
+    : ((typeof CONFIG !== "undefined" && CONFIG.googleAppsScriptUrl)
+      ? CONFIG.googleAppsScriptUrl
+      : localStorage.getItem("alvap_gas_url"));
+
+  if (btn) btn.disabled = true;
+  try {
+    if (gasUrl) {
+      await fetch(gasUrl, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({
+          action: "save_design",
+          business_id: businessId,
+          design
+        })
+      });
+    }
+    if (statusEl) {
+      statusEl.style.display = "block";
+      statusEl.style.color = "#34d399";
+      statusEl.textContent = "✅ Diseño guardado correctamente.";
+    }
+  } catch (err) {
+    if (statusEl) {
+      statusEl.style.display = "block";
+      statusEl.style.color = "#f59e0b";
+      statusEl.textContent = "⚠️ Guardado localmente (sin conexión al Sheet).";
+    }
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+};
