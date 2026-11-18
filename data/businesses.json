@@ -149,8 +149,8 @@
     "boton_ubicacion": "",
     "boton_extra_label": "",
     "boton_extra_url": "",
-    "color_primario": "#6366f1",
-    "color_acento": "#a855f7",
+    "color_primario": "#8e8fcc",
+    "color_acento": "#7b668f",
     "color_btn_whatsapp": "#25d366",
     "color_btn_instagram": "#e1306c",
     "color_btn_facebook": "#1877f2",
@@ -160,6 +160,11 @@
     "link_google_negocio": "",
     "password": "Al3m4n.123",
     "botones_adicionales": [],
-    "fecha_actualizacion": "2026-11-18T17:27:04.910Z"
+    "fecha_actualizacion": "2026-11-18T19:42:30.714Z",
+    "orden_botones": [
+      "whatsapp",
+      "instagram",
+      "facebook"
+    ]
   }
 }
