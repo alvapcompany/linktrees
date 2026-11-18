@@ -394,12 +394,35 @@ const CONFIG = {
       const angle = 120 + ((i * 15) % 120);
       const accentHue = (hue + 18) % 360;
       const accent = `hsl(${accentHue}, ${spec.lightText ? 82 : 72}%, ${spec.lightText ? 58 : 44}%)`;
+      const baseColor = `hsl(${hue}, ${sat}%, ${light1}%)`;
+      const altColor = `hsl(${hue2}, ${sat}%, ${light2}%)`;
+      const glowColor = `hsla(${accentHue}, 85%, ${spec.lightText ? 52 : 65}%, ${spec.lightText ? 0.28 : 0.22})`;
+      const patternLine = spec.lightText ? "rgba(255,255,255,0.06)" : "rgba(17,24,39,0.06)";
+
+      const styleVariants = [
+        // 0: Sólido minimalista
+        baseColor,
+        // 1: Brillo radial (spotlight)
+        `radial-gradient(circle at 20% 15%, ${glowColor} 0%, transparent 55%), ${baseColor}`,
+        // 2: Malla suave (mesh)
+        `radial-gradient(at 15% 20%, ${glowColor} 0px, transparent 50%), radial-gradient(at 85% 80%, hsla(${hue2}, 80%, 55%, 0.22) 0px, transparent 50%), ${baseColor}`,
+        // 3: Rayas diagonales sutiles
+        `repeating-linear-gradient(45deg, ${patternLine} 0px, ${patternLine} 2px, transparent 2px, transparent 14px), ${baseColor}`,
+        // 4: Cuadrícula (grid)
+        `linear-gradient(${patternLine} 1px, transparent 1px) 0 0 / 24px 24px, linear-gradient(90deg, ${patternLine} 1px, transparent 1px) 0 0 / 24px 24px, ${baseColor}`,
+        // 5: Puntos (dots)
+        `radial-gradient(${patternLine} 1.5px, transparent 1.5px) 0 0 / 20px 20px, ${baseColor}`,
+        // 6: Degradado clásico
+        `linear-gradient(${angle}deg, ${baseColor} 0%, ${altColor} 100%)`
+      ];
+
+      const bg = styleVariants[i % styleVariants.length];
 
       CONFIG.themes.push({
         id: `${cat}-style-${idx}`,
         name: `${spec.prefix} ${spec.label} #${idx}`,
         category: cat,
-        bg: `linear-gradient(${angle}deg, hsl(${hue}, ${sat}%, ${light1}%) 0%, hsl(${hue2}, ${sat}%, ${light2}%) 100%)`,
+        bg,
         textColor: spec.lightText ? "#f9fafb" : "#111827",
         cardBg: spec.lightText ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0.85)",
         cardBorder: spec.lightText ? "rgba(255, 255, 255, 0.16)" : "rgba(17, 24, 39, 0.12)",
