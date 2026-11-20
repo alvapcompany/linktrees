@@ -336,10 +336,22 @@ const CONFIG = {
 (function expandThemesTo300() {
   if (!CONFIG || !Array.isArray(CONFIG.themes)) return;
 
+  function hslToHex(h, s, l) {
+    const a = (s / 100) * Math.min(l / 100, 1 - l / 100);
+    const f = (n) => {
+      const k = (n + h / 30) % 12;
+      const color = l / 100 - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+      return Math.round(255 * color).toString(16).padStart(2, "0");
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+  }
+
+  const styleNames = ["Sólido", "Destello", "Malla", "Diagonal", "Grilla", "Puntos", "Degradado"];
+
   const categorySpecs = {
     dark: {
       prefix: "🌙",
-      label: "Cyber",
+      names: ["Obsidiana", "Cobalto", "Eclipse", "Abismo", "Nebulosa", "Grafito", "Cripto", "Medianoche", "Titanio", "Ónix", "Prisma", "Cuántico"],
       lightText: true,
       hues: [220, 245, 265, 195, 170, 285, 210, 255, 185, 235],
       bgSat: [35, 55],
@@ -347,7 +359,7 @@ const CONFIG = {
     },
     light: {
       prefix: "☀️",
-      label: "Claro",
+      names: ["Marfil", "Brisa", "Lino", "Alabastro", "Salvia", "Nube", "Cuarzo", "Perla", "Arena", "Lavanda", "Ártico", "Seda"],
       lightText: false,
       hues: [195, 160, 215, 140, 35, 250, 180, 205, 125, 20],
       bgSat: [45, 75],
@@ -355,7 +367,7 @@ const CONFIG = {
     },
     luxury: {
       prefix: "👑",
-      label: "Lujo",
+      names: ["Imperial", "Cartier", "Champagne", "Rolex", "Terciopelo", "Zafiro", "Esmeralda", "Platino", "Borgoña", "Ébano", "Monarca", "Gala"],
       lightText: true,
       hues: [42, 35, 48, 28, 345, 275, 155, 215, 15, 52],
       bgSat: [20, 40],
@@ -363,7 +375,7 @@ const CONFIG = {
     },
     gastro: {
       prefix: "🍽️",
-      label: "Gastro",
+      names: ["Espresso", "Toscana", "Matcha", "Cacao", "Carmesí", "Trufa", "Mezcal", "Azafrán", "Olivo", "Canela", "Barista", "Brasa"],
       lightText: true,
       hues: [18, 28, 8, 38, 135, 350, 24, 45, 150, 12],
       bgSat: [45, 70],
@@ -371,7 +383,7 @@ const CONFIG = {
     },
     creative: {
       prefix: "🎨",
-      label: "Neón",
+      names: ["Synthwave", "Tokio", "Aurora", "Magenta", "Ciber", "Ácido", "Láser", "Cósmico", "Retro", "Eléctrico", "Flúor", "Vórtice"],
       lightText: true,
       hues: [315, 280, 185, 340, 155, 25, 260, 195, 295, 170],
       bgSat: [65, 85],
@@ -393,40 +405,40 @@ const CONFIG = {
       const light2 = spec.lightText ? Math.max(4, light1 - 5) : Math.min(98, light1 + 3);
       const angle = 120 + ((i * 15) % 120);
       const accentHue = (hue + 18) % 360;
-      const accent = `hsl(${accentHue}, ${spec.lightText ? 82 : 72}%, ${spec.lightText ? 58 : 44}%)`;
-      const baseColor = `hsl(${hue}, ${sat}%, ${light1}%)`;
-      const altColor = `hsl(${hue2}, ${sat}%, ${light2}%)`;
+      const accentHex = hslToHex(accentHue, spec.lightText ? 82 : 72, spec.lightText ? 58 : 44);
+      const baseColor = hslToHex(hue, sat, light1);
+      const altColor = hslToHex(hue2, sat, light2);
       const glowColor = `hsla(${accentHue}, 85%, ${spec.lightText ? 52 : 65}%, ${spec.lightText ? 0.28 : 0.22})`;
-      const patternLine = spec.lightText ? "rgba(255,255,255,0.06)" : "rgba(17,24,39,0.06)";
+      const patternLine = spec.lightText ? `hsla(${accentHue}, 70%, 75%, 0.08)` : `hsla(${accentHue}, 45%, 30%, 0.08)`;
+      const styleIdx = i % styleNames.length;
+      const baseName = spec.names[(i - 1) % spec.names.length];
 
       const styleVariants = [
-        // 0: Sólido minimalista
+        // 0: Sólido
         baseColor,
-        // 1: Brillo radial (spotlight)
+        // 1: Destello
         `radial-gradient(circle at 20% 15%, ${glowColor} 0%, transparent 55%), ${baseColor}`,
-        // 2: Malla suave (mesh)
+        // 2: Malla
         `radial-gradient(at 15% 20%, ${glowColor} 0px, transparent 50%), radial-gradient(at 85% 80%, hsla(${hue2}, 80%, 55%, 0.22) 0px, transparent 50%), ${baseColor}`,
-        // 3: Rayas diagonales sutiles
+        // 3: Diagonal
         `repeating-linear-gradient(45deg, ${patternLine} 0px, ${patternLine} 2px, transparent 2px, transparent 14px), ${baseColor}`,
-        // 4: Cuadrícula (grid)
+        // 4: Grilla
         `linear-gradient(${patternLine} 1px, transparent 1px) 0 0 / 24px 24px, linear-gradient(90deg, ${patternLine} 1px, transparent 1px) 0 0 / 24px 24px, ${baseColor}`,
-        // 5: Puntos (dots)
+        // 5: Puntos
         `radial-gradient(${patternLine} 1.5px, transparent 1.5px) 0 0 / 20px 20px, ${baseColor}`,
-        // 6: Degradado clásico
+        // 6: Degradado
         `linear-gradient(${angle}deg, ${baseColor} 0%, ${altColor} 100%)`
       ];
 
-      const bg = styleVariants[i % styleVariants.length];
-
       CONFIG.themes.push({
         id: `${cat}-style-${idx}`,
-        name: `${spec.prefix} ${spec.label} #${idx}`,
+        name: `${spec.prefix} ${baseName} ${styleNames[styleIdx]}`,
         category: cat,
-        bg,
+        bg: styleVariants[styleIdx],
         textColor: spec.lightText ? "#f9fafb" : "#111827",
-        cardBg: spec.lightText ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0.85)",
-        cardBorder: spec.lightText ? "rgba(255, 255, 255, 0.16)" : "rgba(17, 24, 39, 0.12)",
-        accentColor: accent
+        cardBg: spec.lightText ? `hsla(${accentHue}, 35%, 18%, 0.45)` : `hsla(${accentHue}, 40%, 98%, 0.88)`,
+        cardBorder: spec.lightText ? `hsla(${accentHue}, 80%, 65%, 0.28)` : `hsla(${accentHue}, 55%, 45%, 0.24)`,
+        accentColor: accentHex
       });
     }
   });

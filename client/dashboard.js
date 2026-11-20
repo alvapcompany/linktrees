@@ -32,8 +32,9 @@ let currentPeriod = "all";
 let customSelectedDate = "";
 let cachedRawDataset = null;
 
-function purgeBrowserCaches() {
+function purgeBrowserCaches(refreshCss = false) {
   try {
+    localStorage.removeItem("alvap_biz_" + businessId);
     if ("caches" in window && typeof window.caches.keys === "function") {
       window.caches.keys().then(keys => {
         keys.forEach(k => window.caches.delete(k));
@@ -43,6 +44,14 @@ function purgeBrowserCaches() {
       navigator.serviceWorker.getRegistrations().then(regs => {
         regs.forEach(reg => reg.unregister());
       }).catch(() => {});
+    }
+    if (refreshCss) {
+      document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+        const href = link.getAttribute("href") || "";
+        if (href.includes("dashboard.css")) {
+          link.setAttribute("href", href.split("?")[0] + "?_cb=" + Date.now());
+        }
+      });
     }
   } catch (e) {}
 }
@@ -127,19 +136,20 @@ async function refreshDashboardState() {
   }
 }
 
-purgeBrowserCaches();
+purgeBrowserCaches(true);
 
 document.addEventListener("DOMContentLoaded", refreshDashboardState);
 
 window.addEventListener("pageshow", (e) => {
   if (e.persisted) {
-    purgeBrowserCaches();
-    refreshDashboardState();
+    purgeBrowserCaches(true);
+    window.location.reload();
   }
 });
 
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") {
+    purgeBrowserCaches(true);
     refreshDashboardState();
   }
 });
@@ -313,11 +323,26 @@ async function loadBusinessInfo() {
   document.getElementById("bizCategory").textContent = businessData.categoria || "Portal de Métricas y Clics por Botón";
   document.getElementById("bizAvatar").src = businessData.avatar_url || "https://via.placeholder.com/150";
 
-  // Aplicar colores del Linktree del negocio al dashboard
-  const primaryColor = businessData.color_primario || businessData.color_btn_extra;
-  const accentColor = businessData.color_secundario || businessData.color_acento || primaryColor;
+  // Aplicar paleta real del tema/Linktree del negocio al dashboard (evitando colores genéricos)
+  const activeTheme = (typeof CONFIG !== "undefined" && Array.isArray(CONFIG.themes))
+    ? CONFIG.themes.find(t => t.id === businessData.tema)
+    : null;
+  const hasGenericDefaults = (!businessData.color_primario || businessData.color_primario.toLowerCase() === "#6366f1")
+    && (!businessData.color_acento || businessData.color_acento.toLowerCase() === "#a855f7")
+    && !businessData.custom_colors_active;
+
+  const primaryColor = (hasGenericDefaults && activeTheme && activeTheme.accentColor)
+    ? activeTheme.accentColor
+    : (businessData.color_primario || (activeTheme && activeTheme.accentColor) || businessData.color_btn_extra);
+  const accentColor = (hasGenericDefaults && activeTheme && activeTheme.accentColor)
+    ? activeTheme.accentColor
+    : (businessData.color_secundario || businessData.color_acento || primaryColor);
+
   if (primaryColor) {
     document.documentElement.style.setProperty("--primary", primaryColor);
+    if (/^#[0-9a-f]{6}$/i.test(primaryColor)) {
+      document.documentElement.style.setProperty("--border-color", `${primaryColor}4d`);
+    }
   }
   if (accentColor) {
     document.documentElement.style.setProperty("--accent", accentColor);
@@ -1148,12 +1173,24 @@ function initClientDesignEditor(channelsData) {
   clientSelectedTheme = (businessData && businessData.tema) || "modern-dark";
   clientSelectedButtonStyle = (businessData && businessData.estilo_botones) || "icon_only";
 
-  if (businessData && businessData.color_primario && /^#[0-9a-f]{6}$/i.test(businessData.color_primario)) {
-    primaryInput.value = businessData.color_primario;
-  }
-  const savedAccent = businessData && (businessData.color_secundario || businessData.color_acento);
-  if (savedAccent && /^#[0-9a-f]{6}$/i.test(savedAccent)) {
-    accentInput.value = savedAccent;
+  const activeTheme = (typeof CONFIG !== "undefined" && Array.isArray(CONFIG.themes))
+    ? CONFIG.themes.find(t => t.id === clientSelectedTheme)
+    : null;
+  const hasGenericDefaults = (!businessData || !businessData.color_primario || businessData.color_primario.toLowerCase() === "#6366f1")
+    && (!businessData || !businessData.color_acento || businessData.color_acento.toLowerCase() === "#a855f7")
+    && !(businessData && businessData.custom_colors_active);
+
+  if (hasGenericDefaults && activeTheme && activeTheme.accentColor && /^#[0-9a-f]{6}$/i.test(activeTheme.accentColor)) {
+    primaryInput.value = activeTheme.accentColor;
+    accentInput.value = activeTheme.accentColor;
+  } else {
+    if (businessData && businessData.color_primario && /^#[0-9a-f]{6}$/i.test(businessData.color_primario)) {
+      primaryInput.value = businessData.color_primario;
+    }
+    const savedAccent = businessData && (businessData.color_secundario || businessData.color_acento);
+    if (savedAccent && /^#[0-9a-f]{6}$/i.test(savedAccent)) {
+      accentInput.value = savedAccent;
+    }
   }
 
   primaryInput.oninput = () => {
@@ -1264,9 +1301,14 @@ window.changeClientTheme = async function (themeId) {
   const themeObj = themes.find(t => t.id === themeId);
   const primaryInput = document.getElementById("clientColorPrimary");
 
+  const accentInput = document.getElementById("clientColorAccent");
+
   if (themeObj && themeObj.accentColor && /^#[0-9a-f]{6}$/i.test(themeObj.accentColor)) {
     if (primaryInput) primaryInput.value = themeObj.accentColor;
+    if (accentInput) accentInput.value = themeObj.accentColor;
     document.documentElement.style.setProperty("--primary", themeObj.accentColor);
+    document.documentElement.style.setProperty("--accent", themeObj.accentColor);
+    document.documentElement.style.setProperty("--border-color", `${themeObj.accentColor}4d`);
   }
 
   if (businessData) {

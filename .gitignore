@@ -7,3 +7,4 @@ node_modules/
 credentials.json
 config.local.json
 config.local.js
+graphify-out/.graphify_*

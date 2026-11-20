@@ -739,12 +739,12 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
   <meta http-equiv="Expires" content="0">
   <title>${escapeHtml(b.nombre_negocio)} | Enlaces Oficiales</title>
   <meta name="description" content="${escapeHtml(b.descripcion || b.nombre_negocio)}">
-  <link rel="stylesheet" href="${coreBase}/p/viewer.css?v=${v}">
+  <script>document.write('<link rel="stylesheet" href="${coreBase}/p/viewer.css?_cb=' + Date.now() + '">');</script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="${coreBase}/config.js?v=${v}"></script>
+  <script>document.write('<script src="${coreBase}/config.js?_cb=' + Date.now() + '"><\\/script>');</script>
 </head>
 <body data-theme="${escapeHtml(b.tema || 'modern-dark')}">
   <div id="app" class="linktree-container">
@@ -757,7 +757,7 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
     window.STANDALONE_REPO = true;
     window.INITIAL_BUSINESS = ${safeJson};
   </script>
-  <script src="${coreBase}/p/viewer.js?v=${v}"></script>
+  <script>document.write('<script src="${coreBase}/p/viewer.js?_cb=' + Date.now() + '"><\\/script>');</script>
 </body>
 </html>`;
   },
@@ -781,7 +781,7 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>${escapeHtml(b.nombre_negocio || b.id)} | Panel de Clics y Métricas</title>
-  <link rel="stylesheet" href="${coreBase}/client/dashboard.css?v=${v}">
+  <script>document.write('<link rel="stylesheet" href="${coreBase}/client/dashboard.css?_cb=' + Date.now() + '">');</script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1070,9 +1070,9 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
     window.STANDALONE_BUSINESS_ID = ${safeIdJson};
     window.INITIAL_BUSINESS = ${safeJson};
   </script>
-  <script src="${coreBase}/config.js?v=${v}"></script>
-  <script src="${coreBase}/assets/github-sync.js?v=${v}"></script>
-  <script src="${coreBase}/client/dashboard.js?v=${v}"></script>
+  <script>document.write('<script src="${coreBase}/config.js?_cb=' + Date.now() + '"><\\/script>');</script>
+  <script>document.write('<script src="${coreBase}/assets/github-sync.js?_cb=' + Date.now() + '"><\\/script>');</script>
+  <script>document.write('<script src="${coreBase}/client/dashboard.js?_cb=' + Date.now() + '"><\\/script>');</script>
 </body>
 </html>`;
   },
@@ -1093,16 +1093,16 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
   <meta http-equiv="Expires" content="0">
   <title>${escapeHtml(b.nombre_negocio)} | Enlaces Oficiales</title>
   <meta name="description" content="${escapeHtml(b.descripcion || b.nombre_negocio)}">
-  <link rel="stylesheet" href="../../p/viewer.css?v=${v}">
+  <script>document.write('<link rel="stylesheet" href="../../p/viewer.css?_cb=' + Date.now() + '">');</script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <script src="../../config.js?v=${v}"></script>
+  <script>document.write('<script src="../../config.js?_cb=' + Date.now() + '"><\\/script>');</script>
 </head>
 <body data-theme="${escapeHtml(b.tema || 'modern-dark')}">
   <div id="app" class="linktree-container"></div>
   <script>
     window.INITIAL_BUSINESS = ${safeJson};
   </script>
-  <script src="../../p/viewer.js?v=${v}"></script>
+  <script>document.write('<script src="../../p/viewer.js?_cb=' + Date.now() + '"><\\/script>');</script>
 </body>
 </html>`;
   }

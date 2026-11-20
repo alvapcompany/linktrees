@@ -10,9 +10,10 @@
   let hasTrackedInitialView = false;
   let currentBusinessData = null;
 
-  // Limpiar Cache Storage y Service Workers obsoletos en móviles (iOS/Android)
-  function purgeBrowserCaches() {
+  // Limpiar Cache Storage, Service Workers y caché local de perfil en móviles (iOS/Android)
+  function purgeBrowserCaches(refreshCss = false) {
     try {
+      localStorage.removeItem("alvap_biz_" + businessId);
       if ("caches" in window && typeof window.caches.keys === "function") {
         window.caches.keys().then(keys => {
           keys.forEach(k => window.caches.delete(k));
@@ -22,6 +23,14 @@
         navigator.serviceWorker.getRegistrations().then(regs => {
           regs.forEach(reg => reg.unregister());
         }).catch(() => {});
+      }
+      if (refreshCss) {
+        document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+          const href = link.getAttribute("href") || "";
+          if (href.includes("viewer.css")) {
+            link.setAttribute("href", href.split("?")[0] + "?_cb=" + Date.now());
+          }
+        });
       }
     } catch (e) {}
   }
@@ -160,13 +169,14 @@
 
   window.addEventListener("pageshow", (e) => {
     if (e.persisted) {
-      purgeBrowserCaches();
-      loadBusinessProfile(businessId, true);
+      purgeBrowserCaches(true);
+      window.location.reload();
     }
   });
 
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
+      purgeBrowserCaches(true);
       loadBusinessProfile(businessId, true);
     }
   });
@@ -181,20 +191,18 @@
     let networkData = pickNewestBusiness(apiData, staticData);
     let data = networkData || window.INITIAL_BUSINESS || null;
 
-    // Respaldo / sincronización de localStorage sin permitir caché antigua sobre la red
+    // Priorizar siempre la red fresca; usar localStorage solo como respaldo offline
     try {
-      const localCache = localStorage.getItem("alvap_biz_" + id);
-      if (localCache) {
-        const parsed = JSON.parse(localCache);
-        if (!networkData && parsed && parsed.nombre_negocio) {
-          data = pickNewestBusiness(window.INITIAL_BUSINESS || null, parsed);
-        } else if (networkData && parsed && getBizTimestamp(parsed) > getBizTimestamp(networkData)) {
-          data = parsed;
-        } else if (networkData) {
-          localStorage.setItem("alvap_biz_" + id, JSON.stringify(networkData));
-        }
-      } else if (networkData) {
+      if (networkData) {
         localStorage.setItem("alvap_biz_" + id, JSON.stringify(networkData));
+      } else {
+        const localCache = localStorage.getItem("alvap_biz_" + id);
+        if (localCache) {
+          const parsed = JSON.parse(localCache);
+          if (parsed && parsed.nombre_negocio) {
+            data = pickNewestBusiness(window.INITIAL_BUSINESS || null, parsed);
+          }
+        }
       }
     } catch (e) {}
 
