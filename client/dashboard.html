@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Panel del Cliente | Métricas & Clics Alvap</title>
-  <link rel="stylesheet" href="dashboard.css?v=15.0">
+  <link rel="stylesheet" href="dashboard.css?v=16.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -236,15 +236,16 @@
       </div>
     </section>
 
-    <!-- Sección 3: Personalizar Colores y Orden de Botones (Sin editar contenido) -->
+    <!-- Sección 3: Personalizar Diseño, Colores y Orden de Botones (Sin editar contenido) -->
     <section class="buttons-breakdown-section" style="margin-top: 24px;">
       <div class="breakdown-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
         <div>
-          <h2 style="font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-palette" style="color: var(--primary);"></i> 🎨 Personalizar colores y orden
+          <h2 style="font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <i class="fas fa-palette" style="color: var(--primary);"></i> 🎨 Personalizar diseño, colores y orden
+            <span id="clientActiveThemeBadge" class="active-period-badge" style="font-size: 0.74rem;">Diseño: --</span>
           </h2>
           <p style="font-size: 0.84rem; color: #9ca3af; margin-top: 4px;">
-            Cambia los colores de tu tarjeta o mueve tus botones arriba y abajo (sin modificar textos ni enlaces).
+            Elige entre 300 diseños distintos o cambia el estilo, los colores y el orden de tus botones (sin modificar textos ni enlaces).
           </p>
         </div>
         <button type="button" id="btnSaveClientDesign" onclick="saveClientDesign()" class="btn btn-primary" style="font-size: 0.85rem;">
@@ -252,27 +253,53 @@
         </button>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 18px;">
-        <div style="background: #0b1120; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-size: 0.86rem; font-weight: 600;">Color principal</span>
-          <input type="color" id="clientColorPrimary" value="#6366f1" style="width: 42px; height: 32px; border: none; border-radius: 8px; background: transparent; cursor: pointer;">
+      <!-- Bloque 1: Galería de Diseños con botón Cambiar -->
+      <div style="margin-bottom: 22px;">
+        <div style="font-size: 0.92rem; font-weight: 700; margin-bottom: 10px;">1. Elige un Diseño de Plantilla</div>
+        <div id="clientThemeFilters" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
+          <button type="button" class="period-btn active" data-client-filter="all" onclick="filterClientThemes('all')">Todos (300)</button>
+          <button type="button" class="period-btn" data-client-filter="dark" onclick="filterClientThemes('dark')">🌙 Oscuros & Cyber</button>
+          <button type="button" class="period-btn" data-client-filter="light" onclick="filterClientThemes('light')">☀️ Claros & Salud</button>
+          <button type="button" class="period-btn" data-client-filter="luxury" onclick="filterClientThemes('luxury')">👑 Lujo & Joyas</button>
+          <button type="button" class="period-btn" data-client-filter="gastro" onclick="filterClientThemes('gastro')">🍽️ Gastro & Cafés</button>
+          <button type="button" class="period-btn" data-client-filter="creative" onclick="filterClientThemes('creative')">🎨 Creativos & Neón</button>
         </div>
-        <div style="background: #0b1120; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-size: 0.86rem; font-weight: 600;">Color secundario</span>
-          <input type="color" id="clientColorAccent" value="#a855f7" style="width: 42px; height: 32px; border: none; border-radius: 8px; background: transparent; cursor: pointer;">
+        <div id="clientThemesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; max-height: 310px; overflow-y: auto; padding-right: 4px;">
+          <p style="font-size: 0.84rem; color: #9ca3af;">Cargando diseños...</p>
         </div>
       </div>
 
-      <div id="clientButtonOrderList" style="display: flex; flex-direction: column; gap: 8px;">
-        <p style="font-size: 0.84rem; color: #9ca3af;">Cargando botones...</p>
+      <!-- Bloque 2: Estilo de Botones con botón Cambiar -->
+      <div style="margin-bottom: 22px;">
+        <div style="font-size: 0.92rem; font-weight: 700; margin-bottom: 10px;">2. Estilo de Botones</div>
+        <div id="clientButtonStylesGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px;"></div>
+      </div>
+
+      <!-- Bloque 3: Colores personalizados y Orden de Botones -->
+      <div>
+        <div style="font-size: 0.92rem; font-weight: 700; margin-bottom: 10px;">3. Colores Personalizados y Orden de Botones</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 14px;">
+          <div style="background: #0b1120; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 0.86rem; font-weight: 600;">Color principal</span>
+            <input type="color" id="clientColorPrimary" value="#6366f1" style="width: 42px; height: 32px; border: none; border-radius: 8px; background: transparent; cursor: pointer;">
+          </div>
+          <div style="background: #0b1120; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 0.86rem; font-weight: 600;">Color secundario</span>
+            <input type="color" id="clientColorAccent" value="#a855f7" style="width: 42px; height: 32px; border: none; border-radius: 8px; background: transparent; cursor: pointer;">
+          </div>
+        </div>
+
+        <div id="clientButtonOrderList" style="display: flex; flex-direction: column; gap: 8px;">
+          <p style="font-size: 0.84rem; color: #9ca3af;">Cargando botones...</p>
+        </div>
       </div>
       <div id="clientDesignStatus" style="margin-top: 12px; font-size: 0.84rem; color: #34d399; display: none;"></div>
     </section>
 
   </div>
 
-  <script src="../config.js?v=15.0"></script>
-  <script src="../assets/github-sync.js?v=15.0"></script>
-  <script src="dashboard.js?v=15.0"></script>
+  <script src="../config.js?v=16.0"></script>
+  <script src="../assets/github-sync.js?v=16.0"></script>
+  <script src="dashboard.js?v=16.0"></script>
 </body>
 </html>

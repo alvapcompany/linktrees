@@ -1084,6 +1084,10 @@ function renderButtonsBreakdown(metrics, channelsData) {
 }
 
 let clientButtonOrder = [];
+let clientSelectedTheme = "";
+let clientSelectedButtonStyle = "icon_only";
+let clientThemeCategoryFilter = "all";
+let clientCustomColorsTouched = false;
 
 function normalizeHexColor(c, fallback = "#6366f1") {
   if (!c) return fallback;
@@ -1141,6 +1145,9 @@ function initClientDesignEditor(channelsData) {
   const accentInput = document.getElementById("clientColorAccent");
   if (!listEl || !primaryInput || !accentInput) return;
 
+  clientSelectedTheme = (businessData && businessData.tema) || "modern-dark";
+  clientSelectedButtonStyle = (businessData && businessData.estilo_botones) || "icon_only";
+
   if (businessData && businessData.color_primario && /^#[0-9a-f]{6}$/i.test(businessData.color_primario)) {
     primaryInput.value = businessData.color_primario;
   }
@@ -1149,8 +1156,14 @@ function initClientDesignEditor(channelsData) {
     accentInput.value = savedAccent;
   }
 
-  primaryInput.oninput = () => document.documentElement.style.setProperty("--primary", primaryInput.value);
-  accentInput.oninput = () => document.documentElement.style.setProperty("--accent", accentInput.value);
+  primaryInput.oninput = () => {
+    clientCustomColorsTouched = true;
+    document.documentElement.style.setProperty("--primary", primaryInput.value);
+  };
+  accentInput.oninput = () => {
+    clientCustomColorsTouched = true;
+    document.documentElement.style.setProperty("--accent", accentInput.value);
+  };
 
   if (!clientButtonOrder.length && Array.isArray(channelsData)) {
     const reorderable = channelsData
@@ -1171,8 +1184,160 @@ function initClientDesignEditor(channelsData) {
     clientButtonOrder = reorderable;
   }
 
+  updateActiveThemeBadge();
+  renderClientThemesGrid();
+  renderClientButtonStylesGrid();
   renderClientButtonOrderList();
 }
+
+function updateActiveThemeBadge() {
+  const badgeEl = document.getElementById("clientActiveThemeBadge");
+  if (!badgeEl) return;
+  const themes = (typeof CONFIG !== "undefined" && Array.isArray(CONFIG.themes)) ? CONFIG.themes : [];
+  const found = themes.find(t => t.id === clientSelectedTheme);
+  if (businessData && businessData.custom_colors_active && clientCustomColorsTouched) {
+    badgeEl.textContent = "Diseño: Colores personalizados";
+  } else if (found) {
+    badgeEl.textContent = `Diseño: ${found.name}`;
+  } else {
+    badgeEl.textContent = `Diseño: ${clientSelectedTheme || "Personalizado"}`;
+  }
+}
+
+function renderClientThemesGrid() {
+  const grid = document.getElementById("clientThemesGrid");
+  if (!grid) return;
+
+  const themes = (typeof CONFIG !== "undefined" && Array.isArray(CONFIG.themes)) ? CONFIG.themes : [];
+  const filtered = clientThemeCategoryFilter === "all"
+    ? themes
+    : themes.filter(t => t.category === clientThemeCategoryFilter);
+
+  if (!filtered.length) {
+    grid.innerHTML = `<p style="font-size: 0.84rem; color: #9ca3af;">No hay diseños disponibles en esta categoría.</p>`;
+    return;
+  }
+
+  const isCustomOnly = Boolean(businessData && businessData.custom_colors_active && clientCustomColorsTouched);
+
+  grid.innerHTML = filtered.map(t => {
+    const isActive = (t.id === clientSelectedTheme) && !isCustomOnly;
+    const borderStyle = isActive
+      ? "2px solid var(--primary)"
+      : "1px solid var(--border-color)";
+
+    return `
+      <div style="background: #0b1120; border: ${borderStyle}; border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="background: ${t.bg}; border: 1px solid ${t.cardBorder || 'rgba(255,255,255,0.18)'}; border-radius: 10px; height: 74px; padding: 8px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;">
+          <div style="display: flex; align-items: center; gap: 5px;">
+            <span style="width: 14px; height: 14px; border-radius: 50%; background: ${t.accentColor || '#6366f1'}; border: 1.5px solid rgba(255,255,255,0.5);"></span>
+            <span style="height: 6px; width: 48%; border-radius: 4px; background: ${t.textColor || '#fff'}; opacity: 0.75;"></span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <div style="height: 11px; border-radius: 5px; background: ${t.cardBg || 'rgba(255,255,255,0.14)'}; border: 1px solid ${t.cardBorder || 'rgba(255,255,255,0.2)'};"></div>
+            <div style="height: 11px; border-radius: 5px; background: ${t.cardBg || 'rgba(255,255,255,0.14)'}; border: 1px solid ${t.cardBorder || 'rgba(255,255,255,0.2)'};"></div>
+          </div>
+        </div>
+        <div style="font-size: 0.78rem; font-weight: 700; color: #f3f4f6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(t.name)}">${escapeHtml(t.name)}</div>
+        ${isActive
+          ? `<button type="button" class="btn btn-secondary" disabled style="width: 100%; justify-content: center; padding: 6px 10px; font-size: 0.76rem; opacity: 0.85; cursor: default;">✓ Activo</button>`
+          : `<button type="button" class="btn btn-primary" onclick="changeClientTheme('${escapeHtml(t.id)}')" style="width: 100%; justify-content: center; padding: 6px 10px; font-size: 0.76rem;">Cambiar</button>`
+        }
+      </div>
+    `;
+  }).join("");
+}
+
+window.filterClientThemes = function (category) {
+  clientThemeCategoryFilter = category || "all";
+  document.querySelectorAll("#clientThemeFilters [data-client-filter]").forEach(btn => {
+    btn.classList.toggle("active", btn.getAttribute("data-client-filter") === clientThemeCategoryFilter);
+  });
+  renderClientThemesGrid();
+};
+
+window.changeClientTheme = async function (themeId) {
+  clientSelectedTheme = themeId;
+  clientCustomColorsTouched = false;
+
+  const themes = (typeof CONFIG !== "undefined" && Array.isArray(CONFIG.themes)) ? CONFIG.themes : [];
+  const themeObj = themes.find(t => t.id === themeId);
+  const primaryInput = document.getElementById("clientColorPrimary");
+
+  if (themeObj && themeObj.accentColor && /^#[0-9a-f]{6}$/i.test(themeObj.accentColor)) {
+    if (primaryInput) primaryInput.value = themeObj.accentColor;
+    document.documentElement.style.setProperty("--primary", themeObj.accentColor);
+  }
+
+  if (businessData) {
+    businessData.tema = themeId;
+    businessData.custom_colors_active = false;
+  }
+
+  updateActiveThemeBadge();
+  renderClientThemesGrid();
+  await window.saveClientDesign({ preserveCustomColorsFlag: true });
+};
+
+function renderClientButtonStylesGrid() {
+  const grid = document.getElementById("clientButtonStylesGrid");
+  if (!grid) return;
+
+  const primaryColor = (document.getElementById("clientColorPrimary") && document.getElementById("clientColorPrimary").value) || "#6366f1";
+  const styles = [
+    {
+      id: "icon_only",
+      name: "Minimalista con Ícono",
+      desc: "Tarjeta limpia con ícono a color",
+      previewStyle: "background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #fff;",
+      iconBg: primaryColor
+    },
+    {
+      id: "full_card",
+      name: "Botón Lleno de Color",
+      desc: "Botones sólidos llamativos",
+      previewStyle: `background: ${primaryColor}; border: 1px solid rgba(255,255,255,0.25); color: #fff;`,
+      iconBg: "rgba(0,0,0,0.25)"
+    },
+    {
+      id: "border_glow",
+      name: "Borde Brillante Neón",
+      desc: "Borde luminoso en cada botón",
+      previewStyle: `background: rgba(255,255,255,0.06); border: 1.5px solid ${primaryColor}; box-shadow: 0 0 12px ${primaryColor}55; color: #fff;`,
+      iconBg: primaryColor
+    }
+  ];
+
+  grid.innerHTML = styles.map(st => {
+    const isActive = st.id === clientSelectedButtonStyle;
+    const cardBorder = isActive ? "2px solid var(--primary)" : "1px solid var(--border-color)";
+    return `
+      <div style="background: #0b1120; border: ${cardBorder}; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="${st.previewStyle} border-radius: 10px; padding: 8px 10px; display: flex; align-items: center; gap: 8px;">
+          <span style="width: 24px; height: 24px; border-radius: 7px; background: ${st.iconBg}; display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem;"><i class="fas fa-link"></i></span>
+          <span style="font-size: 0.78rem; font-weight: 700;">Ejemplo de botón</span>
+        </div>
+        <div>
+          <div style="font-size: 0.85rem; font-weight: 700; color: #f3f4f6;">${escapeHtml(st.name)}</div>
+          <div style="font-size: 0.75rem; color: #9ca3af;">${escapeHtml(st.desc)}</div>
+        </div>
+        ${isActive
+          ? `<button type="button" class="btn btn-secondary" disabled style="width: 100%; justify-content: center; padding: 6px 10px; font-size: 0.76rem; opacity: 0.85; cursor: default;">✓ Activo</button>`
+          : `<button type="button" class="btn btn-primary" onclick="changeClientButtonStyle('${escapeHtml(st.id)}')" style="width: 100%; justify-content: center; padding: 6px 10px; font-size: 0.76rem;">Cambiar</button>`
+        }
+      </div>
+    `;
+  }).join("");
+}
+
+window.changeClientButtonStyle = async function (styleId) {
+  clientSelectedButtonStyle = styleId;
+  if (businessData) {
+    businessData.estilo_botones = styleId;
+  }
+  renderClientButtonStylesGrid();
+  await window.saveClientDesign({ preserveCustomColorsFlag: true });
+};
 
 function renderClientButtonOrderList() {
   const listEl = document.getElementById("clientButtonOrderList");
@@ -1211,7 +1376,7 @@ window.moveClientButton = function (index, direction) {
   renderClientButtonOrderList();
 };
 
-window.saveClientDesign = async function () {
+window.saveClientDesign = async function (opts = {}) {
   const primaryInput = document.getElementById("clientColorPrimary");
   const accentInput = document.getElementById("clientColorAccent");
   const statusEl = document.getElementById("clientDesignStatus");
@@ -1219,6 +1384,12 @@ window.saveClientDesign = async function () {
 
   const primaryColor = primaryInput ? primaryInput.value : (businessData && businessData.color_primario) || "#6366f1";
   const accentColor = accentInput ? accentInput.value : (businessData && businessData.color_acento) || "#a855f7";
+  const selectedTheme = clientSelectedTheme || (businessData && businessData.tema) || "modern-dark";
+  const selectedButtonStyle = clientSelectedButtonStyle || (businessData && businessData.estilo_botones) || "icon_only";
+  const customColorsActive = opts && opts.preserveCustomColorsFlag
+    ? Boolean(businessData && businessData.custom_colors_active)
+    : (clientCustomColorsTouched ? true : Boolean(businessData && businessData.custom_colors_active));
+
   const buttonOrder = clientButtonOrder.map(b => b.id);
   const buttonColors = {};
   clientButtonOrder.forEach(b => {
@@ -1227,9 +1398,11 @@ window.saveClientDesign = async function () {
 
   if (businessData) {
     businessData.id = businessData.id || businessId;
+    businessData.tema = selectedTheme;
+    businessData.estilo_botones = selectedButtonStyle;
     businessData.color_primario = primaryColor;
     businessData.color_acento = accentColor;
-    businessData.custom_colors_active = true;
+    businessData.custom_colors_active = customColorsActive;
     businessData.orden_botones = buttonOrder;
     if (buttonColors.whatsapp) businessData.color_btn_whatsapp = buttonColors.whatsapp;
     if (buttonColors.instagram) businessData.color_btn_instagram = buttonColors.instagram;
@@ -1247,6 +1420,9 @@ window.saveClientDesign = async function () {
   }
 
   const design = {
+    tema: selectedTheme,
+    estilo_botones: selectedButtonStyle,
+    custom_colors_active: customColorsActive,
     color_primario: primaryColor,
     color_acento: accentColor,
     button_order: buttonOrder,
@@ -1291,9 +1467,11 @@ window.saveClientDesign = async function () {
         const applyDesignMutation = (target) => {
           const next = {
             ...(target || {}),
+            tema: selectedTheme,
+            estilo_botones: selectedButtonStyle,
             color_primario: primaryColor,
             color_acento: accentColor,
-            custom_colors_active: true,
+            custom_colors_active: customColorsActive,
             orden_botones: buttonOrder,
             fecha_actualizacion: businessData.fecha_actualizacion
           };
@@ -1359,12 +1537,15 @@ window.saveClientDesign = async function () {
   }
 
   applyDashboardView();
+  updateActiveThemeBadge();
+  renderClientThemesGrid();
+  renderClientButtonStylesGrid();
 
   if (statusEl) {
     statusEl.style.display = "block";
     if (syncedGithub) {
       statusEl.style.color = "#34d399";
-      statusEl.textContent = "✅ ¡Diseño guardado! Los colores y el orden ya se aplicaron en tu tarjeta.";
+      statusEl.textContent = "✅ ¡Diseño guardado! Los cambios ya se aplicaron en tu tarjeta.";
     } else if (syncedSheets) {
       statusEl.style.color = "#34d399";
       statusEl.textContent = "✅ Diseño guardado en el registro.";
