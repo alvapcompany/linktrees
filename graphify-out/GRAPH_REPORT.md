@@ -1,16 +1,16 @@
 # Graph Report - paginas NFC  (2026-11-19)
 
 ## Corpus Check
-- 10 files · ~28,556 words
+- 10 files · ~29,104 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 114 nodes · 196 edges · 15 communities
+- 118 nodes · 204 edges · 15 communities
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 2 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `44849e67`
+- Built from commit: `fe15b125`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -41,7 +41,7 @@
 7. `escapeHtml()` - 6 edges
 8. `loadBusinessInfo()` - 6 edges
 9. `loadBusinessProfile()` - 6 edges
-10. `selectBusiness()` - 5 edges
+10. `renderProfile()` - 6 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `runSingleBusinessCommit()` --references--> `GitHubSync`  [EXTRACTED]
@@ -61,8 +61,8 @@ Cohesion: 0.18
 Nodes (7): businessId, clientButtonOrder, mergeNumericMapsMax(), normalizeNumericMap(), params, renderDailyMetricsTable(), sumBtnAliases()
 
 ### Community 1 - "viewer.js"
-Cohesion: 0.29
-Nodes (11): applyTheme(), decodeGitHubBase64Utf8(), fetchFreshBusinessFromGitHubApi(), fetchGitHubContentsJson(), fetchStaticFreshBusiness(), getBizTimestamp(), loadBusinessProfile(), pickNewestBusiness() (+3 more)
+Cohesion: 0.24
+Nodes (14): applyTheme(), decodeGitHubBase64Utf8(), escapeHtml(), fetchFreshBusinessFromGitHubApi(), fetchGitHubContentsJson(), fetchStaticFreshBusiness(), getBizTimestamp(), loadBusinessProfile() (+6 more)
 
 ### Community 2 - "admin.js"
 Cohesion: 0.22
@@ -85,8 +85,8 @@ Cohesion: 0.39
 Nodes (8): escapeHtml(), initClientDesignEditor(), normalizeHexColor(), renderButtonsBreakdown(), renderClientButtonOrderList(), renderClientButtonStylesGrid(), renderClientThemesGrid(), updateActiveThemeBadge()
 
 ### Community 7 - "scrape-reviews.js"
-Cohesion: 0.29
-Nodes (7): CONFIG_FILE, DATA_FILE, fs, main(), path, puppeteer, sleep()
+Cohesion: 0.28
+Nodes (8): CONFIG_FILE, DATA_FILE, fetchPlaceRatingViaHttp(), fs, main(), path, puppeteer, sleep()
 
 ### Community 8 - "applyDashboardView"
 Cohesion: 0.33
@@ -124,10 +124,10 @@ Nodes (3): getResolvedRepoUrls(), loadBusinessesData(), GitHubSync
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `client/dashboard.html (Dashboard Privado del Cliente)` connect `config.js` to `dashboard.js`?**
-  _High betweenness centrality (0.249) - this node is a cross-community bridge._
+  _High betweenness centrality (0.242) - this node is a cross-community bridge._
 - **Why does `admin/index.html (Panel Administrativo)` connect `config.js` to `admin.js`?**
-  _High betweenness centrality (0.226) - this node is a cross-community bridge._
+  _High betweenness centrality (0.225) - this node is a cross-community bridge._
 - **Why does `p/index.html (Visor Público Linktree NFC)` connect `config.js` to `viewer.js`?**
-  _High betweenness centrality (0.168) - this node is a cross-community bridge._
+  _High betweenness centrality (0.193) - this node is a cross-community bridge._
 - **What connects `businesses`, `IMAGE_PRESETS`, `params` to the rest of the system?**
   _17 weakly-connected nodes found - possible documentation gaps or missing edges._
