@@ -11,6 +11,7 @@
       "_origin": "ast",
       "id": "admin_admin",
       "community": 2,
+      "community_name": "admin.js",
       "norm_label": "admin.js"
     },
     {
@@ -21,6 +22,7 @@
       "_origin": "ast",
       "id": "admin_admin_businesses",
       "community": 2,
+      "community_name": "admin.js",
       "norm_label": "businesses"
     },
     {
@@ -31,6 +33,7 @@
       "_origin": "ast",
       "id": "admin_admin_sha256",
       "community": 2,
+      "community_name": "admin.js",
       "norm_label": "sha256()"
     },
     {
@@ -41,6 +44,7 @@
       "_origin": "ast",
       "id": "admin_admin_checkadminauth",
       "community": 2,
+      "community_name": "admin.js",
       "norm_label": "checkadminauth()"
     },
     {
@@ -51,6 +55,7 @@
       "_origin": "ast",
       "id": "admin_admin_loadstoredsettings",
       "community": 5,
+      "community_name": "updateLivePreview",
       "norm_label": "loadstoredsettings()"
     },
     {
@@ -61,6 +66,7 @@
       "_origin": "ast",
       "id": "admin_admin_updateconnectionbadges",
       "community": 5,
+      "community_name": "updateLivePreview",
       "norm_label": "updateconnectionbadges()"
     },
     {
@@ -71,6 +77,7 @@
       "_origin": "ast",
       "id": "admin_admin_loadbusinessesdata",
       "community": 14,
+      "community_name": "getResolvedRepoUrls",
       "norm_label": "loadbusinessesdata()"
     },
     {
@@ -81,6 +88,7 @@
       "_origin": "ast",
       "id": "admin_admin_initidselector",
       "community": 9,
+      "community_name": "runSingleBusinessCommit",
       "norm_label": "initidselector()"
     },
     {
@@ -91,6 +99,7 @@
       "_origin": "ast",
       "id": "admin_admin_selectbusiness",
       "community": 5,
+      "community_name": "updateLivePreview",
       "norm_label": "selectbusiness()"
     },
     {
@@ -101,6 +110,7 @@
       "_origin": "ast",
       "id": "admin_admin_getresolvedrepourls",
       "community": 14,
+      "community_name": "getResolvedRepoUrls",
       "norm_label": "getresolvedrepourls()"
     },
     {
@@ -111,6 +121,7 @@
       "_origin": "ast",
       "id": "admin_admin_renderthemegrid",
       "community": 5,
+      "community_name": "updateLivePreview",
       "norm_label": "renderthemegrid()"
     },
     {
@@ -121,6 +132,7 @@
       "_origin": "ast",
       "id": "admin_admin_selectthemecard",
       "community": 5,
+      "community_name": "updateLivePreview",
       "norm_label": "selectthemecard()"
     },
     {
@@ -131,6 +143,7 @@
       "_origin": "ast",
       "id": "admin_admin_getselectedtheme",
       "community": 13,
+      "community_name": "getFormData",
       "norm_label": "getselectedtheme()"
     },
     {
@@ -141,6 +154,7 @@
       "_origin": "ast",
       "id": "admin_admin_renderdynamicbuttonslist",
       "community": 2,
+      "community_name": "admin.js",
       "norm_label": "renderdynamicbuttonslist()"
     },
     {
@@ -151,6 +165,7 @@
       "_origin": "ast",
       "id": "admin_admin_getformdata",
       "community": 13,
+      "community_name": "getFormData",
       "norm_label": "getformdata()"
     },
     {
@@ -161,6 +176,7 @@
       "_origin": "ast",
       "id": "admin_admin_updatelivepreview",
       "community": 5,
+      "community_name": "updateLivePreview",
       "norm_label": "updatelivepreview()"
     },
     {
@@ -171,6 +187,7 @@
       "_origin": "ast",
       "id": "admin_admin_savetogooglesheets",
       "community": 9,
+      "community_name": "runSingleBusinessCommit",
       "norm_label": "savetogooglesheets()"
     },
     {
@@ -181,6 +198,7 @@
       "_origin": "ast",
       "id": "admin_admin_runsinglebusinesscommit",
       "community": 9,
+      "community_name": "runSingleBusinessCommit",
       "norm_label": "runsinglebusinesscommit()"
     },
     {
@@ -191,6 +209,7 @@
       "_origin": "ast",
       "id": "admin_admin_autocommittogithub",
       "community": 13,
+      "community_name": "getFormData",
       "norm_label": "autocommittogithub()"
     },
     {
@@ -201,6 +220,7 @@
       "_origin": "ast",
       "id": "admin_admin_setupeventlisteners",
       "community": 5,
+      "community_name": "updateLivePreview",
       "norm_label": "setupeventlisteners()"
     },
     {
@@ -211,6 +231,7 @@
       "_origin": "ast",
       "id": "admin_admin_showcommitmodal",
       "community": 9,
+      "community_name": "runSingleBusinessCommit",
       "norm_label": "showcommitmodal()"
     },
     {
@@ -221,6 +242,7 @@
       "_origin": "ast",
       "id": "admin_admin_appendcommitlog",
       "community": 9,
+      "community_name": "runSingleBusinessCommit",
       "norm_label": "appendcommitlog()"
     },
     {
@@ -231,6 +253,7 @@
       "_origin": "ast",
       "id": "admin_admin_setmodalcompleted",
       "community": 9,
+      "community_name": "runSingleBusinessCommit",
       "norm_label": "setmodalcompleted()"
     },
     {
@@ -241,6 +264,7 @@
       "_origin": "ast",
       "id": "admin_admin_escapehtml",
       "community": 2,
+      "community_name": "admin.js",
       "norm_label": "escapehtml()"
     },
     {
@@ -251,6 +275,7 @@
       "_origin": "ast",
       "id": "admin_admin_image_presets",
       "community": 2,
+      "community_name": "admin.js",
       "norm_label": "image_presets"
     },
     {
@@ -261,6 +286,7 @@
       "_origin": "ast",
       "id": "admin_admin_getadmingithubconfig",
       "community": 2,
+      "community_name": "admin.js",
       "norm_label": "getadmingithubconfig()"
     },
     {
@@ -271,6 +297,7 @@
       "_origin": "ast",
       "id": "admin_admin_setimagesrepostatus",
       "community": 2,
+      "community_name": "admin.js",
       "norm_label": "setimagesrepostatus()"
     },
     {
@@ -281,6 +308,7 @@
       "_origin": "ast",
       "id": "admin_admin_optimizeimageinbrowser",
       "community": 2,
+      "community_name": "admin.js",
       "norm_label": "optimizeimageinbrowser()"
     },
     {
@@ -291,6 +319,7 @@
       "_origin": "ast",
       "id": "admin_admin_renderpendingimagepreview",
       "community": 2,
+      "community_name": "admin.js",
       "norm_label": "renderpendingimagepreview()"
     },
     {
@@ -301,6 +330,7 @@
       "_origin": "ast",
       "id": "admin_admin_applyuploadedimageurltoeditor",
       "community": 5,
+      "community_name": "updateLivePreview",
       "norm_label": "applyuploadedimageurltoeditor()"
     },
     {
@@ -311,6 +341,7 @@
       "_origin": "ast",
       "id": "assets_github_sync",
       "community": 3,
+      "community_name": "config.js",
       "norm_label": "github-sync.js"
     },
     {
@@ -321,6 +352,7 @@
       "_origin": "ast",
       "id": "assets_github_sync_githubsync",
       "community": 14,
+      "community_name": "getResolvedRepoUrls",
       "norm_label": "githubsync"
     },
     {
@@ -331,6 +363,7 @@
       "_origin": "ast",
       "id": "assets_github_sync_escapehtml",
       "community": 3,
+      "community_name": "config.js",
       "norm_label": "escapehtml()"
     },
     {
@@ -341,6 +374,7 @@
       "_origin": "ast",
       "id": "client_dashboard",
       "community": 0,
+      "community_name": "dashboard.js",
       "norm_label": "dashboard.js"
     },
     {
@@ -351,6 +385,7 @@
       "_origin": "ast",
       "id": "client_dashboard_params",
       "community": 0,
+      "community_name": "dashboard.js",
       "norm_label": "params"
     },
     {
@@ -361,6 +396,7 @@
       "_origin": "ast",
       "id": "client_dashboard_resolvedashboardbusinessid",
       "community": 0,
+      "community_name": "dashboard.js",
       "norm_label": "resolvedashboardbusinessid()"
     },
     {
@@ -371,6 +407,7 @@
       "_origin": "ast",
       "id": "client_dashboard_businessid",
       "community": 0,
+      "community_name": "dashboard.js",
       "norm_label": "businessid"
     },
     {
@@ -381,376 +418,414 @@
       "_origin": "ast",
       "id": "client_dashboard_purgebrowsercaches",
       "community": 0,
+      "community_name": "dashboard.js",
       "norm_label": "purgebrowsercaches()"
     },
     {
       "label": "decodeGitHubBase64Utf8()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L59",
+      "source_location": "L63",
       "_origin": "ast",
       "id": "client_dashboard_decodegithubbase64utf8",
       "community": 11,
+      "community_name": "decodeGitHubBase64Utf8",
       "norm_label": "decodegithubbase64utf8()"
     },
     {
       "label": "getBizTimestamp()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L69",
+      "source_location": "L73",
       "_origin": "ast",
       "id": "client_dashboard_getbiztimestamp",
       "community": 12,
+      "community_name": "loadBusinessInfo",
       "norm_label": "getbiztimestamp()"
     },
     {
       "label": "pickNewestBusiness()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L75",
+      "source_location": "L79",
       "_origin": "ast",
       "id": "client_dashboard_picknewestbusiness",
       "community": 12,
+      "community_name": "loadBusinessInfo",
       "norm_label": "picknewestbusiness()"
     },
     {
       "label": "fetchGitHubContentsJson()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L81",
+      "source_location": "L85",
       "_origin": "ast",
       "id": "client_dashboard_fetchgithubcontentsjson",
       "community": 11,
+      "community_name": "decodeGitHubBase64Utf8",
       "norm_label": "fetchgithubcontentsjson()"
     },
     {
       "label": "fetchFreshBusinessFromGitHubApi()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L96",
+      "source_location": "L100",
       "_origin": "ast",
       "id": "client_dashboard_fetchfreshbusinessfromgithubapi",
       "community": 11,
+      "community_name": "decodeGitHubBase64Utf8",
       "norm_label": "fetchfreshbusinessfromgithubapi()"
     },
     {
       "label": "refreshDashboardState()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L127",
+      "source_location": "L131",
       "_origin": "ast",
       "id": "client_dashboard_refreshdashboardstate",
       "community": 10,
+      "community_name": "buildDailyLedger",
       "norm_label": "refreshdashboardstate()"
     },
     {
       "label": "escapeHtml()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L157",
+      "source_location": "L161",
       "_origin": "ast",
       "id": "client_dashboard_escapehtml",
       "community": 6,
+      "community_name": "initClientDesignEditor",
       "norm_label": "escapehtml()"
     },
     {
       "label": "sha256()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L169",
+      "source_location": "L173",
       "_origin": "ast",
       "id": "client_dashboard_sha256",
       "community": 0,
+      "community_name": "dashboard.js",
       "norm_label": "sha256()"
     },
     {
       "label": "checkClientAuth()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L176",
+      "source_location": "L180",
       "_origin": "ast",
       "id": "client_dashboard_checkclientauth",
       "community": 10,
+      "community_name": "buildDailyLedger",
       "norm_label": "checkclientauth()"
     },
     {
       "label": "fetchStaticFreshBusinessForDashboard()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L238",
+      "source_location": "L242",
       "_origin": "ast",
       "id": "client_dashboard_fetchstaticfreshbusinessfordashboard",
       "community": 12,
+      "community_name": "loadBusinessInfo",
       "norm_label": "fetchstaticfreshbusinessfordashboard()"
     },
     {
       "label": "loadBusinessInfo()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L286",
+      "source_location": "L290",
       "_origin": "ast",
       "id": "client_dashboard_loadbusinessinfo",
       "community": 12,
+      "community_name": "loadBusinessInfo",
       "norm_label": "loadbusinessinfo()"
     },
     {
       "label": "normalizeNumericMap()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L365",
+      "source_location": "L369",
       "_origin": "ast",
       "id": "client_dashboard_normalizenumericmap",
       "community": 0,
+      "community_name": "dashboard.js",
       "norm_label": "normalizenumericmap()"
     },
     {
       "label": "mergeNumericMapsMax()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L376",
+      "source_location": "L380",
       "_origin": "ast",
       "id": "client_dashboard_mergenumericmapsmax",
       "community": 0,
+      "community_name": "dashboard.js",
       "norm_label": "mergenumericmapsmax()"
     },
     {
       "label": "getTodayDateStr()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L386",
+      "source_location": "L390",
       "_origin": "ast",
       "id": "client_dashboard_gettodaydatestr",
       "community": 8,
+      "community_name": "applyDashboardView",
       "norm_label": "gettodaydatestr()"
     },
     {
       "label": "getIsoWeekStr()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L390",
+      "source_location": "L394",
       "_origin": "ast",
       "id": "client_dashboard_getisoweekstr",
       "community": 0,
+      "community_name": "dashboard.js",
       "norm_label": "getisoweekstr()"
     },
     {
       "label": "getMonthStr()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L402",
+      "source_location": "L406",
       "_origin": "ast",
       "id": "client_dashboard_getmonthstr",
       "community": 0,
+      "community_name": "dashboard.js",
       "norm_label": "getmonthstr()"
     },
     {
       "label": "stripButtonDateSuffix()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L406",
+      "source_location": "L410",
       "_origin": "ast",
       "id": "client_dashboard_stripbuttondatesuffix",
       "community": 10,
+      "community_name": "buildDailyLedger",
       "norm_label": "stripbuttondatesuffix()"
     },
     {
       "label": "sumBtnAliases()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L415",
+      "source_location": "L419",
       "_origin": "ast",
       "id": "client_dashboard_sumbtnaliases",
       "community": 0,
+      "community_name": "dashboard.js",
       "norm_label": "sumbtnaliases()"
     },
     {
       "label": "buildDailyLedger()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L428",
+      "source_location": "L432",
       "_origin": "ast",
       "id": "client_dashboard_builddailyledger",
       "community": 10,
+      "community_name": "buildDailyLedger",
       "norm_label": "builddailyledger()"
     },
     {
       "label": "filterLedgerByPeriod()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L561",
+      "source_location": "L523",
       "_origin": "ast",
       "id": "client_dashboard_filterledgerbyperiod",
       "community": 8,
+      "community_name": "applyDashboardView",
       "norm_label": "filterledgerbyperiod()"
     },
     {
       "label": "aggregateFilteredMetrics()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L581",
+      "source_location": "L543",
       "_origin": "ast",
       "id": "client_dashboard_aggregatefilteredmetrics",
       "community": 8,
+      "community_name": "applyDashboardView",
       "norm_label": "aggregatefilteredmetrics()"
     },
     {
       "label": "updateFilterUiState()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L622",
+      "source_location": "L583",
       "_origin": "ast",
       "id": "client_dashboard_updatefilteruistate",
       "community": 8,
+      "community_name": "applyDashboardView",
       "norm_label": "updatefilteruistate()"
     },
     {
       "label": "renderDailyMetricsTable()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L662",
+      "source_location": "L623",
       "_origin": "ast",
       "id": "client_dashboard_renderdailymetricstable",
       "community": 0,
+      "community_name": "dashboard.js",
       "norm_label": "renderdailymetricstable()"
     },
     {
       "label": "applyDashboardView()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L701",
+      "source_location": "L662",
       "_origin": "ast",
       "id": "client_dashboard_applydashboardview",
       "community": 8,
+      "community_name": "applyDashboardView",
       "norm_label": "applydashboardview()"
     },
     {
       "label": "loadMetrics()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L775",
+      "source_location": "L736",
       "_origin": "ast",
       "id": "client_dashboard_loadmetrics",
       "community": 10,
+      "community_name": "buildDailyLedger",
       "norm_label": "loadmetrics()"
     },
     {
       "label": "buildChannelsAnalytics()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L817",
+      "source_location": "L771",
       "_origin": "ast",
       "id": "client_dashboard_buildchannelsanalytics",
       "community": 8,
+      "community_name": "applyDashboardView",
       "norm_label": "buildchannelsanalytics()"
     },
     {
       "label": "renderCharts()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L930",
+      "source_location": "L884",
       "_origin": "ast",
       "id": "client_dashboard_rendercharts",
       "community": 8,
+      "community_name": "applyDashboardView",
       "norm_label": "rendercharts()"
     },
     {
       "label": "renderButtonsBreakdown()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L1034",
+      "source_location": "L988",
       "_origin": "ast",
       "id": "client_dashboard_renderbuttonsbreakdown",
       "community": 6,
+      "community_name": "initClientDesignEditor",
       "norm_label": "renderbuttonsbreakdown()"
     },
     {
       "label": "clientButtonOrder",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L1111",
+      "source_location": "L1065",
       "_origin": "ast",
       "id": "client_dashboard_clientbuttonorder",
       "community": 0,
+      "community_name": "dashboard.js",
       "norm_label": "clientbuttonorder"
     },
     {
       "label": "normalizeHexColor()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L1117",
+      "source_location": "L1071",
       "_origin": "ast",
       "id": "client_dashboard_normalizehexcolor",
       "community": 6,
+      "community_name": "initClientDesignEditor",
       "norm_label": "normalizehexcolor()"
     },
     {
       "label": "encodeGitHubBase64Utf8()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L1124",
+      "source_location": "L1078",
       "_origin": "ast",
       "id": "client_dashboard_encodegithubbase64utf8",
       "community": 11,
+      "community_name": "decodeGitHubBase64Utf8",
       "norm_label": "encodegithubbase64utf8()"
     },
     {
       "label": "putGitHubJsonFile()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L1133",
+      "source_location": "L1087",
       "_origin": "ast",
       "id": "client_dashboard_putgithubjsonfile",
       "community": 11,
+      "community_name": "decodeGitHubBase64Utf8",
       "norm_label": "putgithubjsonfile()"
     },
     {
       "label": "initClientDesignEditor()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L1167",
+      "source_location": "L1121",
       "_origin": "ast",
       "id": "client_dashboard_initclientdesigneditor",
       "community": 6,
+      "community_name": "initClientDesignEditor",
       "norm_label": "initclientdesigneditor()"
     },
     {
       "label": "updateActiveThemeBadge()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L1230",
+      "source_location": "L1184",
       "_origin": "ast",
       "id": "client_dashboard_updateactivethemebadge",
       "community": 6,
+      "community_name": "initClientDesignEditor",
       "norm_label": "updateactivethemebadge()"
     },
     {
       "label": "renderClientThemesGrid()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L1244",
+      "source_location": "L1198",
       "_origin": "ast",
       "id": "client_dashboard_renderclientthemesgrid",
       "community": 6,
+      "community_name": "initClientDesignEditor",
       "norm_label": "renderclientthemesgrid()"
     },
     {
       "label": "renderClientButtonStylesGrid()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L1324",
+      "source_location": "L1278",
       "_origin": "ast",
       "id": "client_dashboard_renderclientbuttonstylesgrid",
       "community": 6,
+      "community_name": "initClientDesignEditor",
       "norm_label": "renderclientbuttonstylesgrid()"
     },
     {
       "label": "renderClientButtonOrderList()",
       "file_type": "code",
       "source_file": "client/dashboard.js",
-      "source_location": "L1384",
+      "source_location": "L1338",
       "_origin": "ast",
       "id": "client_dashboard_renderclientbuttonorderlist",
       "community": 6,
+      "community_name": "initClientDesignEditor",
       "norm_label": "renderclientbuttonorderlist()"
     },
     {
@@ -761,6 +836,7 @@
       "_origin": "ast",
       "id": "config",
       "community": 3,
+      "community_name": "config.js",
       "norm_label": "config.js"
     },
     {
@@ -771,6 +847,7 @@
       "_origin": "ast",
       "id": "config_config",
       "community": 3,
+      "community_name": "config.js",
       "norm_label": "config"
     },
     {
@@ -781,6 +858,7 @@
       "_origin": "ast",
       "id": "config_hsltohex",
       "community": 3,
+      "community_name": "config.js",
       "norm_label": "hsltohex()"
     },
     {
@@ -791,6 +869,7 @@
       "_origin": "ast",
       "id": "p_viewer",
       "community": 1,
+      "community_name": "viewer.js",
       "norm_label": "viewer.js"
     },
     {
@@ -801,116 +880,128 @@
       "_origin": "ast",
       "id": "p_viewer_purgebrowsercaches",
       "community": 1,
+      "community_name": "viewer.js",
       "norm_label": "purgebrowsercaches()"
     },
     {
       "label": "decodeGitHubBase64Utf8()",
       "file_type": "code",
       "source_file": "p/viewer.js",
-      "source_location": "L38",
+      "source_location": "L42",
       "_origin": "ast",
       "id": "p_viewer_decodegithubbase64utf8",
       "community": 1,
+      "community_name": "viewer.js",
       "norm_label": "decodegithubbase64utf8()"
     },
     {
       "label": "getBizTimestamp()",
       "file_type": "code",
       "source_file": "p/viewer.js",
-      "source_location": "L48",
+      "source_location": "L52",
       "_origin": "ast",
       "id": "p_viewer_getbiztimestamp",
       "community": 1,
+      "community_name": "viewer.js",
       "norm_label": "getbiztimestamp()"
     },
     {
       "label": "pickNewestBusiness()",
       "file_type": "code",
       "source_file": "p/viewer.js",
-      "source_location": "L54",
+      "source_location": "L58",
       "_origin": "ast",
       "id": "p_viewer_picknewestbusiness",
       "community": 1,
+      "community_name": "viewer.js",
       "norm_label": "picknewestbusiness()"
     },
     {
       "label": "resolveStandaloneRepoSlug()",
       "file_type": "code",
       "source_file": "p/viewer.js",
-      "source_location": "L60",
+      "source_location": "L64",
       "_origin": "ast",
       "id": "p_viewer_resolvestandalonereposlug",
       "community": 1,
+      "community_name": "viewer.js",
       "norm_label": "resolvestandalonereposlug()"
     },
     {
       "label": "fetchGitHubContentsJson()",
       "file_type": "code",
       "source_file": "p/viewer.js",
-      "source_location": "L80",
+      "source_location": "L84",
       "_origin": "ast",
       "id": "p_viewer_fetchgithubcontentsjson",
       "community": 1,
+      "community_name": "viewer.js",
       "norm_label": "fetchgithubcontentsjson()"
     },
     {
       "label": "fetchFreshBusinessFromGitHubApi()",
       "file_type": "code",
       "source_file": "p/viewer.js",
-      "source_location": "L96",
+      "source_location": "L100",
       "_origin": "ast",
       "id": "p_viewer_fetchfreshbusinessfromgithubapi",
       "community": 1,
+      "community_name": "viewer.js",
       "norm_label": "fetchfreshbusinessfromgithubapi()"
     },
     {
       "label": "fetchStaticFreshBusiness()",
       "file_type": "code",
       "source_file": "p/viewer.js",
-      "source_location": "L121",
+      "source_location": "L125",
       "_origin": "ast",
       "id": "p_viewer_fetchstaticfreshbusiness",
       "community": 1,
+      "community_name": "viewer.js",
       "norm_label": "fetchstaticfreshbusiness()"
     },
     {
       "label": "loadBusinessProfile()",
       "file_type": "code",
       "source_file": "p/viewer.js",
-      "source_location": "L184",
+      "source_location": "L188",
       "_origin": "ast",
       "id": "p_viewer_loadbusinessprofile",
       "community": 1,
+      "community_name": "viewer.js",
       "norm_label": "loadbusinessprofile()"
     },
     {
       "label": "renderProfile()",
       "file_type": "code",
       "source_file": "p/viewer.js",
-      "source_location": "L255",
+      "source_location": "L259",
       "_origin": "ast",
       "id": "p_viewer_renderprofile",
       "community": 1,
+      "community_name": "viewer.js",
       "norm_label": "renderprofile()"
     },
     {
       "label": "applyTheme()",
       "file_type": "code",
       "source_file": "p/viewer.js",
-      "source_location": "L435",
+      "source_location": "L439",
       "_origin": "ast",
       "id": "p_viewer_applytheme",
       "community": 1,
+      "community_name": "viewer.js",
       "norm_label": "applytheme()"
     },
     {
       "label": "trackEvent()",
       "file_type": "code",
       "source_file": "p/viewer.js",
-      "source_location": "L472",
+      "source_location": "L476",
       "_origin": "ast",
       "id": "p_viewer_trackevent",
       "community": 1,
+      "community_name": "viewer.js",
       "norm_label": "trackevent()"
     },
     {
@@ -921,6 +1012,7 @@
       "_origin": "ast",
       "id": "package",
       "community": 4,
+      "community_name": "package.json",
       "norm_label": "package.json"
     },
     {
@@ -931,6 +1023,7 @@
       "_origin": "ast",
       "id": "package_name",
       "community": 4,
+      "community_name": "package.json",
       "norm_label": "name"
     },
     {
@@ -941,6 +1034,7 @@
       "_origin": "ast",
       "id": "package_version",
       "community": 4,
+      "community_name": "package.json",
       "norm_label": "version"
     },
     {
@@ -951,6 +1045,7 @@
       "_origin": "ast",
       "id": "package_description",
       "community": 4,
+      "community_name": "package.json",
       "norm_label": "description"
     },
     {
@@ -961,6 +1056,7 @@
       "_origin": "ast",
       "id": "package_main",
       "community": 4,
+      "community_name": "package.json",
       "norm_label": "main"
     },
     {
@@ -971,6 +1067,7 @@
       "_origin": "ast",
       "id": "package_scripts",
       "community": 4,
+      "community_name": "package.json",
       "norm_label": "scripts"
     },
     {
@@ -981,6 +1078,7 @@
       "_origin": "ast",
       "id": "package_scripts_scrape",
       "community": 4,
+      "community_name": "package.json",
       "norm_label": "scrape"
     },
     {
@@ -991,6 +1089,7 @@
       "_origin": "ast",
       "id": "package_dependencies",
       "community": 4,
+      "community_name": "package.json",
       "norm_label": "dependencies"
     },
     {
@@ -1001,6 +1100,7 @@
       "_origin": "ast",
       "id": "package_dependencies_puppeteer",
       "community": 4,
+      "community_name": "package.json",
       "norm_label": "puppeteer"
     },
     {
@@ -1011,6 +1111,7 @@
       "_origin": "ast",
       "id": "puppeteer",
       "community": 4,
+      "community_name": "package.json",
       "norm_label": "puppeteer"
     },
     {
@@ -1021,6 +1122,7 @@
       "_origin": "ast",
       "id": "scripts_scrape_reviews",
       "community": 7,
+      "community_name": "scrape-reviews.js",
       "norm_label": "scrape-reviews.js"
     },
     {
@@ -1031,6 +1133,7 @@
       "_origin": "ast",
       "id": "scripts_scrape_reviews_fs",
       "community": 7,
+      "community_name": "scrape-reviews.js",
       "norm_label": "fs"
     },
     {
@@ -1041,6 +1144,7 @@
       "_origin": "ast",
       "id": "scripts_scrape_reviews_path",
       "community": 7,
+      "community_name": "scrape-reviews.js",
       "norm_label": "path"
     },
     {
@@ -1051,6 +1155,7 @@
       "_origin": "ast",
       "id": "scripts_scrape_reviews_puppeteer",
       "community": 7,
+      "community_name": "scrape-reviews.js",
       "norm_label": "puppeteer"
     },
     {
@@ -1061,6 +1166,7 @@
       "_origin": "ast",
       "id": "scripts_scrape_reviews_sleep",
       "community": 7,
+      "community_name": "scrape-reviews.js",
       "norm_label": "sleep()"
     },
     {
@@ -1071,6 +1177,7 @@
       "_origin": "ast",
       "id": "scripts_scrape_reviews_data_file",
       "community": 7,
+      "community_name": "scrape-reviews.js",
       "norm_label": "data_file"
     },
     {
@@ -1081,6 +1188,7 @@
       "_origin": "ast",
       "id": "scripts_scrape_reviews_config_file",
       "community": 7,
+      "community_name": "scrape-reviews.js",
       "norm_label": "config_file"
     },
     {
@@ -1091,6 +1199,7 @@
       "_origin": "ast",
       "id": "scripts_scrape_reviews_main",
       "community": 7,
+      "community_name": "scrape-reviews.js",
       "norm_label": "main()"
     },
     {
@@ -1099,9 +1208,10 @@
       "source_file": "README.md",
       "source_location": "L1-L34",
       "confidence": "EXTRACTED",
-      "id": "doc_readme",
       "community": 3,
-      "norm_label": "readme.md (arquitectura multi-repositorio)"
+      "norm_label": "readme.md (arquitectura multi-repositorio)",
+      "id": "doc_readme",
+      "community_name": "config.js"
     },
     {
       "label": "INSTRUCCIONES_GOOGLE_SHEETS.md (Backend Apps Script)",
@@ -1109,9 +1219,10 @@
       "source_file": "google-apps-script/INSTRUCCIONES_GOOGLE_SHEETS.md",
       "source_location": "L1-L40",
       "confidence": "EXTRACTED",
-      "id": "doc_google_sheets",
       "community": 3,
-      "norm_label": "instrucciones_google_sheets.md (backend apps script)"
+      "norm_label": "instrucciones_google_sheets.md (backend apps script)",
+      "id": "doc_google_sheets",
+      "community_name": "config.js"
     },
     {
       "label": "admin/index.html (Panel Administrativo)",
@@ -1119,9 +1230,10 @@
       "source_file": "admin/index.html",
       "source_location": "L1-L592",
       "confidence": "EXTRACTED",
-      "id": "html_admin_index",
       "community": 3,
-      "norm_label": "admin/index.html (panel administrativo)"
+      "norm_label": "admin/index.html (panel administrativo)",
+      "id": "html_admin_index",
+      "community_name": "config.js"
     },
     {
       "label": "client/dashboard.html (Dashboard Privado del Cliente)",
@@ -1129,9 +1241,10 @@
       "source_file": "client/dashboard.html",
       "source_location": "L1-L303",
       "confidence": "EXTRACTED",
-      "id": "html_client_dashboard",
       "community": 3,
-      "norm_label": "client/dashboard.html (dashboard privado del cliente)"
+      "norm_label": "client/dashboard.html (dashboard privado del cliente)",
+      "id": "html_client_dashboard",
+      "community_name": "config.js"
     },
     {
       "label": "p/index.html (Visor P\u00fablico Linktree NFC)",
@@ -1139,9 +1252,10 @@
       "source_file": "p/index.html",
       "source_location": "L1-L27",
       "confidence": "EXTRACTED",
-      "id": "html_viewer_index",
       "community": 3,
-      "norm_label": "p/index.html (visor publico linktree nfc)"
+      "norm_label": "p/index.html (visor publico linktree nfc)",
+      "id": "html_viewer_index",
+      "community_name": "config.js"
     }
   ],
   "links": [
@@ -1902,7 +2016,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L581",
+      "source_location": "L543",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -1913,7 +2027,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L701",
+      "source_location": "L662",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -1924,7 +2038,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L817",
+      "source_location": "L771",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -1935,7 +2049,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L428",
+      "source_location": "L432",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -1957,7 +2071,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L176",
+      "source_location": "L180",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -1968,7 +2082,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1111",
+      "source_location": "L1065",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -1979,7 +2093,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L59",
+      "source_location": "L63",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -1990,7 +2104,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1124",
+      "source_location": "L1078",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2001,7 +2115,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L157",
+      "source_location": "L161",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2012,7 +2126,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L96",
+      "source_location": "L100",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2023,7 +2137,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L81",
+      "source_location": "L85",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2034,7 +2148,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L238",
+      "source_location": "L242",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2045,7 +2159,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L561",
+      "source_location": "L523",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2056,7 +2170,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L69",
+      "source_location": "L73",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2067,7 +2181,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L390",
+      "source_location": "L394",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2078,7 +2192,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L402",
+      "source_location": "L406",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2089,7 +2203,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L386",
+      "source_location": "L390",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2100,7 +2214,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1167",
+      "source_location": "L1121",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2111,7 +2225,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L286",
+      "source_location": "L290",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2122,7 +2236,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L775",
+      "source_location": "L736",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2133,7 +2247,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L376",
+      "source_location": "L380",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2144,7 +2258,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1117",
+      "source_location": "L1071",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2155,7 +2269,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L365",
+      "source_location": "L369",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2177,7 +2291,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L75",
+      "source_location": "L79",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2199,7 +2313,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1133",
+      "source_location": "L1087",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2210,7 +2324,7 @@
       "relation": "indirect_call",
       "confidence": "INFERRED",
       "source_file": "client/dashboard.js",
-      "source_location": "L141",
+      "source_location": "L145",
       "weight": 1.0,
       "_origin": "ast",
       "context": "argument",
@@ -2222,7 +2336,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1034",
+      "source_location": "L988",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2233,7 +2347,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L930",
+      "source_location": "L884",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2244,7 +2358,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1384",
+      "source_location": "L1338",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2255,7 +2369,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1324",
+      "source_location": "L1278",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2266,7 +2380,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1244",
+      "source_location": "L1198",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2277,7 +2391,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L662",
+      "source_location": "L623",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2299,7 +2413,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L169",
+      "source_location": "L173",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2310,7 +2424,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L406",
+      "source_location": "L410",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2321,7 +2435,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L415",
+      "source_location": "L419",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2332,7 +2446,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1230",
+      "source_location": "L1184",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2343,7 +2457,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L622",
+      "source_location": "L583",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard",
@@ -2371,7 +2485,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L93",
+      "source_location": "L97",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_fetchgithubcontentsjson",
@@ -2383,7 +2497,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1149",
+      "source_location": "L1103",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_putgithubjsonfile",
@@ -2395,7 +2509,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L302",
+      "source_location": "L306",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_loadbusinessinfo",
@@ -2407,7 +2521,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L78",
+      "source_location": "L82",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_picknewestbusiness",
@@ -2419,7 +2533,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L292",
+      "source_location": "L296",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_loadbusinessinfo",
@@ -2431,7 +2545,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L111",
+      "source_location": "L115",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_fetchfreshbusinessfromgithubapi",
@@ -2443,7 +2557,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L288",
+      "source_location": "L292",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_loadbusinessinfo",
@@ -2455,7 +2569,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L132",
+      "source_location": "L136",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_refreshdashboardstate",
@@ -2467,7 +2581,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L131",
+      "source_location": "L135",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_refreshdashboardstate",
@@ -2479,7 +2593,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L133",
+      "source_location": "L137",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_refreshdashboardstate",
@@ -2491,7 +2605,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1077",
+      "source_location": "L1031",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_renderbuttonsbreakdown",
@@ -2503,7 +2617,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1396",
+      "source_location": "L1350",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_renderclientbuttonorderlist",
@@ -2515,7 +2629,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1363",
+      "source_location": "L1317",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_renderclientbuttonstylesgrid",
@@ -2527,7 +2641,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1278",
+      "source_location": "L1232",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_renderclientthemesgrid",
@@ -2539,7 +2653,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L684",
+      "source_location": "L645",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_renderdailymetricstable",
@@ -2551,7 +2665,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L289",
+      "source_location": "L293",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_loadbusinessinfo",
@@ -2563,7 +2677,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L377",
+      "source_location": "L381",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_mergenumericmapsmax",
@@ -2575,7 +2689,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L500",
+      "source_location": "L504",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_builddailyledger",
@@ -2587,7 +2701,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L563",
+      "source_location": "L525",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_filterledgerbyperiod",
@@ -2599,7 +2713,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L645",
+      "source_location": "L606",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_updatefilteruistate",
@@ -2611,7 +2725,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L488",
+      "source_location": "L492",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_builddailyledger",
@@ -2623,7 +2737,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L675",
+      "source_location": "L636",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_renderdailymetricstable",
@@ -2635,7 +2749,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L809",
+      "source_location": "L763",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_loadmetrics",
@@ -2647,7 +2761,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L704",
+      "source_location": "L665",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_applydashboardview",
@@ -2659,7 +2773,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L705",
+      "source_location": "L666",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_applydashboardview",
@@ -2671,7 +2785,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L707",
+      "source_location": "L668",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_applydashboardview",
@@ -2683,7 +2797,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L717",
+      "source_location": "L678",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_applydashboardview",
@@ -2695,7 +2809,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L709",
+      "source_location": "L670",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_applydashboardview",
@@ -2707,7 +2821,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L716",
+      "source_location": "L677",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_applydashboardview",
@@ -2719,7 +2833,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L715",
+      "source_location": "L676",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_applydashboardview",
@@ -2731,7 +2845,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L811",
+      "source_location": "L765",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_loadmetrics",
@@ -2743,7 +2857,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1108",
+      "source_location": "L1062",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_renderbuttonsbreakdown",
@@ -2755,7 +2869,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1208",
+      "source_location": "L1162",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_initclientdesigneditor",
@@ -2767,7 +2881,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1396",
+      "source_location": "L1350",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_renderclientbuttonorderlist",
@@ -2779,7 +2893,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1156",
+      "source_location": "L1110",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_putgithubjsonfile",
@@ -2791,7 +2905,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1227",
+      "source_location": "L1181",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_initclientdesigneditor",
@@ -2803,7 +2917,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1226",
+      "source_location": "L1180",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_initclientdesigneditor",
@@ -2815,7 +2929,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1225",
+      "source_location": "L1179",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_initclientdesigneditor",
@@ -2827,7 +2941,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "client/dashboard.js",
-      "source_location": "L1224",
+      "source_location": "L1178",
       "weight": 1.0,
       "_origin": "ast",
       "source": "client_dashboard_initclientdesigneditor",
@@ -2900,7 +3014,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L435",
+      "source_location": "L439",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer",
@@ -2911,7 +3025,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L38",
+      "source_location": "L42",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer",
@@ -2922,7 +3036,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L96",
+      "source_location": "L100",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer",
@@ -2933,7 +3047,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L80",
+      "source_location": "L84",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer",
@@ -2944,7 +3058,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L121",
+      "source_location": "L125",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer",
@@ -2955,7 +3069,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L48",
+      "source_location": "L52",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer",
@@ -2966,7 +3080,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L184",
+      "source_location": "L188",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer",
@@ -2977,7 +3091,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L54",
+      "source_location": "L58",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer",
@@ -2999,7 +3113,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L255",
+      "source_location": "L259",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer",
@@ -3010,7 +3124,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L60",
+      "source_location": "L64",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer",
@@ -3021,7 +3135,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L472",
+      "source_location": "L476",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer",
@@ -3033,7 +3147,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L92",
+      "source_location": "L96",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer_fetchgithubcontentsjson",
@@ -3045,7 +3159,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L57",
+      "source_location": "L61",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer_picknewestbusiness",
@@ -3057,7 +3171,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L114",
+      "source_location": "L118",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer_fetchfreshbusinessfromgithubapi",
@@ -3069,7 +3183,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L191",
+      "source_location": "L195",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer_loadbusinessprofile",
@@ -3081,7 +3195,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L105",
+      "source_location": "L109",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer_fetchfreshbusinessfromgithubapi",
@@ -3093,7 +3207,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L108",
+      "source_location": "L112",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer_fetchfreshbusinessfromgithubapi",
@@ -3105,7 +3219,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L187",
+      "source_location": "L191",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer_loadbusinessprofile",
@@ -3117,7 +3231,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L188",
+      "source_location": "L192",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer_loadbusinessprofile",
@@ -3129,7 +3243,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L246",
+      "source_location": "L250",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer_loadbusinessprofile",
@@ -3141,7 +3255,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L251",
+      "source_location": "L255",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer_loadbusinessprofile",
@@ -3153,7 +3267,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "p/viewer.js",
-      "source_location": "L259",
+      "source_location": "L263",
       "weight": 1.0,
       "_origin": "ast",
       "source": "p_viewer_renderprofile",
@@ -3351,5 +3465,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "9117535cbc6e91df2780ef224c2bcbf8f387e483"
+  "built_at_commit": "44849e67f17daaf9f4febccede1529b7d731769c"
 }
