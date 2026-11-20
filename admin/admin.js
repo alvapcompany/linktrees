@@ -658,10 +658,10 @@ function updateLivePreview() {
       ${data.categoria ? `<div class="category">${escapeHtml(data.categoria)}</div>` : ''}
       ${data.descripcion ? `<div class="desc">${escapeHtml(data.descripcion)}</div>` : ''}
       
-      <div class="badge">
+      ${(data.link_google_negocio || "").trim() ? `<div class="badge">
         <i class="fab fa-google" style="color: #4285F4;"></i>
         <span>4.9</span> <span style="color: #f59e0b;">★★★★★</span>
-      </div>
+      </div>` : ''}
 
       <div class="buttons-list">
         ${buttons.map(b => {

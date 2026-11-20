@@ -354,7 +354,7 @@
     }
 
     const effectiveBizId = b.id || businessId;
-    const reviewUrl = b.link_google_negocio || b.boton_ubicacion || "#";
+    const reviewUrl = (b.link_google_negocio || "").trim();
 
     app.innerHTML = `
       <div class="header-card">
@@ -367,12 +367,12 @@
         ${b.categoria ? `<span class="business-category">${b.categoria}</span>` : ""}
         ${b.descripcion ? `<p class="business-desc">${b.descripcion}</p>` : ""}
         
-        <a href="${reviewUrl}" target="_blank" rel="noopener noreferrer" class="google-badge" onclick="trackClick('${effectiveBizId}', 'google_reviews_badge')">
+        ${reviewUrl ? `<a href="${reviewUrl}" target="_blank" rel="noopener noreferrer" class="google-badge" onclick="trackClick('${effectiveBizId}', 'google_reviews_badge')">
           <i class="fab fa-google" style="color: #4285F4;"></i>
           <span>4.9</span>
           <span class="stars">★★★★★</span>
           <span style="opacity: 0.8; font-size: 0.78rem;">(Reseñas)</span>
-        </a>
+        </a>` : ""}
       </div>
 
       <div class="links-list">
