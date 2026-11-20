@@ -157,7 +157,7 @@
     "color_btn_ubicacion": "#ea4335",
     "color_btn_extra": "#eab308",
     "estilo_botones": "icon_only",
-    "link_google_negocio": "https://search.google.com/local/writereview?placeid=ChIJc5knYKpyiIYR1JvV5aVBj7E ",
+    "link_google_negocio": "https://search.google.com/local/writereview?placeid=ChIJmfHj0khziIYRLuHj9cVYhWU ",
     "password": "Al3m4n.123",
     "botones_adicionales": [],
     "orden_botones": [
@@ -166,7 +166,7 @@
       "facebook"
     ],
     "custom_colors_active": false,
-    "fecha_actualizacion": "2026-11-20T02:25:40.706Z"
+    "fecha_actualizacion": "2026-11-20T02:28:07.631Z"
   },
   "raul-dj": {
     "id": "raul-dj",
