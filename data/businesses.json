@@ -153,8 +153,8 @@
     "boton_ubicacion": "https://www.google.com/maps/dir//Despacho+Jur%C3%ADdico+Alem%C3%A1n,+Oaxaca+989,+Rep%C3%BAblica+Oriente,+25280+Saltillo,+Coah./@25.4375536,-100.9861402,17z/data=!4m16!1m7!3m6!1s0x86887348d2e3f199:0x658558c5f5e3e12e!2sDespacho+Jur%C3%ADdico+Alem%C3%A1n!8m2!3d25.4375536!4d-100.9835653!16s%2Fg%2F11l256j4x7!4m7!1m0!1m5!1m1!1s0x86887348d2e3f199:0x658558c5f5e3e12e!2m2!1d-100.9835653!2d25.4375536?hl=es-419&entry=ttu&g_ep=EgoyMDI2MTExNy4wIKXMDSoASAFQAw%3D%3D",
     "boton_extra_label": "",
     "boton_extra_url": "",
-    "color_primario": "#cc9e8e",
-    "color_acento": "#ff0000",
+    "color_primario": "#ffffff",
+    "color_acento": "#0040ff",
     "color_btn_whatsapp": "#25d366",
     "color_btn_instagram": "#e1306c",
     "color_btn_facebook": "#1877f2",
@@ -165,12 +165,13 @@
     "password": "Al3m4n.123",
     "botones_adicionales": [],
     "orden_botones": [
+      "ubicacion",
       "whatsapp",
       "instagram",
       "facebook"
     ],
-    "custom_colors_active": false,
-    "fecha_actualizacion": "2026-11-20T02:54:17.710Z"
+    "custom_colors_active": true,
+    "fecha_actualizacion": "2026-11-20T02:56:57.835Z"
   },
   "raul-dj": {
     "id": "raul-dj",
