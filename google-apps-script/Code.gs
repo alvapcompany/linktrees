@@ -557,7 +557,6 @@ function recordEvent(event) {
   ]);
 
   if (cleanBizId) {
-    syncDailySheetFromRawMetrics();
     upsertDailyMetricsRow(parsedBtn.dateKey, cleanBizId, tipo, cleanBoton, visitor, nowIso);
   }
 }
@@ -584,8 +583,6 @@ function matchesRequestedPeriod(dateKey, period, targetDate) {
  * Obtiene métricas agregadas y filas diarias estructuradas para un negocio
  */
 function getBusinessMetrics(id, period, targetDate) {
-  syncDailySheetFromRawMetrics();
-
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheetDaily = ss.getSheetByName(SHEET_DAILY_METRICS);
   const cleanId = String(id || "").trim().toLowerCase();

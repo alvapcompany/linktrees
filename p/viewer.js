@@ -13,7 +13,11 @@
   // Limpiar Cache Storage, Service Workers y caché local de perfil en móviles (iOS/Android)
   function purgeBrowserCaches(refreshCss = false) {
     try {
-      localStorage.removeItem("alvap_biz_" + businessId);
+      Object.keys(localStorage).forEach(k => {
+        if (k.startsWith("alvap_stats_") || k.startsWith("alvap_biz_")) {
+          localStorage.removeItem(k);
+        }
+      });
       if ("caches" in window && typeof window.caches.keys === "function") {
         window.caches.keys().then(keys => {
           keys.forEach(k => window.caches.delete(k));
@@ -474,33 +478,7 @@
     const cleanBtnId = (buttonId || "").trim().toLowerCase();
     const todayKey = new Date().toISOString().split("T")[0];
 
-    // 1. Guardar en registro local por día y por botón para reflejo inmediato en dashboard
-    try {
-      const statsKey = "alvap_stats_" + cleanBizId;
-      const stats = JSON.parse(localStorage.getItem(statsKey) || '{"views":0,"clicks":{},"visitors":[],"views_by_date":{},"clicks_by_date":{},"clicks_by_date_button":{}}');
-      stats.views = Number(stats.views) || 0;
-      stats.clicks = (stats.clicks && typeof stats.clicks === "object") ? stats.clicks : {};
-      stats.visitors = Array.isArray(stats.visitors) ? stats.visitors : [];
-      stats.views_by_date = (stats.views_by_date && typeof stats.views_by_date === "object") ? stats.views_by_date : {};
-      stats.clicks_by_date = (stats.clicks_by_date && typeof stats.clicks_by_date === "object") ? stats.clicks_by_date : {};
-      stats.clicks_by_date_button = (stats.clicks_by_date_button && typeof stats.clicks_by_date_button === "object") ? stats.clicks_by_date_button : {};
-
-      if (type === "view") {
-        stats.views += 1;
-        if (!stats.visitors.includes(visitorId)) stats.visitors.push(visitorId);
-        stats.views_by_date[todayKey] = (Number(stats.views_by_date[todayKey]) || 0) + 1;
-      } else if (type === "click" && cleanBtnId) {
-        stats.clicks[cleanBtnId] = (Number(stats.clicks[cleanBtnId]) || 0) + 1;
-        stats.clicks_by_date[todayKey] = (Number(stats.clicks_by_date[todayKey]) || 0) + 1;
-        if (!stats.clicks_by_date_button[todayKey] || typeof stats.clicks_by_date_button[todayKey] !== "object") {
-          stats.clicks_by_date_button[todayKey] = {};
-        }
-        stats.clicks_by_date_button[todayKey][cleanBtnId] = (Number(stats.clicks_by_date_button[todayKey][cleanBtnId]) || 0) + 1;
-      }
-      localStorage.setItem(statsKey, JSON.stringify(stats));
-    } catch (e) {}
-
-    // 2. Transmitir a Google Apps Script vía GET (?action=track) para evitar bloqueo OPTIONS preflight en Chrome/Safari
+    // Transmitir directamente a Google Apps Script vía GET (?action=track) para evitar bloqueo OPTIONS preflight en Chrome/Safari
     const gasUrl = (currentBusinessData && currentBusinessData.gas_url)
       || (window.INITIAL_BUSINESS && window.INITIAL_BUSINESS.gas_url)
       || ((typeof CONFIG !== "undefined" && CONFIG.googleAppsScriptUrl)

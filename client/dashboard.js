@@ -34,7 +34,11 @@ let cachedRawDataset = null;
 
 function purgeBrowserCaches(refreshCss = false) {
   try {
-    localStorage.removeItem("alvap_biz_" + businessId);
+    Object.keys(localStorage).forEach(k => {
+      if (k.startsWith("alvap_stats_") || k.startsWith("alvap_biz_")) {
+        localStorage.removeItem(k);
+      }
+    });
     if ("caches" in window && typeof window.caches.keys === "function") {
       window.caches.keys().then(keys => {
         keys.forEach(k => window.caches.delete(k));
@@ -508,48 +512,6 @@ function buildDailyLedger(cloudMetrics, localStats) {
     }
   }
 
-  // D. Datos locales del dispositivo (views_by_date, clicks_by_date, clicks_by_date_button)
-  if (localStats) {
-    if (localStats.views_by_date) {
-      Object.keys(localStats.views_by_date).forEach(d => {
-        const row = ensureDateRow(d);
-        row.views = Math.max(row.views, Number(localStats.views_by_date[d]) || 0);
-      });
-    }
-    if (localStats.clicks_by_date) {
-      Object.keys(localStats.clicks_by_date).forEach(d => {
-        const row = ensureDateRow(d);
-        row.total_clicks = Math.max(row.total_clicks, Number(localStats.clicks_by_date[d]) || 0);
-      });
-    }
-    if (localStats.clicks_by_date_button) {
-      Object.keys(localStats.clicks_by_date_button).forEach(d => {
-        const row = ensureDateRow(d);
-        const dayBtns = localStats.clicks_by_date_button[d] || {};
-        Object.keys(dayBtns).forEach(bk => {
-          const cleanBk = stripButtonDateSuffix(bk).cleanKey;
-          if (cleanBk) {
-            row.clicks_by_button[cleanBk] = Math.max(Number(row.clicks_by_button[cleanBk]) || 0, Number(dayBtns[bk]) || 0);
-          }
-        });
-      });
-    } else if (localStats.clicks) {
-      const sortedDates = Object.keys(byDate).sort();
-      const targetFallbackDate = sortedDates.length ? sortedDates[sortedDates.length - 1] : getTodayDateStr();
-      Object.keys(localStats.clicks).forEach(bk => {
-        const cleanBk = stripButtonDateSuffix(bk).cleanKey;
-        const val = Number(localStats.clicks[bk]) || 0;
-        if (cleanBk && val > 0) {
-          const alreadySummed = Object.values(byDate).reduce((acc, r) => acc + (Number(r.clicks_by_button[cleanBk]) || 0), 0);
-          if (val > alreadySummed) {
-            const row = ensureDateRow(targetFallbackDate);
-            row.clicks_by_button[cleanBk] = (Number(row.clicks_by_button[cleanBk]) || 0) + (val - alreadySummed);
-          }
-        }
-      });
-    }
-  }
-
   return Object.values(byDate).map(row => {
     const sumBtns = Object.values(row.clicks_by_button).reduce((a, b) => a + (Number(b) || 0), 0);
     row.total_clicks = Math.max(row.total_clicks, sumBtns);
@@ -597,10 +559,9 @@ function aggregateFilteredMetrics(filteredRows, cloudMetrics, localStats, period
 
   let uniqueVisitors = 0;
   if (period === "all") {
-    const localVisitorsCount = (localStats && Array.isArray(localStats.visitors)) ? localStats.visitors.length : 0;
-    views = Math.max(views, Number(cloudMetrics && cloudMetrics.total_views) || 0, Number(localStats && localStats.views) || 0);
+    views = Math.max(views, Number(cloudMetrics && cloudMetrics.total_views) || 0);
     clicks = Math.max(clicks, Number(cloudMetrics && cloudMetrics.total_clicks) || 0);
-    uniqueVisitors = Math.max(Number(cloudMetrics && cloudMetrics.unique_visitors) || 0, localVisitorsCount, views > 0 ? 1 : 0);
+    uniqueVisitors = Number(cloudMetrics && cloudMetrics.unique_visitors) || (views > 0 ? 1 : 0);
   } else {
     const summedVisitors = filteredRows.reduce((acc, r) => acc + (Number(r.unique_visitors) || Number(r.views) || 0), 0);
     uniqueVisitors = views > 0 ? Math.max(1, Math.min(views, summedVisitors || views)) : 0;
@@ -795,15 +756,8 @@ async function loadMetrics() {
     }
   }
 
-  // 2. Leer métricas locales del dispositivo para reflejo inmediato
-  let localStats = null;
-  try {
-    const cleanId = String(businessId || "").trim().toLowerCase();
-    const raw = localStorage.getItem("alvap_stats_" + cleanId) || localStorage.getItem("alvap_stats_" + businessId);
-    if (raw) {
-      localStats = JSON.parse(raw);
-    }
-  } catch (e) {}
+  // 2. Sin mezcla con caché local: todas las métricas provienen exclusivamente de Google Sheets
+  const localStats = null;
 
   // 3. Construir registro estructurado por día/semana/mes y aplicar el filtro activo
   const ledger = buildDailyLedger(cloudMetrics, localStats);
