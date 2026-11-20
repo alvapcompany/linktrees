@@ -641,7 +641,7 @@ function updateLivePreview() {
         .avatar { width: 84px; height: 84px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); object-fit: cover; background: #1e293b; z-index: 2; margin-bottom: 10px; }
         h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 2px; text-align: center; }
         .category { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.75; margin-bottom: 6px; }
-        .desc { font-size: 0.85rem; opacity: 0.85; text-align: center; margin-bottom: 12px; }
+        .desc { font-size: 0.85rem; opacity: 0.85; text-align: center; margin-bottom: 12px; white-space: pre-line; }
         .badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.12); padding: 5px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; margin-bottom: 16px; }
         .buttons-list { width: 100%; display: flex; flex-direction: column; gap: 10px; }
         .btn-card { display: flex; align-items: center; padding: 12px 14px; border-radius: 14px; background: ${cardBg}; border: 1px solid ${cardBorder}; text-decoration: none; color: inherit; }

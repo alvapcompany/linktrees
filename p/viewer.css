@@ -118,6 +118,7 @@ body {
   opacity: 0.88;
   max-width: 90%;
   margin-bottom: 12px;
+  white-space: pre-line;
 }
 
 /* Badge de Google Reviews */
