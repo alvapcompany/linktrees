@@ -156,11 +156,11 @@
     "color_btn_facebook": "#1877f2",
     "color_btn_ubicacion": "#ea4335",
     "color_btn_extra": "#eab308",
-    "estilo_botones": "border_glow",
+    "estilo_botones": "full_card",
     "link_google_negocio": "",
     "password": "Al3m4n.123",
     "botones_adicionales": [],
-    "fecha_actualizacion": "2026-11-20T01:30:36.721Z",
+    "fecha_actualizacion": "2026-11-20T01:30:56.196Z",
     "custom_colors_active": false,
     "orden_botones": [
       "whatsapp",
