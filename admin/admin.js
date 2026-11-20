@@ -662,7 +662,7 @@ function updateLivePreview() {
       
       ${(data.link_google_negocio || "").trim() ? `<div class="badge">
         <i class="fab fa-google" style="color: #4285F4;"></i>
-        <span>${escapeHtml(String(data.google_rating || "4.9"))}</span> <span style="color: #f59e0b;">★★★★★</span>
+        <span>Reseñas Google</span> <span style="color: #f59e0b;">★★★★★</span>
       </div>` : ''}
 
       <div class="buttons-list">
