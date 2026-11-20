@@ -94,7 +94,9 @@
     "link_google_negocio": "https://search.google.com/local/writereview?placeid=ChIJbaosTyETiIYRESo-idjTaX0",
     "password": "VAINILLA123",
     "botones_adicionales": [],
-    "fecha_actualizacion": "2026-11-16T19:35:33.342Z"
+    "fecha_actualizacion": "2026-11-20T02:41:05.589Z",
+    "google_rating": 4.4,
+    "google_total_reviews": 709
   },
   "barbacoasofi": {
     "id": "barbacoasofi",
