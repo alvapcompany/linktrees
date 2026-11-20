@@ -556,6 +556,8 @@ function getFormData() {
     color_btn_extra: document.getElementById("btnExtraColor") ? document.getElementById("btnExtraColor").value : "#eab308",
     estilo_botones: document.getElementById("estiloBotones") ? document.getElementById("estiloBotones").value : "icon_only",
     link_google_negocio: document.getElementById("linkGoogle").value || "",
+    google_rating: (businesses[id] && businesses[id].google_rating) || undefined,
+    google_total_reviews: (businesses[id] && businesses[id].google_total_reviews) || undefined,
     password: document.getElementById("businessPassword") ? document.getElementById("businessPassword").value.trim() : "",
     botones_adicionales: extraBtns,
     orden_botones: (businesses[id] && Array.isArray(businesses[id].orden_botones)) ? businesses[id].orden_botones : undefined,
@@ -660,7 +662,7 @@ function updateLivePreview() {
       
       ${(data.link_google_negocio || "").trim() ? `<div class="badge">
         <i class="fab fa-google" style="color: #4285F4;"></i>
-        <span>4.9</span> <span style="color: #f59e0b;">★★★★★</span>
+        <span>${escapeHtml(String(data.google_rating || "4.9"))}</span> <span style="color: #f59e0b;">★★★★★</span>
       </div>` : ''}
 
       <div class="buttons-list">

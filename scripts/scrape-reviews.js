@@ -13,8 +13,47 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const DATA_FILE = path.join(__dirname, '..', 'data', 'businesses.json');
 const CONFIG_FILE = path.join(__dirname, '..', 'config.js');
 
+async function fetchPlaceRatingViaHttp(googleInput) {
+  const raw = String(googleInput || '').trim();
+  if (!raw) return null;
+  const pidMatch = raw.match(/(?:placeid=|place_id:|^)(ChIJ[a-zA-Z0-9_-]+)/i);
+  const placeId = pidMatch ? pidMatch[1] : '';
+  const mapsUrl = placeId
+    ? `https://www.google.com/maps/place/?q=place_id:${encodeURIComponent(placeId)}&hl=es-419&gl=MX`
+    : (/^https?:\/\//i.test(raw) ? raw : '');
+  if (!mapsUrl) return null;
+
+  const headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+    'Accept-Language': 'es-419,es-MX;q=0.9,es;q=0.8'
+  };
+
+  try {
+    const res = await fetch(mapsUrl, { headers, redirect: 'follow' });
+    if (!res.ok) return null;
+    const html = await res.text();
+    const previewMatch = html.match(/\/maps\/preview\/place\?authuser=0[^"'\s\\]+/);
+    if (!previewMatch) return null;
+
+    const previewUrl = 'https://www.google.com' + previewMatch[0].replace(/&amp;/g, '&');
+    const prevRes = await fetch(previewUrl, { headers, redirect: 'follow' });
+    if (!prevRes.ok) return null;
+    const prevText = await prevRes.text();
+    const tupleMatch = prevText.match(/null,([1-5]\.\d),(\d+),null/);
+    if (!tupleMatch) return null;
+
+    return {
+      placeId,
+      rating: parseFloat(tupleMatch[1]),
+      total: parseInt(tupleMatch[2], 10)
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
 async function main() {
-  console.log('🚀 Iniciando Scraper de Reseñas de Google Maps en GitHub Actions...');
+  console.log('🚀 Iniciando Scraper de Reseñas de Google Maps...');
 
   if (!fs.existsSync(DATA_FILE)) {
     console.error('❌ No se encontró data/businesses.json');
@@ -32,39 +71,76 @@ async function main() {
     if (match) gasUrl = match[1];
   }
 
-  const browser = await puppeteer.launch({
-    headless: 'new',
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-accelerated-2d-canvas',
-      '--no-first-run',
-      '--no-zygote',
-      '--disable-gpu',
-      '--window-size=1280,900',
-      '--lang=es-419,es-MX,es'
-    ]
-  });
+  let browser = null;
+  try {
+    browser = await puppeteer.launch({
+      headless: 'new',
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--disable-gpu',
+        '--window-size=1280,900',
+        '--lang=es-419,es-MX,es'
+      ]
+    });
+  } catch (launchErr) {
+    console.warn('⚠️ Chromium/Puppeteer no disponible, usando extracción HTTP por Place ID:', launchErr.message);
+  }
 
   const businessKeys = Object.keys(businesses);
   console.log(`📋 Total de negocios a inspeccionar: ${businessKeys.length}`);
 
   for (const id of businessKeys) {
     const b = businesses[id];
-    let googleUrl = b.link_google_negocio || b.boton_ubicacion;
+    const rawGoogleRef = b.link_google_negocio || '';
+    let googleUrl = rawGoogleRef || b.boton_ubicacion || '';
 
-    // Si es enlace de writereview directo, convertir a enlace de ficha para poder inspeccionar las reseñas
-    if (googleUrl && googleUrl.includes('writereview?placeid=')) {
-      const pIdMatch = googleUrl.match(/placeid=([a-zA-Z0-9_-]+)/);
-      if (pIdMatch) {
-        googleUrl = `https://www.google.com/maps/place/?q=place_id:${pIdMatch[1]}`;
-      }
+    // Extracción HTTP rápida por Place ID (actualiza google_rating y google_total_reviews sin Chromium)
+    const httpStats = await fetchPlaceRatingViaHttp(rawGoogleRef);
+    if (httpStats) {
+      b.google_rating = httpStats.rating;
+      b.google_total_reviews = httpStats.total;
+      console.log(`⭐ [${id}] Calificación actual vía Place ID: ${httpStats.rating}★ (${httpStats.total} reseñas)`);
+    }
+
+    // Si es solo un Place ID o enlace de writereview, convertir a enlace de ficha Maps
+    const pidMatch = googleUrl.match(/(?:placeid=|place_id:|^)(ChIJ[a-zA-Z0-9_-]+)/i);
+    if (pidMatch) {
+      googleUrl = `https://www.google.com/maps/place/?q=place_id:${pidMatch[1]}`;
     }
 
     // Verificar si es un enlace válido de Google Maps (incluyendo goo.gl y google.com)
     if (!googleUrl || (!googleUrl.includes('google.com') && !googleUrl.includes('goo.gl'))) {
-      console.log(`⏩ Saltando [${id}] - No tiene enlace de Google Maps.`);
+      console.log(`⏩ Saltando [${id}] - No tiene enlace o Place ID de Google.`);
+      continue;
+    }
+
+    if (!browser) {
+      const targetGas = b.gas_url || gasUrl;
+      if (targetGas && httpStats) {
+        try {
+          await fetch(targetGas, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({
+              action: 'save_reviews',
+              business_id: id,
+              data: {
+                rating_promedio: httpStats.rating,
+                total_reviews: httpStats.total,
+                reviews: (b.google_reviews && b.google_reviews.reviews) || []
+              }
+            })
+          });
+          console.log(`✅ [${id}] Calificación ${httpStats.rating}★ (${httpStats.total}) sincronizada en Google Sheets.`);
+        } catch (e) {
+          console.warn(`⚠️ Google Sheets sync falló para [${id}]:`, e.message);
+        }
+      }
       continue;
     }
 
@@ -358,8 +434,10 @@ async function main() {
       });
 
       // Mantener rating y total real de Google Maps (sin degradar a conteo parcial)
-      const realTotal = stats.total || (b.google_reviews && b.google_reviews.total_reviews) || 683;
-      const realRating = stats.rating || (b.google_reviews && b.google_reviews.rating_promedio) || 4.4;
+      const realTotal = (httpStats && httpStats.total) || stats.total || (b.google_reviews && b.google_reviews.total_reviews) || 0;
+      const realRating = (httpStats && httpStats.rating) || stats.rating || (b.google_reviews && b.google_reviews.rating_promedio) || 4.9;
+      if (realRating) b.google_rating = realRating;
+      if (realTotal) b.google_total_reviews = realTotal;
 
       if (maxOneMonthReviews.length > 0) {
         b.google_reviews = {
@@ -374,11 +452,12 @@ async function main() {
       }
 
       // Sincronizar con Google Sheets si está disponible
-      if (gasUrl && b.google_reviews) {
+      const targetGas = b.gas_url || gasUrl;
+      if (targetGas && (b.google_reviews || b.google_rating)) {
         try {
           console.log(`☁️ Transmitiendo reseñas y datos a Google Sheets...`);
           // 1. Guardar en Reseñas_Cache
-          await fetch(gasUrl, {
+          await fetch(targetGas, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify({
@@ -386,11 +465,11 @@ async function main() {
               business_id: id,
               google_place_url: googleUrl,
               business_name: b.nombre_negocio,
-              data: b.google_reviews
+              data: b.google_reviews || { rating_promedio: realRating, total_reviews: realTotal, reviews: [] }
             })
           });
           // 2. Guardar actualización en Negocios
-          await fetch(gasUrl, {
+          await fetch(targetGas, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify({
@@ -410,7 +489,7 @@ async function main() {
     }
   }
 
-  await browser.close();
+  if (browser) await browser.close();
 
   // Guardar archivo actualizado
   fs.writeFileSync(DATA_FILE, JSON.stringify(businesses, null, 2), 'utf8');

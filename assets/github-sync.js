@@ -61,7 +61,9 @@ const GitHubSync = {
       deploy_individual_repo: deployIndividual,
       repo_url: rawCopy.repo_url || (deployIndividual ? repoUrl : ""),
       pages_url: rawCopy.pages_url || (deployIndividual ? pagesUrl : ""),
-      dashboard_url: rawCopy.dashboard_url || (deployIndividual ? dashboardUrl : "")
+      dashboard_url: rawCopy.dashboard_url || (deployIndividual ? dashboardUrl : ""),
+      google_rating: rawCopy.google_rating || undefined,
+      google_total_reviews: rawCopy.google_total_reviews || undefined
     };
   },
 

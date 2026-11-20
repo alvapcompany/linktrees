@@ -358,7 +358,9 @@
     }
 
     const effectiveBizId = b.id || businessId;
-    const reviewUrl = (b.link_google_negocio || "").trim();
+    const googleInfo = resolveGooglePlaceInfo(b.link_google_negocio);
+    const initialRating = b.google_rating || (b.google_reviews && b.google_reviews.rating_promedio) || "★";
+    const initialReviewsCount = b.google_total_reviews || (b.google_reviews && b.google_reviews.total_reviews) || 0;
 
     app.innerHTML = `
       <div class="header-card">
@@ -371,11 +373,11 @@
         ${b.categoria ? `<span class="business-category">${b.categoria}</span>` : ""}
         ${b.descripcion ? `<p class="business-desc">${b.descripcion}</p>` : ""}
         
-        ${reviewUrl ? `<a href="${reviewUrl}" target="_blank" rel="noopener noreferrer" class="google-badge" onclick="trackClick('${effectiveBizId}', 'google_reviews_badge')">
+        ${googleInfo ? `<a href="${escapeHtml(googleInfo.url)}" target="_blank" rel="noopener noreferrer" class="google-badge" onclick="trackClick('${effectiveBizId}', 'google_reviews_badge')">
           <i class="fab fa-google" style="color: #4285F4;"></i>
-          <span>4.9</span>
+          <span id="googleRatingValue">${escapeHtml(String(initialRating))}</span>
           <span class="stars">★★★★★</span>
-          <span style="opacity: 0.8; font-size: 0.78rem;">(Reseñas)</span>
+          <span id="googleReviewsCount" style="opacity: 0.8; font-size: 0.78rem;">(${initialReviewsCount ? escapeHtml(String(initialReviewsCount)) + " reseñas" : "Reseñas"})</span>
         </a>` : ""}
       </div>
 
@@ -434,6 +436,57 @@
         </div>
       </div>
     `;
+
+    if (googleInfo) {
+      refreshLiveGoogleRating(effectiveBizId, b, googleInfo);
+    }
+  }
+
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function resolveGooglePlaceInfo(rawInput) {
+    const clean = (rawInput || "").trim();
+    if (!clean) return null;
+    const pidMatch = clean.match(/(?:placeid=|place_id:|^)(ChIJ[a-zA-Z0-9_-]+)/i);
+    const placeId = pidMatch ? pidMatch[1] : "";
+    const url = /^https?:\/\//i.test(clean)
+      ? clean
+      : (placeId ? `https://search.google.com/local/writereview?placeid=${encodeURIComponent(placeId)}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clean)}`);
+    return { placeId, url };
+  }
+
+  async function refreshLiveGoogleRating(bizId, bizObj, googleInfo) {
+    const gasUrl = (bizObj && bizObj.gas_url)
+      || ((typeof CONFIG !== "undefined" && CONFIG.googleAppsScriptUrl) ? CONFIG.googleAppsScriptUrl : localStorage.getItem("alvap_gas_url"));
+    if (!gasUrl || !googleInfo) return;
+
+    try {
+      const placeParam = googleInfo.placeId || googleInfo.url;
+      const res = await fetch(
+        `${gasUrl}${gasUrl.includes("?") ? "&" : "?"}action=get_reviews&id=${encodeURIComponent(bizId)}&place=${encodeURIComponent(placeParam)}&_t=${Date.now()}`,
+        { cache: "no-store" }
+      );
+      if (!res.ok) return;
+      const json = await res.json();
+      if (!json || !json.success || !json.data) return;
+
+      const ratingEl = document.getElementById("googleRatingValue");
+      const countEl = document.getElementById("googleReviewsCount");
+      if (ratingEl && json.data.rating_promedio) {
+        ratingEl.textContent = String(json.data.rating_promedio);
+      }
+      if (countEl && Number(json.data.total_reviews) > 0) {
+        countEl.textContent = `(${json.data.total_reviews} reseñas)`;
+      }
+    } catch (e) {}
   }
 
   function applyTheme(themeId, primary, accent, customColorsActive) {

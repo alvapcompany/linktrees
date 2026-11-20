@@ -135,7 +135,7 @@ function doGet(e) {
     if (action === "get_reviews") {
       const id = params.id;
       if (!id) return jsonResponse({ success: false, error: "ID requerido" });
-      const reviews = getGoogleReviews(id);
+      const reviews = getGoogleReviews(id, params.place || "");
       return jsonResponse({ success: true, data: reviews });
     }
 
@@ -688,32 +688,56 @@ function scrapeAndCacheReviews(businessId, googleUrl, businessName) {
 
   let rating = 4.9;
   let totalReviews = 28;
+  let gotLiveRating = false;
   let reviews = [];
 
-  if (googleUrl && googleUrl.includes("google.com")) {
+  const rawGoogle = String(googleUrl || "").trim();
+  const pidMatch = rawGoogle.match(/(?:placeid=|place_id:|^)(ChIJ[a-zA-Z0-9_-]+)/i);
+  const placeId = pidMatch ? pidMatch[1] : "";
+  const targetMapsUrl = placeId
+    ? `https://www.google.com/maps/place/?q=place_id:${encodeURIComponent(placeId)}&hl=es-419&gl=MX`
+    : rawGoogle;
+
+  if (targetMapsUrl && (targetMapsUrl.includes("google.com") || targetMapsUrl.includes("goo.gl"))) {
     try {
-      // Intentar fetch público de la página de Google Maps/Search para extraer rating y reseñas
-      const response = UrlFetchApp.fetch(googleUrl, {
+      const fetchOpts = {
         muteHttpExceptions: true,
+        followRedirects: true,
         headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-          "Accept-Language": "es-ES,es;q=0.9,en;q=0.8"
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+          "Accept-Language": "es-419,es-MX;q=0.9,es;q=0.8"
         }
-      });
+      };
+      const response = UrlFetchApp.fetch(targetMapsUrl, fetchOpts);
       const html = response.getContentText();
 
-      // Extraer puntuación promedio (ej: 4.8 o 5,0)
-      const ratingMatch = html.match(/(\d[.,]\d)\s*(?:estrellas|stars|puntuación)/i) ||
-                          html.match(/class="[^"]*fontDisplayLarge[^"]*">(\d[.,]\d)</i) ||
-                          html.match(/"rating":\s*(\d[.,]\d)/i);
-      if (ratingMatch) {
-        rating = parseFloat(ratingMatch[1].replace(",", "."));
+      // 1. Extracción directa vía endpoint interno /maps/preview/place (funciona por Place ID sin navegador)
+      const previewMatch = html.match(/\/maps\/preview\/place\?authuser=0[^"'\s\\]+/);
+      if (previewMatch) {
+        const previewPath = previewMatch[0].replace(/&amp;/g, "&");
+        const prevRes = UrlFetchApp.fetch("https://www.google.com" + previewPath, fetchOpts);
+        const prevText = prevRes.getContentText();
+        const tupleMatch = prevText.match(/null,([1-5]\.\d),(\d+),null/);
+        if (tupleMatch) {
+          rating = parseFloat(tupleMatch[1]);
+          totalReviews = parseInt(tupleMatch[2], 10);
+          gotLiveRating = true;
+        }
       }
 
-      // Extraer número de reseñas
-      const countMatch = html.match(/([\d.,]+)\s*(?:reseñas|reviews|opiniones)/i);
-      if (countMatch) {
-        totalReviews = parseInt(countMatch[1].replace(/[.,]/g, ""), 10);
+      // 2. Respaldo por expresiones regulares en HTML
+      if (!gotLiveRating) {
+        const ratingMatch = html.match(/(\d[.,]\d)\s*(?:estrellas|stars|puntuación)/i) ||
+                            html.match(/class="[^"]*fontDisplayLarge[^"]*">(\d[.,]\d)</i) ||
+                            html.match(/"rating":\s*(\d[.,]\d)/i);
+        if (ratingMatch) {
+          rating = parseFloat(ratingMatch[1].replace(",", "."));
+          gotLiveRating = true;
+        }
+        const countMatch = html.match(/([\d.,]+)\s*(?:reseñas|reviews|opiniones)/i);
+        if (countMatch) {
+          totalReviews = parseInt(countMatch[1].replace(/[.,]/g, ""), 10);
+        }
       }
 
       // Extraer fragmentos de reseñas
@@ -735,11 +759,13 @@ function scrapeAndCacheReviews(businessId, googleUrl, businessName) {
   }
 
   // Si no se pudieron raspar reseñas en vivo por bloqueos de bot de Google,
-  // proveer las opiniones reales más recientes clasificadas por fecha
+  // proveer opiniones de respaldo sin sobreescribir la calificación real obtenida
   if (reviews.length === 0) {
     if (businessId === "vainilla-saltillo") {
-      rating = 4.8;
-      totalReviews = 86;
+      if (!gotLiveRating) {
+        rating = 4.8;
+        totalReviews = 86;
+      }
       reviews = [
         {
           autor: "Mariana Morales G.",
@@ -871,13 +897,23 @@ function saveReviewsToCache(businessId, rating, totalReviews, reviews) {
 /**
  * Obtiene reseñas en caché de un negocio
  */
-function getGoogleReviews(businessId) {
+function getGoogleReviews(businessId, placeHint) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName(SHEET_REVIEWS);
   const rows = sheet.getDataRange().getValues();
 
   for (let i = 1; i < rows.length; i++) {
-    if (String(rows[i][0]).toLowerCase() === businessId.toLowerCase()) {
+    if (String(rows[i][0]).toLowerCase() === String(businessId).toLowerCase()) {
+      const updatedAt = rows[i][4] ? new Date(rows[i][4]).getTime() : 0;
+      const ageMs = Date.now() - (isFinite(updatedAt) ? updatedAt : 0);
+      const hasStaleFallback = Number(rows[i][2]) === 28 && Number(rows[i][1]) === 4.9;
+      if (ageMs > 6 * 3600 * 1000 || (placeHint && hasStaleFallback)) {
+        const bizFresh = getBusinessById(businessId);
+        const refUrl = placeHint || (bizFresh && bizFresh.link_google_negocio) || "";
+        if (refUrl) {
+          return scrapeAndCacheReviews(businessId, refUrl, bizFresh && bizFresh.nombre_negocio);
+        }
+      }
       let reviews = [];
       try {
         reviews = JSON.parse(rows[i][3]);
@@ -894,10 +930,11 @@ function getGoogleReviews(businessId) {
     }
   }
 
-  // Si no hay en caché, intentar sincronizar si conocemos el negocio
+  // Si no hay en caché, intentar sincronizar si conocemos el negocio o recibimos placeHint
   const biz = getBusinessById(businessId);
-  if (biz) {
-    return scrapeAndCacheReviews(businessId, biz.link_google_negocio, biz.nombre_negocio);
+  const targetRef = placeHint || (biz && biz.link_google_negocio) || "";
+  if (biz || targetRef) {
+    return scrapeAndCacheReviews(businessId, targetRef, biz && biz.nombre_negocio);
   }
 
   return {
