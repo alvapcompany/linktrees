@@ -12,7 +12,7 @@
     "descripcion": "Soluciones digitales de alto impacto, tarjetas inteligentes NFC y diseño web.",
     "avatar_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80",
     "portada_url": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&auto=format&fit=crop&q=80",
-    "tema": "modern-dark",
+    "tema": "cyberpunk-matrix",
     "boton_whatsapp": "https://wa.me/528446041874",
     "boton_facebook": "https://www.facebook.com/gabriel.poot.40339?locale=es_LA",
     "boton_instagram": "https://www.instagram.com/its_gabriel_ap/",
@@ -32,7 +32,7 @@
     "password": "",
     "botones_adicionales": [],
     "custom_colors_active": false,
-    "fecha_actualizacion": "2026-11-21T14:10:22.753Z"
+    "fecha_actualizacion": "2026-11-21T14:18:07.337Z"
   },
   "tacos-el-pastor": {
     "id": "tacos-el-pastor",
@@ -100,21 +100,7 @@
     "botones_adicionales": [],
     "fecha_actualizacion": "2026-11-20T02:41:05.589Z",
     "google_rating": 4.4,
-    "google_total_reviews": 710,
-    "google_reviews": {
-      "rating_promedio": 4.4,
-      "total_reviews": 710,
-      "reviews": [
-        {
-          "autor": "Daniel Gibran Ulloa Cisneros",
-          "rating": 5,
-          "tiempo": "una semana atrás",
-          "isNew": true,
-          "comentario": "No conocía este lugar.\nVine por las promociones que salen en videos esperando algo bueno.\nQue grata sorpresa esta buenísimo 👏  la pasta Alfredo muy buena y la mixologia de mezcal esta genial.\nMuy buena atención en todo momento pidan los atienda Alejandro.\nExcelente volvería a venir."
-        }
-      ],
-      "ultima_actualizacion": "2026-11-21T14:13:10.433Z"
-    }
+    "google_total_reviews": 709
   },
   "barbacoasofi": {
     "id": "barbacoasofi",
