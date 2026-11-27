@@ -100,7 +100,21 @@
     "botones_adicionales": [],
     "fecha_actualizacion": "2026-11-20T02:41:05.589Z",
     "google_rating": 4.4,
-    "google_total_reviews": 709
+    "google_total_reviews": 717,
+    "google_reviews": {
+      "rating_promedio": 4.4,
+      "total_reviews": 717,
+      "reviews": [
+        {
+          "autor": "Daniel Gibran Ulloa Cisneros",
+          "rating": 5,
+          "tiempo": "2 semanas atrás",
+          "isNew": true,
+          "comentario": "No conocía este lugar.\nVine por las promociones que salen en videos esperando algo bueno.\nQue grata sorpresa esta buenísimo 👏  la pasta Alfredo muy buena y la mixologia de mezcal esta genial.\nMuy buena atención en todo momento pidan los atienda Alejandro.\nExcelente volvería a venir."
+        }
+      ],
+      "ultima_actualizacion": "2026-11-27T19:56:30.974Z"
+    }
   },
   "barbacoasofi": {
     "id": "barbacoasofi",
@@ -243,6 +257,7 @@
     "password": "D0bl32.157",
     "botones_adicionales": [],
     "custom_colors_active": false,
-    "fecha_actualizacion": "2026-11-27T19:53:39.815Z"
+    "fecha_actualizacion": "2026-11-27T19:53:39.815Z",
+    "google_rating": 4.8
   }
 }
