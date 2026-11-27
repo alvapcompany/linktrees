@@ -235,7 +235,7 @@
     "color_btn_whatsapp": "#25d366",
     "color_btn_instagram": "#e1306c",
     "color_btn_facebook": "#1877f2",
-    "color_btn_tiktok": "#fe2c55",
+    "color_btn_tiktok": "#000000",
     "color_btn_ubicacion": "#ea4335",
     "color_btn_extra": "#eab308",
     "estilo_botones": "border_glow",
@@ -243,6 +243,6 @@
     "password": "D0bl32.157",
     "botones_adicionales": [],
     "custom_colors_active": false,
-    "fecha_actualizacion": "2026-11-27T20:01:52.821Z"
+    "fecha_actualizacion": "2026-11-27T20:03:33.702Z"
   }
 }
