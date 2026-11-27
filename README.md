@@ -23,6 +23,7 @@ Plataforma central para crear, previsualizar, modificar y desplegar **Linktrees 
 | **(barbacoasofi)** | `barbacoasofi` | [barbacoasofi](https://github.com/alvapcompany/barbacoasofi) | [Abrir Linktree](https://alvapcompany.github.io/barbacoasofi/) | [Ver Dashboard](https://alvapcompany.github.io/barbacoasofi/dashboard.html) | [Editar](https://alvapcompany.github.io/linktrees/admin/?id=barbacoasofi) |
 | **Daniel Aleman** | `daniel-aleman` | [daniel-aleman](https://github.com/alvapcompany/daniel-aleman) | [Abrir Linktree](https://alvapcompany.github.io/daniel-aleman/) | [Ver Dashboard](https://alvapcompany.github.io/daniel-aleman/dashboard.html) | [Editar](https://alvapcompany.github.io/linktrees/admin/?id=daniel-aleman) |
 | **RAUL** | `raul-dj` | [raul-dj](https://github.com/alvapcompany/raul-dj) | [Abrir Linktree](https://alvapcompany.github.io/raul-dj/) | [Ver Dashboard](https://alvapcompany.github.io/raul-dj/dashboard.html) | [Editar](https://alvapcompany.github.io/linktrees/admin/?id=raul-dj) |
+| **Doble2** | `doble2` | [Doble2](https://github.com/alvapcompany/Doble2) | [Abrir Linktree](https://alvapcompany.github.io/Doble2/) | [Ver Dashboard](https://alvapcompany.github.io/Doble2/dashboard.html) | [Editar](https://alvapcompany.github.io/linktrees/admin/?id=doble2) |
 
 ---
 
