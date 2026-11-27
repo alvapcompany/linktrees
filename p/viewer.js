@@ -305,6 +305,18 @@
       });
     }
 
+    if (b.boton_tiktok) {
+      buttons.push({
+        id: "tiktok",
+        title: "TikTok Oficial",
+        subtitle: "Videos cortos y tendencias",
+        url: b.boton_tiktok,
+        icon: "fab fa-tiktok",
+        customClass: "icon-tiktok",
+        customColor: b.color_btn_tiktok || "#FE2C55"
+      });
+    }
+
     if (b.boton_ubicacion) {
       buttons.push({
         id: "ubicacion",

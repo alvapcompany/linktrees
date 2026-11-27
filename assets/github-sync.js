@@ -993,13 +993,14 @@ Cada repositorio creado o sincronizado desde el Panel Admin contiene:
               <th>WhatsApp</th>
               <th>Instagram</th>
               <th>Facebook</th>
+              <th>TikTok</th>
               <th>Google Maps</th>
               <th>Otro enlace</th>
               <th>Reseñas Google</th>
             </tr>
           </thead>
           <tbody id="dailyMetricsTableBody">
-            <tr><td colspan="12" style="text-align: center; padding: 20px; color: #9ca3af;">Cargando registros...</td></tr>
+            <tr><td colspan="13" style="text-align: center; padding: 20px; color: #9ca3af;">Cargando registros...</td></tr>
           </tbody>
         </table>
       </div>

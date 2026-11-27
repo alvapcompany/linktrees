@@ -626,7 +626,7 @@ function renderDailyMetricsTable(rows) {
   if (!tbody) return;
 
   if (!rows || rows.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; padding: 24px; color: #9ca3af;">No hay vistas o clics registrados en el periodo seleccionado.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="13" style="text-align: center; padding: 24px; color: #9ca3af;">No hay vistas o clics registrados en el periodo seleccionado.</td></tr>`;
     return;
   }
 
@@ -636,6 +636,7 @@ function renderDailyMetricsTable(rows) {
     const cWa = sumBtnAliases(r.clicks_by_button, ["whatsapp", "btn_whatsapp"]);
     const cIg = sumBtnAliases(r.clicks_by_button, ["instagram", "btn_instagram"]);
     const cFb = sumBtnAliases(r.clicks_by_button, ["facebook", "btn_facebook"]);
+    const cTk = sumBtnAliases(r.clicks_by_button, ["tiktok", "btn_tiktok"]);
     const cMaps = sumBtnAliases(r.clicks_by_button, ["ubicacion", "btn_ubicacion", "maps"]);
     const cExtra = sumBtnAliases(r.clicks_by_button, ["extra", "btn_extra"]);
     const cReviews = sumBtnAliases(r.clicks_by_button, ["google_reviews", "google_reviews_badge", "btn_google_review"]);
@@ -651,6 +652,7 @@ function renderDailyMetricsTable(rows) {
         <td>${cWa}</td>
         <td>${cIg}</td>
         <td>${cFb}</td>
+        <td>${cTk}</td>
         <td>${cMaps}</td>
         <td>${cExtra}</td>
         <td>${cReviews}</td>
@@ -697,7 +699,7 @@ window.setCustomDashboardDate = function (dateStr) {
 
 window.exportDailyTableCsv = function () {
   const rows = (window.__lastDailyRows || []).slice().reverse();
-  const headers = ["Fecha", "Semana", "Mes", "Negocio", "Vistas", "Clics Totales", "CTR", "WhatsApp", "Instagram", "Facebook", "Google Maps", "Enlace Extra", "Insignia Google"];
+  const headers = ["Fecha", "Semana", "Mes", "Negocio", "Vistas", "Clics Totales", "CTR", "WhatsApp", "Instagram", "Facebook", "TikTok", "Google Maps", "Enlace Extra", "Insignia Google"];
   const lines = [headers.join(",")];
 
   rows.forEach(r => {
@@ -713,6 +715,7 @@ window.exportDailyTableCsv = function () {
       sumBtnAliases(r.clicks_by_button, ["whatsapp", "btn_whatsapp"]),
       sumBtnAliases(r.clicks_by_button, ["instagram", "btn_instagram"]),
       sumBtnAliases(r.clicks_by_button, ["facebook", "btn_facebook"]),
+      sumBtnAliases(r.clicks_by_button, ["tiktok", "btn_tiktok"]),
       sumBtnAliases(r.clicks_by_button, ["ubicacion", "btn_ubicacion", "maps"]),
       sumBtnAliases(r.clicks_by_button, ["extra", "btn_extra"]),
       sumBtnAliases(r.clicks_by_button, ["google_reviews", "google_reviews_badge", "btn_google_review"])
@@ -800,6 +803,16 @@ function buildChannelsAnalytics(metrics) {
       url: b.boton_facebook,
       icon: "fab fa-facebook-f",
       color: b.color_btn_facebook || "#1877F2"
+    });
+  }
+  if (b.boton_tiktok) {
+    definitions.push({
+      id: "tiktok",
+      aliases: ["tiktok", "btn_tiktok"],
+      label: "TikTok",
+      url: b.boton_tiktok,
+      icon: "fab fa-tiktok",
+      color: b.color_btn_tiktok || "#FE2C55"
     });
   }
   if (b.boton_ubicacion) {
@@ -1403,6 +1416,7 @@ window.saveClientDesign = async function (opts = {}) {
     if (buttonColors.whatsapp) businessData.color_btn_whatsapp = buttonColors.whatsapp;
     if (buttonColors.instagram) businessData.color_btn_instagram = buttonColors.instagram;
     if (buttonColors.facebook) businessData.color_btn_facebook = buttonColors.facebook;
+    if (buttonColors.tiktok) businessData.color_btn_tiktok = buttonColors.tiktok;
     if (buttonColors.ubicacion) businessData.color_btn_ubicacion = buttonColors.ubicacion;
     if (buttonColors.extra) businessData.color_btn_extra = buttonColors.extra;
     if (Array.isArray(businessData.botones_adicionales)) {
@@ -1474,6 +1488,7 @@ window.saveClientDesign = async function (opts = {}) {
           if (buttonColors.whatsapp) next.color_btn_whatsapp = buttonColors.whatsapp;
           if (buttonColors.instagram) next.color_btn_instagram = buttonColors.instagram;
           if (buttonColors.facebook) next.color_btn_facebook = buttonColors.facebook;
+          if (buttonColors.tiktok) next.color_btn_tiktok = buttonColors.tiktok;
           if (buttonColors.ubicacion) next.color_btn_ubicacion = buttonColors.ubicacion;
           if (buttonColors.extra) next.color_btn_extra = buttonColors.extra;
           if (Array.isArray(next.botones_adicionales)) {

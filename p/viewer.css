@@ -232,6 +232,7 @@ body {
 .icon-whatsapp { background: linear-gradient(135deg, #25D366, #128C7E); }
 .icon-facebook { background: linear-gradient(135deg, #1877F2, #0d5dbb); }
 .icon-instagram { background: linear-gradient(135deg, #833AB4, #FD1D1D, #FCAF45); }
+.icon-tiktok { background: linear-gradient(135deg, #25F4EE, #FE2C55); }
 .icon-ubicacion { background: linear-gradient(135deg, #EA4335, #c5221f); }
 .icon-extra { background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); }
 

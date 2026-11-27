@@ -245,6 +245,7 @@ function selectBusiness(id) {
   document.getElementById("btnWhatsapp").value = b.boton_whatsapp || "";
   document.getElementById("btnFacebook").value = b.boton_facebook || "";
   document.getElementById("btnInstagram").value = b.boton_instagram || "";
+  if (document.getElementById("btnTiktok")) document.getElementById("btnTiktok").value = b.boton_tiktok || "";
   document.getElementById("btnUbicacion").value = b.boton_ubicacion || "";
   document.getElementById("btnExtraLabel").value = b.boton_extra_label || "";
   document.getElementById("btnExtraUrl").value = b.boton_extra_url || "";
@@ -253,6 +254,7 @@ function selectBusiness(id) {
   if (document.getElementById("btnWhatsappColor")) document.getElementById("btnWhatsappColor").value = b.color_btn_whatsapp || "#25D366";
   if (document.getElementById("btnInstagramColor")) document.getElementById("btnInstagramColor").value = b.color_btn_instagram || "#E1306C";
   if (document.getElementById("btnFacebookColor")) document.getElementById("btnFacebookColor").value = b.color_btn_facebook || "#1877F2";
+  if (document.getElementById("btnTiktokColor")) document.getElementById("btnTiktokColor").value = b.color_btn_tiktok || "#FE2C55";
   if (document.getElementById("btnUbicacionColor")) document.getElementById("btnUbicacionColor").value = b.color_btn_ubicacion || "#EA4335";
   if (document.getElementById("btnExtraColor")) document.getElementById("btnExtraColor").value = b.color_btn_extra || "#eab308";
   if (document.getElementById("estiloBotones")) document.getElementById("estiloBotones").value = b.estilo_botones || "icon_only";
@@ -544,6 +546,7 @@ function getFormData() {
     boton_whatsapp: document.getElementById("btnWhatsapp").value || "",
     boton_facebook: document.getElementById("btnFacebook").value || "",
     boton_instagram: document.getElementById("btnInstagram").value || "",
+    boton_tiktok: document.getElementById("btnTiktok") ? (document.getElementById("btnTiktok").value || "") : "",
     boton_ubicacion: document.getElementById("btnUbicacion").value || "",
     boton_extra_label: document.getElementById("btnExtraLabel").value || "",
     boton_extra_url: document.getElementById("btnExtraUrl").value || "",
@@ -552,6 +555,7 @@ function getFormData() {
     color_btn_whatsapp: document.getElementById("btnWhatsappColor") ? document.getElementById("btnWhatsappColor").value : "#25D366",
     color_btn_instagram: document.getElementById("btnInstagramColor") ? document.getElementById("btnInstagramColor").value : "#E1306C",
     color_btn_facebook: document.getElementById("btnFacebookColor") ? document.getElementById("btnFacebookColor").value : "#1877F2",
+    color_btn_tiktok: document.getElementById("btnTiktokColor") ? document.getElementById("btnTiktokColor").value : "#FE2C55",
     color_btn_ubicacion: document.getElementById("btnUbicacionColor") ? document.getElementById("btnUbicacionColor").value : "#EA4335",
     color_btn_extra: document.getElementById("btnExtraColor") ? document.getElementById("btnExtraColor").value : "#eab308",
     estilo_botones: document.getElementById("estiloBotones") ? document.getElementById("estiloBotones").value : "icon_only",
@@ -598,6 +602,9 @@ function updateLivePreview() {
   }
   if (data.boton_facebook) {
     buttons.push({ id: "facebook", label: "Facebook", sub: "Comunidad oficial", icon: "fab fa-facebook-f", color: data.color_btn_facebook || "#1877F2" });
+  }
+  if (data.boton_tiktok) {
+    buttons.push({ id: "tiktok", label: "TikTok", sub: "Videos y contenido", icon: "fab fa-tiktok", color: data.color_btn_tiktok || "#FE2C55" });
   }
   if (data.boton_ubicacion) {
     buttons.push({ id: "ubicacion", label: "Google Maps", sub: "Ver ubicación en GPS", icon: "fas fa-map-marker-alt", color: data.color_btn_ubicacion || "#EA4335" });
@@ -1034,6 +1041,7 @@ window.createNewBusinessId = function () {
     boton_whatsapp: "https://wa.me/5215500000000",
     boton_facebook: "",
     boton_instagram: "",
+    boton_tiktok: "",
     boton_ubicacion: "",
     boton_extra_label: "",
     boton_extra_url: "",
