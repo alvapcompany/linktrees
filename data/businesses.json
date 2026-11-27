@@ -221,7 +221,7 @@
     "categoria": "Comercio Local",
     "descripcion": "Venta de Gorras , Perfumes y mas.",
     "avatar_url": "https://cdn.jsdelivr.net/gh/alvapcompany/imagenes@main/logos/doble2.webp",
-    "portada_url": "https://cdn.jsdelivr.net/gh/alvapcompany/imagenes@main/portadas/doble2.webp",
+    "portada_url": "https://cdn.jsdelivr.net/gh/alvapcompany/imagenes@main/portadas/doble2-portada.webp",
     "tema": "cloud-minimal",
     "boton_whatsapp": "https://api.whatsapp.com/message/G2HV354MW535K1?autoload=1&app_absent=0",
     "boton_facebook": "https://www.facebook.com/people/Doble-2/61563512818055/?mibextid=wwXIfr&rdid=1JX1o1mQk76mq5HN&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1C3MtNnZ2b%2F%3Fmibextid%3DwwXIfr",
@@ -243,6 +243,6 @@
     "password": "D0bl32.157",
     "botones_adicionales": [],
     "custom_colors_active": false,
-    "fecha_actualizacion": "2026-11-27T19:58:54.578Z"
+    "fecha_actualizacion": "2026-11-27T20:01:52.821Z"
   }
 }
