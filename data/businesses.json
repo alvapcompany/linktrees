@@ -100,21 +100,7 @@
     "botones_adicionales": [],
     "fecha_actualizacion": "2026-11-20T02:41:05.589Z",
     "google_rating": 4.4,
-    "google_total_reviews": 717,
-    "google_reviews": {
-      "rating_promedio": 4.4,
-      "total_reviews": 717,
-      "reviews": [
-        {
-          "autor": "Daniel Gibran Ulloa Cisneros",
-          "rating": 5,
-          "tiempo": "2 semanas atrás",
-          "isNew": true,
-          "comentario": "No conocía este lugar.\nVine por las promociones que salen en videos esperando algo bueno.\nQue grata sorpresa esta buenísimo 👏  la pasta Alfredo muy buena y la mixologia de mezcal esta genial.\nMuy buena atención en todo momento pidan los atienda Alejandro.\nExcelente volvería a venir."
-        }
-      ],
-      "ultima_actualizacion": "2026-11-27T05:37:19.587Z"
-    }
+    "google_total_reviews": 709
   },
   "barbacoasofi": {
     "id": "barbacoasofi",
@@ -222,5 +208,39 @@
     "password": "RAUL1234.",
     "botones_adicionales": [],
     "fecha_actualizacion": "2026-11-19T13:24:35.592Z"
+  },
+  "doble2": {
+    "id": "doble2",
+    "github_repo": "Doble2",
+    "gas_url": "https://script.google.com/macros/s/AKfycbw620it97TS0k7YnodKowQj2hKxnSrMNNiiWr-WxfTRNC-IhikBv0RD-kpWtHwGaik6Xg/exec",
+    "deploy_individual_repo": true,
+    "repo_url": "https://github.com/alvapcompany/Doble2",
+    "pages_url": "https://alvapcompany.github.io/Doble2/",
+    "dashboard_url": "https://alvapcompany.github.io/Doble2/dashboard.html",
+    "nombre_negocio": "Doble2",
+    "categoria": "Comercio Local",
+    "descripcion": "Venta de Gorras , Perfumes y mas.",
+    "avatar_url": "https://cdn.jsdelivr.net/gh/alvapcompany/imagenes@main/logos/doble2.webp",
+    "portada_url": "https://cdn.jsdelivr.net/gh/alvapcompany/imagenes@main/portadas/doble2.webp",
+    "tema": "cloud-minimal",
+    "boton_whatsapp": "https://api.whatsapp.com/message/G2HV354MW535K1?autoload=1&app_absent=0",
+    "boton_facebook": "https://www.facebook.com/people/Doble-2/61563512818055/?mibextid=wwXIfr&rdid=1JX1o1mQk76mq5HN&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1C3MtNnZ2b%2F%3Fmibextid%3DwwXIfr",
+    "boton_instagram": "",
+    "boton_ubicacion": "https://www.google.com/maps/place/25%C2%B025'01.1%22N+100%C2%B058'46.2%22W/@25.4169722,-100.9795,17z/data=!3m1!4b1!4m4!3m3!8m2!3d25.4169722!4d-100.9795?hl=es&entry=ttu&g_ep=EgoyMDI2MTEyMy4wIKXMDSoASAFQAw%3D%3D",
+    "boton_extra_label": "Tiktok",
+    "boton_extra_url": "https://www.tiktok.com/@doble2614?_r=1&_t=ZS-9BlK2pVnt6z",
+    "color_primario": "#ffffff",
+    "color_acento": "#000000",
+    "color_btn_whatsapp": "#25d366",
+    "color_btn_instagram": "#e1306c",
+    "color_btn_facebook": "#1877f2",
+    "color_btn_ubicacion": "#ea4335",
+    "color_btn_extra": "#eab308",
+    "estilo_botones": "border_glow",
+    "link_google_negocio": "",
+    "password": "D0bl32.157",
+    "botones_adicionales": [],
+    "custom_colors_active": false,
+    "fecha_actualizacion": "2026-11-27T19:48:26.355Z"
   }
 }
